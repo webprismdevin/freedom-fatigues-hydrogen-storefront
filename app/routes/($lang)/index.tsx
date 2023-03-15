@@ -10,6 +10,7 @@ import type {
   ProductConnection,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
+import {sanity} from '~/lib/sanity';
 
 interface HomeSeoData {
   shop: {
@@ -46,12 +47,19 @@ export async function loader({params, context}: LoaderArgs) {
     hero: CollectionHero;
     shop: HomeSeoData;
   }>(HOMEPAGE_SEO_QUERY, {
-    variables: {handle: 'freestyle'},
+    variables: {handle: 'new-releases'},
   });
+
+  const sanityHero = await sanity.fetch(`
+    *[_type == "home"][0]
+  `);
+
 
   return defer({
     shop,
-    primaryHero: hero,
+    sanityHero,
+    // primaryHero: hero,
+    primaryHero: null,
     // These different queries are separated to illustrate how 3rd party content
     // fetching can be optimized for both above and below the fold.
     featuredProducts: context.storefront.query<{
