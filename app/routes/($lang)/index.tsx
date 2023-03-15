@@ -11,6 +11,7 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
 import {sanity} from '~/lib/sanity';
+import HomeHero from '~/components/HomeHero';
 
 interface HomeSeoData {
   shop: {
@@ -50,14 +51,13 @@ export async function loader({params, context}: LoaderArgs) {
     variables: {handle: 'new-releases'},
   });
 
-  const sanityHero = await sanity.fetch(`
+  const sanityHome = await sanity.fetch(`
     *[_type == "home"][0]
   `);
 
-
   return defer({
     shop,
-    sanityHero,
+    sanityHome,
     // primaryHero: hero,
     primaryHero: null,
     // These different queries are separated to illustrate how 3rd party content
@@ -111,6 +111,7 @@ export async function loader({params, context}: LoaderArgs) {
 
 export default function Homepage() {
   const {
+    sanityHome,
     primaryHero,
     secondaryHero,
     tertiaryHero,
@@ -130,6 +131,7 @@ export default function Homepage() {
 
   return (
     <>
+      {sanityHome && <HomeHero data={sanityHome.hero} />}
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
@@ -250,7 +252,7 @@ export const HOMEPAGE_FEATURED_PRODUCTS_QUERY = `#graphql
   ${PRODUCT_CARD_FRAGMENT}
   query homepageFeaturedProducts($country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
-    products(first: 8) {
+    products(first: 8, sortKey: BEST_SELLING) {
       nodes {
         ...ProductCard
       }

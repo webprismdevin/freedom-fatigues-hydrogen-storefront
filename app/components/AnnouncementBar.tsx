@@ -18,8 +18,6 @@ export default function AnnouncementBar({data: announcements}: any) {
     return () => clearInterval(interval);
   }, [page]);
 
-  console.log(announcements);
-
   return (
     <div className="h-12 overflow-hidden">
       <div
