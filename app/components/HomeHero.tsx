@@ -1,7 +1,7 @@
 import {urlFor} from '~/lib/sanity';
 
 export default function HomeHero({data}: any) {
-  console.log(data);
+  // console.log(data);
   const content = data.content[0];
   const image = content.image;
 

@@ -31,10 +31,14 @@ import type {LayoutData} from '../root';
 export function Layout({
   children,
   layout,
+  settings,
 }: {
   children: React.ReactNode;
   layout: LayoutData;
+  settings: any;
 }) {
+  console.log(settings);
+
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -43,10 +47,7 @@ export function Layout({
             Skip to content
           </a>
         </div>
-        <Header
-          title={layout?.shop.name ?? 'Hydrogen'}
-          menu={layout?.headerMenu}
-        />
+        <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}
         </main>
@@ -56,7 +57,7 @@ export function Layout({
   );
 }
 
-function Header({title, menu}: {title: string; menu?: EnhancedMenu}) {
+function Header({title, menu}: {title: string; menu?: any}) {
   const isHome = useIsHomePath();
 
   const {
@@ -251,7 +252,7 @@ function DesktopHeader({
 }: {
   isHome: boolean;
   openCart: () => void;
-  menu?: EnhancedMenu;
+  menu?: any;
   title: string;
 }) {
   const params = useParams();
@@ -273,19 +274,23 @@ function DesktopHeader({
         </Link>
         <nav className="flex gap-8">
           {/* Top level menu items */}
-          {(menu?.items || []).map((item) => (
-            <Link
-              key={item.id}
-              to={item.to}
-              target={item.target}
-              prefetch="intent"
-              className={({isActive}) =>
-                isActive ? 'pb-1 border-b -mb-px' : 'pb-1'
-              }
-            >
-              {item.title}
-            </Link>
-          ))}
+          {(menu || []).map((item: any) => {
+            console.log(item);
+
+            return (
+              <Link
+                key={item._key}
+                to="/"
+                target="_parent"
+                prefetch="intent"
+                className={({isActive}) =>
+                  isActive ? 'pb-1 border-b -mb-px' : 'pb-1'
+                }
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
       </div>
       <div className="flex items-center gap-1">

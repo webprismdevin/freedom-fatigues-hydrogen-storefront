@@ -32,7 +32,7 @@ import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import AnnouncementBar from './components/AnnouncementBar';
-import { sanity } from './lib/sanity';
+import {getSiteSettings, sanity} from './lib/sanity';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.layout?.shop?.name,
@@ -55,6 +55,10 @@ export const links: LinksFunction = () => {
     },
     {
       rel: 'preconnect',
+      href: 'https://cdn.sanity.io',
+    },
+    {
+      rel: 'preconnect',
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
@@ -73,9 +77,11 @@ export async function loader({context}: LoaderArgs) {
   ]);
 
   const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
+  const settings = await getSiteSettings();
 
   return defer({
     announcements,
+    settings,
     layout,
     selectedLocale: context.storefront.i18n,
     cart: cartId ? getCart(context, cartId) : undefined,
@@ -103,6 +109,7 @@ export default function App() {
       <body>
         <AnnouncementBar data={data.announcements.announcements} />
         <Layout
+          settings={data.settings}
           layout={data.layout as LayoutData}
           key={`${locale.language}-${locale.country}`}
         >
