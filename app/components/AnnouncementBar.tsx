@@ -23,19 +23,17 @@ export default function AnnouncementBar({data: announcements}: any) {
       <div
         style={{
           position: 'relative',
+          zIndex: 1,
         }}
       >
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           <motion.div
-            style={{
-              position: 'absolute',
-            }}
             initial={{opacity: 0, x: -1000}}
             animate={{opacity: 1, x: 0, background: announcements[index].color}}
             exit={{opacity: 0, x: 1000}}
             custom={direction}
             key={page}
-            className="flex items-center justify-center w-full h-12 text-white"
+            className="absolute flex h-12 w-full items-center justify-center text-white"
           >
             <span>{announcements[index].title}</span>
           </motion.div>

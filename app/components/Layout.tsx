@@ -27,6 +27,8 @@ import {Suspense, useEffect, useMemo} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
+import {AnimatePresence, useCycle, motion} from 'framer-motion';
+import {urlFor} from '~/lib/sanity';
 
 export function Layout({
   children,
@@ -37,11 +39,9 @@ export function Layout({
   layout: LayoutData;
   settings: any;
 }) {
-  console.log(settings);
-
   return (
     <>
-      <div className="flex flex-col min-h-screen">
+      <div className="flex min-h-screen flex-col">
         <div className="">
           <a href="#mainContent" className="sr-only">
             Skip to content
@@ -153,7 +153,7 @@ function MenuMobileNav({
             target={item.target}
             onClick={onClose}
             className={({isActive}) =>
-              isActive ? 'pb-1 border-b -mb-px' : 'pb-1'
+              isActive ? '-mb-px border-b pb-1' : 'pb-1'
             }
           >
             <Text as="span" size="copy">
@@ -186,14 +186,14 @@ function MobileHeader({
       role="banner"
       className={`${
         isHome
-          ? 'bg-primary/80 dark:bg-contrast/60 text-contrast dark:text-primary shadow-darkHeader'
+          ? 'bg-primary/80 text-contrast shadow-darkHeader dark:bg-contrast/60 dark:text-primary'
           : 'bg-contrast/80 text-primary'
-      } flex lg:hidden items-center h-nav sticky backdrop-blur-lg z-40 top-0 justify-between w-full leading-none gap-4 px-4 md:px-8`}
+      } sticky top-0 z-40 flex h-nav w-full items-center justify-between gap-4 px-4 leading-none backdrop-blur-lg md:px-8 lg:hidden`}
     >
-      <div className="flex items-center justify-start w-full gap-4">
+      <div className="flex w-full items-center justify-start gap-4">
         <button
           onClick={openMenu}
-          className="relative flex items-center justify-center w-8 h-8"
+          className="relative flex h-8 w-8 items-center justify-center"
         >
           <IconMenu />
         </button>
@@ -204,7 +204,7 @@ function MobileHeader({
         >
           <button
             type="submit"
-            className="relative flex items-center justify-center w-8 h-8"
+            className="relative flex h-8 w-8 items-center justify-center"
           >
             <IconSearch />
           </button>
@@ -223,18 +223,23 @@ function MobileHeader({
       </div>
 
       <Link
-        className="flex items-center self-stretch leading-[3rem] md:leading-[4rem] justify-center flex-grow w-full h-full"
+        className="flex h-full w-full flex-grow items-center justify-center self-stretch leading-[3rem] md:leading-[4rem] overflow-hidden"
         to="/"
       >
-        <Heading className="font-bold text-center" as={isHome ? 'h1' : 'h2'}>
-          {title}
-        </Heading>
+        <div>
+          <img
+            src={'/branding/logo_white.png'}
+            alt="logo"
+            height={84}
+            width={84}
+          />
+        </div>
       </Link>
 
-      <div className="flex items-center justify-end w-full gap-4">
+      <div className="flex w-full items-center justify-end gap-4">
         <Link
           to="/account"
-          className="relative flex items-center justify-center w-8 h-8"
+          className="relative flex h-8 w-8 items-center justify-center"
         >
           <IconAccount />
         </Link>
@@ -257,38 +262,51 @@ function DesktopHeader({
 }) {
   const params = useParams();
   const {y} = useWindowScroll();
+
   return (
     <header
       role="banner"
+      style={{position: 'relative'}}
       className={`${
         isHome
-          ? 'bg-primary/80 dark:bg-contrast/60 text-contrast dark:text-primary shadow-darkHeader'
+          ? 'bg-primary/80 text-contrast shadow-darkHeader dark:bg-contrast/60 dark:text-primary'
           : 'bg-contrast/80 text-primary'
       } ${
         !isHome && y > 50 && ' shadow-lightHeader'
-      } hidden h-nav lg:flex items-center sticky transition duration-300 backdrop-blur-lg z-40 top-0 justify-between w-full leading-none gap-8 px-12 py-8`}
+      } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none backdrop-blur-lg transition duration-300 lg:flex`}
     >
-      <div className="flex gap-12">
-        <Link className="font-bold" to="/" prefetch="intent">
-          {title}
+      <div className="flex items-center gap-12">
+        <Link to="/" prefetch="intent">
+          <div>
+            <img
+              src={'/branding/logo_white.png'}
+              alt="logo"
+              height={96}
+              width={96}
+            />
+          </div>
         </Link>
-        <nav className="flex gap-8">
+        <nav className="flex gap-4">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
             console.log(item);
-
             return (
-              <Link
-                key={item._key}
-                to="/"
-                target="_parent"
-                prefetch="intent"
-                className={({isActive}) =>
-                  isActive ? 'pb-1 border-b -mb-px' : 'pb-1'
-                }
-              >
-                {item.title}
-              </Link>
+              <div key={item._key}>
+                {item.collectionLinks && <MegaMenu item={item} />}
+                {item._type === 'linkInternal' && (
+                  <Link
+                    key={item._key}
+                    to={`/collections/${item.slug}`}
+                    target="_parent"
+                    prefetch="intent"
+                    className={({isActive}) =>
+                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                    }
+                  >
+                    <LinkTitle text={item.title} />
+                  </Link>
+                )}
+              </div>
             );
           })}
         </nav>
@@ -312,20 +330,92 @@ function DesktopHeader({
           />
           <button
             type="submit"
-            className="relative flex items-center justify-center w-8 h-8 focus:ring-primary/5"
+            className="relative flex h-8 w-8 items-center justify-center focus:ring-primary/5"
           >
             <IconSearch />
           </button>
         </Form>
         <Link
           to="/account"
-          className="relative flex items-center justify-center w-8 h-8 focus:ring-primary/5"
+          className="relative flex h-8 w-8 items-center justify-center focus:ring-primary/5"
         >
           <IconAccount />
         </Link>
         <CartCount isHome={isHome} openCart={openCart} />
       </div>
     </header>
+  );
+}
+
+function LinkTitle({text}: {text: string}) {
+  return <span className="font-bold uppercase">{text}</span>;
+}
+
+function MegaMenu({item}: {item: any}) {
+  const [open, cycleOpen] = useCycle(0, 1);
+  console.log(item.megaMenuFeatures, item.title);
+
+  return (
+    <div>
+      <div onMouseEnter={cycleOpen}>
+        <LinkTitle text={item.title} />
+      </div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            onMouseLeave={cycleOpen}
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            exit={{opacity: 0, y: 20}}
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: 'white',
+              color: 'black',
+            }}
+            className="flex items-center justify-between gap-8 px-12 py-8"
+          >
+            <ul>
+              {item.collectionLinks.map((link: any) => (
+                <li key={link._id} className="my-2">
+                  <Link
+                    to={`/collections/${link.slug}`}
+                    target="_parent"
+                    prefetch="intent"
+                    className={({isActive}) =>
+                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                    }
+                  >
+                    {link.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-center gap-8">
+              {item.megaMenuFeatures &&
+                item.megaMenuFeatures.map((feature: any) => (
+                  <div
+                    key={feature._key}
+                    className="relative grid place-items-center"
+                  >
+                    <img
+                      src={urlFor(feature.image)
+                        .height(128)
+                        .width(128)
+                        .quality(100)
+                        .url()}
+                      alt=""
+                    />
+                    <div className="absolute">{feature.title}</div>
+                  </div>
+                ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -371,9 +461,9 @@ function Badge({
         <div
           className={`${
             dark
-              ? 'text-primary bg-contrast dark:text-contrast dark:bg-primary'
-              : 'text-contrast bg-primary'
-          } absolute bottom-1 right-1 text-[0.625rem] font-medium subpixel-antialiased h-3 min-w-[0.75rem] flex items-center justify-center leading-none text-center rounded-full w-auto px-[0.125rem] pb-px`}
+              ? 'bg-contrast text-primary dark:bg-primary dark:text-contrast'
+              : 'bg-primary text-contrast'
+          } absolute bottom-1 right-1 flex h-3 w-auto min-w-[0.75rem] items-center justify-center rounded-full px-[0.125rem] pb-px text-center text-[0.625rem] font-medium leading-none subpixel-antialiased`}
         >
           <span>{count || 0}</span>
         </div>
@@ -385,14 +475,14 @@ function Badge({
   return isHydrated ? (
     <button
       onClick={openCart}
-      className="relative flex items-center justify-center w-8 h-8 focus:ring-primary/5"
+      className="relative flex h-8 w-8 items-center justify-center focus:ring-primary/5"
     >
       {BadgeCounter}
     </button>
   ) : (
     <Link
       to="/cart"
-      className="relative flex items-center justify-center w-8 h-8 focus:ring-primary/5"
+      className="relative flex h-8 w-8 items-center justify-center focus:ring-primary/5"
     >
       {BadgeCounter}
     </Link>
@@ -412,8 +502,8 @@ function Footer({menu}: {menu?: EnhancedMenu}) {
       divider={isHome ? 'none' : 'top'}
       as="footer"
       role="contentinfo"
-      className={`grid min-h-[25rem] items-start grid-flow-row w-full gap-6 py-8 px-6 md:px-8 lg:px-12 md:gap-8 lg:gap-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-${itemsCount}
-        bg-primary dark:bg-contrast dark:text-primary text-contrast overflow-hidden`}
+      className={`grid min-h-[25rem] w-full grid-flow-row grid-cols-1 items-start gap-6 py-8 px-6 md:grid-cols-2 md:gap-8 md:px-8 lg:gap-12 lg:px-12 lg:grid-cols-${itemsCount}
+        overflow-hidden bg-primary text-contrast dark:bg-contrast dark:text-primary`}
     >
       <FooterMenu menu={menu} />
       <CountrySelector />
@@ -469,7 +559,7 @@ function FooterMenu({menu}: {menu?: EnhancedMenu}) {
                 {item?.items?.length > 0 ? (
                   <div
                     className={`${
-                      open ? `max-h-48 h-fit` : `max-h-0 md:max-h-fit`
+                      open ? `h-fit max-h-48` : `max-h-0 md:max-h-fit`
                     } overflow-hidden transition-all duration-300`}
                   >
                     <Suspense data-comment="This suspense fixes a hydration bug in Disclosure.Panel with static prop">

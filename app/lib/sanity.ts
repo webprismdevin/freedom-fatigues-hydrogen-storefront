@@ -19,9 +19,20 @@ export async function getSiteSettings() {
     "menu": menu.links[] {
       ...,
       _type == "collectionGroup" => {
-        collectionLinks[]->
+        ...,
+        collectionLinks[]{
+          "title": displayTitle,
+          "slug": collection->store.slug.current,
+          collection-> {
+            "slug": store.slug.current,
+            "title": store.title,
+          }
+        }
       },
-      _type == "linkInternal" => @.reference->
+      _type == "linkInternal" => @.reference-> {
+        title,
+        "slug": slug.current
+      }
     }
   }`;
 

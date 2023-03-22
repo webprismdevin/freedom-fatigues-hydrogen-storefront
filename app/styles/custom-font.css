@@ -11,3 +11,23 @@
   font-style: italic;
   src: url('./fonts/IBMPlexSerif-TextItalic.woff2') format('woff2');
 }
+
+@font-face {
+  font-family: 'AvenirNext';
+  font-display: swap;
+  font-weight: normal;
+  src: url('./fonts/AvenirNextLTPro-Regular.otf') format('otf');
+}
+@font-face {
+  font-family: 'AvenirNext';
+  font-display: swap;
+  font-weight: normal;
+  font-style: italic;
+  src: url('./fonts/AvenirNextLTPro-It.otf') format('otf');
+}
+@font-face {
+  font-family: 'AvenirNext';
+  font-display: swap;
+  font-weight: bold;
+  src: url('./fonts/AvenirNextLTPro-Bold.otf') format('otf');
+}
