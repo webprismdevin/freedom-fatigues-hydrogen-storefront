@@ -30,15 +30,43 @@ export async function getSiteSettings() {
           }
         }
       },
-      _type == "linkInternal" => @.reference-> {
-        title,
-        "slug": slug.current
-      }
+      (_type == 'linkInternal') => {
+        ${LINK_INTERNAL}
+      },
     }
   }`;
 
   return sanity.fetch(query);
 }
+
+export const COLOR_THEME = groq`
+  'background': background.hex,
+  'text': text.hex,
+`;
+
+export const COLLECTION = groq`
+  _id,
+  colorTheme->{
+    ${COLOR_THEME}
+  },
+  "gid": store.gid,
+  "slug": "/collections/" + store.slug.current,
+  "title": store.title,
+  "vector": vector.asset->url,
+`;
+
+export const COLLECTION_GROUP = groq`
+  _key,
+  _type,
+  collectionLinks[]->{
+    _key,
+    ${COLLECTION}
+  },
+  collectionProducts->{
+    ${COLLECTION}
+  },
+  title,
+`;
 
 export const LINK_INTERNAL = groq`
   _key,

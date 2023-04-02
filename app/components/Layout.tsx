@@ -157,7 +157,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                   {item.collectionLinks.map((link) => (
                     <li key={link.slug}>
                       <Link
-                        to={`/collections/${link.slug}`}
+                        to={link.slug}
                         target={link.target}
                         onClick={onClose}
                         className={({isActive}) =>
@@ -174,10 +174,10 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
               </Disclosure.Panel>
             </Disclosure>
           )}
-          {item._type == 'linkInternal' && item.reference._ref !== 'home' && (
+          {item._type == 'linkInternal' && (
             <span className="block font-heading">
               <Link
-                to={`/collections/${item.slug}`}
+                to={item.slug}
                 target={item.target}
                 onClick={onClose}
                 className={({isActive}) =>
