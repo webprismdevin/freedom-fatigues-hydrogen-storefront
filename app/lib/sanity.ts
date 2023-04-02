@@ -18,17 +18,8 @@ export const urlFor = (source: string) => {
 export async function getSiteSettings() {
   const query = `*[_type == "settings"][0]{
     "menu": menu.links[] {
-      ...,
-      _type == "collectionGroup" => {
-        ...,
-        collectionLinks[]{
-          "title": displayTitle,
-          "slug": collection->store.slug.current,
-          collection-> {
-            "slug": store.slug.current,
-            "title": store.title,
-          }
-        }
+      (_type == 'collectionGroup') => {
+        ${COLLECTION_GROUP}
       },
       (_type == 'linkInternal') => {
         ${LINK_INTERNAL}
@@ -49,17 +40,19 @@ export const COLLECTION = groq`
   colorTheme->{
     ${COLOR_THEME}
   },
-  "gid": store.gid,
-  "slug": "/collections/" + store.slug.current,
-  "title": store.title,
-  "vector": vector.asset->url,
+  "gid": collection->store.gid,
+  "slug": "/collections/" + collection->store.slug.current,
+  "vector": collection->vector.asset->url,
 `;
 
 export const COLLECTION_GROUP = groq`
   _key,
   _type,
-  collectionLinks[]->{
+  ...,
+  collectionLinks[]{
     _key,
+    megaMenuFeatures,
+    "title": displayTitle,
     ${COLLECTION}
   },
   collectionProducts->{

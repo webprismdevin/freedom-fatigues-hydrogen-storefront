@@ -322,34 +322,19 @@ function DesktopHeader({
             return (
               <div key={item._key}>
                 {item.collectionLinks && <MegaMenu item={item} />}
-                {item._type === 'linkInternal' &&
-                  item.reference._ref !== 'home' && (
-                    <Link
-                      key={item._key}
-                      to={`/collections/${item.slug}`}
-                      target="_parent"
-                      prefetch="intent"
-                      className={({isActive}) =>
-                        isActive ? '-mb-px border-b pb-1' : 'pb-1'
-                      }
-                    >
-                      <LinkTitle text={item.title} />
-                    </Link>
-                  )}
-                {item._type === 'linkInternal' &&
-                  item.reference._ref === 'home' && (
-                    <Link
-                      key={item._key}
-                      to={`/`}
-                      target="_parent"
-                      prefetch="intent"
-                      className={({isActive}) =>
-                        isActive ? '-mb-px border-b pb-1' : 'pb-1'
-                      }
-                    >
-                      <LinkTitle text={item.title} />
-                    </Link>
-                  )}
+                {item._type === 'linkInternal' && (
+                  <Link
+                    key={item._key}
+                    to={item.slug}
+                    target="_parent"
+                    prefetch="intent"
+                    className={({isActive}) =>
+                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                    }
+                  >
+                    <LinkTitle text={item.title} />
+                  </Link>
+                )}
               </div>
             );
           })}
@@ -421,9 +406,9 @@ function MegaMenu({item}: {item: any}) {
           >
             <ul>
               {item.collectionLinks.map((link: any) => (
-                <li key={link._id} className="my-2">
+                <li key={link._key} className="my-2">
                   <Link
-                    to={`/collections/${link.slug}`}
+                    to={link.slug}
                     target="_parent"
                     prefetch="intent"
                     className={({isActive}) =>
