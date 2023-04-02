@@ -1,3 +1,8 @@
+@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
+@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224');
+@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224');
+@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-It.otf?v=1680451224');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -150,7 +155,7 @@ shop-pay-button {
   }
 
   .absolute-center {
-    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+    @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
   }
 
   .strike {
@@ -173,7 +178,7 @@ shop-pay-button {
     @apply relative flex items-center justify-center overflow-clip rounded;
     &::before {
       content: ' ';
-      @apply absolute top-0 left-0 z-10 block h-full w-full rounded shadow-border;
+      @apply absolute left-0 top-0 z-10 block h-full w-full rounded shadow-border;
     }
     img {
       @apply aspect-[inherit] w-full object-cover;
@@ -188,6 +193,6 @@ shop-pay-button {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

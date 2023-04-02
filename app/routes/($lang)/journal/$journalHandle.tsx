@@ -11,7 +11,7 @@ import {Blog} from '@shopify/hydrogen/storefront-api-types';
 import invariant from 'tiny-invariant';
 import {PageHeader, Section} from '~/components';
 import {ATTR_LOADING_EAGER} from '~/lib/const';
-import styles from '../../../styles/custom-font.css';
+// import styles from '../../../styles/custom-font.css';
 import type {SeoHandleFunction} from '@shopify/hydrogen';
 
 const BLOG_HANDLE = 'journal';
@@ -74,9 +74,9 @@ export const meta: MetaFunction = ({
   };
 };
 
-export const links: LinksFunction = () => {
-  return [{rel: 'stylesheet', href: styles}];
-};
+// export const links: LinksFunction = () => {
+//   // return [{rel: 'stylesheet', href: styles}];
+// };
 
 export default function Article() {
   const {article, formattedDate} = useLoaderData<typeof loader>();

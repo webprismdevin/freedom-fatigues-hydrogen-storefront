@@ -128,7 +128,12 @@ export function MenuDrawer({
   menu: EnhancedMenu;
 }) {
   return (
-    <Drawer open={isOpen} onClose={onClose} openFrom="left" heading="Menu">
+    <Drawer
+      open={isOpen}
+      onClose={onClose}
+      openFrom="left"
+      heading="Freedom Fatigues"
+    >
       <div className="grid">
         <MenuMobileNav menu={menu} onClose={onClose} />
       </div>
@@ -136,31 +141,56 @@ export function MenuDrawer({
   );
 }
 
-function MenuMobileNav({
-  menu,
-  onClose,
-}: {
-  menu: EnhancedMenu;
-  onClose: () => void;
-}) {
+function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
       {/* Top level menu items */}
-      {(menu?.items || []).map((item) => (
-        <span key={item.id} className="block">
-          <Link
-            to={item.to}
-            target={item.target}
-            onClick={onClose}
-            className={({isActive}) =>
-              isActive ? '-mb-px border-b pb-1' : 'pb-1'
-            }
-          >
-            <Text as="span" size="copy">
-              {item.title}
-            </Text>
-          </Link>
-        </span>
+      {(menu || []).map((item) => (
+        <div key={item._key}>
+          {item.collectionLinks && (
+            <Disclosure>
+              <Disclosure.Button className="pb-1 font-heading">
+                {item.title}
+              </Disclosure.Button>
+              <Disclosure.Panel>
+                <ul className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
+                  {item.collectionLinks.map((link) => (
+                    <li key={link.slug}>
+                      <Link
+                        to={`/collections/${link.slug}`}
+                        target={link.target}
+                        onClick={onClose}
+                        className={({isActive}) =>
+                          isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                        }
+                      >
+                        <Text as="span" size="copy">
+                          {link.title}
+                        </Text>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Disclosure.Panel>
+            </Disclosure>
+          )}
+          {item._type == 'linkInternal' && item.reference._ref !== 'home' && (
+            <span className="block font-heading">
+              <Link
+                to={`/collections/${item.slug}`}
+                target={item.target}
+                onClick={onClose}
+                className={({isActive}) =>
+                  isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                }
+              >
+                <Text as="span" size="copy">
+                  {item.title}
+                </Text>
+              </Link>
+            </span>
+          )}
+        </div>
       ))}
     </nav>
   );
@@ -223,7 +253,7 @@ function MobileHeader({
       </div>
 
       <Link
-        className="flex h-full w-full flex-grow items-center justify-center self-stretch leading-[3rem] md:leading-[4rem] overflow-hidden"
+        className="flex h-full w-full flex-grow items-center justify-center self-stretch overflow-hidden leading-[3rem] md:leading-[4rem]"
         to="/"
       >
         <div>
@@ -275,7 +305,7 @@ function DesktopHeader({
         !isHome && y > 50 && ' shadow-lightHeader'
       } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none backdrop-blur-lg transition duration-300 lg:flex`}
     >
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-12 font-heading">
         <Link to="/" prefetch="intent">
           <div>
             <img
@@ -289,23 +319,37 @@ function DesktopHeader({
         <nav className="flex gap-4">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
-            console.log(item);
             return (
               <div key={item._key}>
                 {item.collectionLinks && <MegaMenu item={item} />}
-                {item._type === 'linkInternal' && (
-                  <Link
-                    key={item._key}
-                    to={`/collections/${item.slug}`}
-                    target="_parent"
-                    prefetch="intent"
-                    className={({isActive}) =>
-                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
-                    }
-                  >
-                    <LinkTitle text={item.title} />
-                  </Link>
-                )}
+                {item._type === 'linkInternal' &&
+                  item.reference._ref !== 'home' && (
+                    <Link
+                      key={item._key}
+                      to={`/collections/${item.slug}`}
+                      target="_parent"
+                      prefetch="intent"
+                      className={({isActive}) =>
+                        isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                      }
+                    >
+                      <LinkTitle text={item.title} />
+                    </Link>
+                  )}
+                {item._type === 'linkInternal' &&
+                  item.reference._ref === 'home' && (
+                    <Link
+                      key={item._key}
+                      to={`/`}
+                      target="_parent"
+                      prefetch="intent"
+                      className={({isActive}) =>
+                        isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                      }
+                    >
+                      <LinkTitle text={item.title} />
+                    </Link>
+                  )}
               </div>
             );
           })}
@@ -353,17 +397,15 @@ function LinkTitle({text}: {text: string}) {
 
 function MegaMenu({item}: {item: any}) {
   const [open, cycleOpen] = useCycle(0, 1);
-  console.log(item.megaMenuFeatures, item.title);
-
   return (
     <div>
-      <div onMouseEnter={cycleOpen}>
+      <div onMouseEnter={() => cycleOpen()}>
         <LinkTitle text={item.title} />
       </div>
       <AnimatePresence>
         {open && (
           <motion.div
-            onMouseLeave={cycleOpen}
+            onMouseLeave={() => cycleOpen()}
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             exit={{opacity: 0, y: 20}}
@@ -502,7 +544,7 @@ function Footer({menu}: {menu?: EnhancedMenu}) {
       divider={isHome ? 'none' : 'top'}
       as="footer"
       role="contentinfo"
-      className={`grid min-h-[25rem] w-full grid-flow-row grid-cols-1 items-start gap-6 py-8 px-6 md:grid-cols-2 md:gap-8 md:px-8 lg:gap-12 lg:px-12 lg:grid-cols-${itemsCount}
+      className={`grid min-h-[25rem] w-full grid-flow-row grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-2 md:gap-8 md:px-8 lg:gap-12 lg:px-12 lg:grid-cols-${itemsCount}
         overflow-hidden bg-primary text-contrast dark:bg-contrast dark:text-primary`}
     >
       <FooterMenu menu={menu} />

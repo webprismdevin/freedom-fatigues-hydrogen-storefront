@@ -107,7 +107,10 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <AnnouncementBar data={data.announcements.announcements} />
+        <AnnouncementBar
+          interval={data.announcements.interval}
+          data={data.announcements.announcements}
+        />
         <Layout
           settings={data.settings}
           layout={data.layout as LayoutData}

@@ -18,6 +18,10 @@ module.exports = {
         notice: withOpacityValue('--color-accent'),
         shopPay: 'var(--color-shop-pay)',
       },
+      fontFamily: {
+        heading: ['Norwester-Regular', 'ui-sans-serif', 'system-ui'],
+        sans: ['Avenir Next LT Pro', 'ui-sans-serif', 'system-ui'],
+      },
       screens: {
         sm: '32em',
         md: '48em',
@@ -43,10 +47,6 @@ module.exports = {
       },
       width: {
         mobileGallery: 'calc(100vw - 3rem)',
-      },
-      fontFamily: {
-        sans: ['"AvenirNext"', 'ui-sans-serif'],
-        serif: ['"IBMPlexSerif"', 'Palatino', 'ui-serif'],
       },
       fontSize: {
         display: ['var(--font-size-display)', '1.1'],
