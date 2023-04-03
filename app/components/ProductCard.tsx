@@ -68,7 +68,7 @@ export function ProductCard({
           <div className="card-image aspect-[4/5] bg-primary/5">
             {image && (
               <Image
-                className="aspect-[4/5] w-full object-cover fadeIn"
+                className="fadeIn aspect-[4/5] w-full object-cover"
                 widths={[320]}
                 sizes="320px"
                 loaderOptions={{
@@ -85,19 +85,19 @@ export function ProductCard({
             <Text
               as="label"
               size="fine"
-              className="absolute top-0 right-0 m-4 text-right text-notice"
+              className="absolute right-0 top-0 m-4 text-right text-notice"
             >
               {cardLabel}
             </Text>
           </div>
-          <div className="grid gap-1">
+          <div className="grid grid-cols-3 gap-1">
             <Text
-              className="w-full overflow-hidden whitespace-nowrap text-ellipsis "
+              className="col-span-2 w-full overflow-hidden text-ellipsis capitalize"
               as="h3"
             >
               {product.title}
             </Text>
-            <div className="flex gap-4">
+            <div className="flex place-items-start justify-end gap-4">
               <Text className="flex gap-4">
                 <Money withoutTrailingZeros data={price!} />
                 {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
@@ -133,6 +133,15 @@ export function ProductCard({
       )}
     </div>
   );
+}
+
+export type ProductRating = {
+  rating: number;
+  reviewCount: number;
+};
+
+export function StarRating({data}: {data: ProductRating}) {
+  return <div>StarRating</div>;
 }
 
 function CompareAtPrice({

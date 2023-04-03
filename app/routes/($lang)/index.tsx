@@ -131,10 +131,10 @@ export default function Homepage() {
 
   return (
     <>
-      {sanityHome && <HomeHero data={sanityHome.hero} />}
+      {/* {sanityHome && <HomeHero data={sanityHome.hero} />}
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
-      )}
+      )} */}
 
       {featuredProducts && (
         <Suspense>
@@ -144,7 +144,7 @@ export default function Homepage() {
               return (
                 <ProductSwimlane
                   products={products.nodes}
-                  title="Featured Products"
+                  title="New Releases"
                   count={4}
                 />
               );
@@ -152,6 +152,24 @@ export default function Homepage() {
           </Await>
         </Suspense>
       )}
+
+      {/* free shipping free returns */}
+      <div className="bg-gray-100 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-base font-semibold uppercase tracking-wide text-indigo-600">
+              Free shipping &amp; returns
+            </h2>
+            <p className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Free shipping on all orders over $100
+            </p>
+            <p className="mt-4 text-lg text-gray-500">
+              We offer free shipping on all orders over $100. We also offer free
+              returns on all orders.
+            </p>
+          </div>
+        </div>
+      </div>
 
       {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
