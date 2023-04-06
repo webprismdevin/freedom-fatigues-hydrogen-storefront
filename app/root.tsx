@@ -25,7 +25,7 @@ import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
 
 import styles from './styles/app.css';
-import favicon from '../public/favicon.svg';
+import favicon from '../public/favicon.png';
 
 import {DEFAULT_LOCALE, parseMenu, type EnhancedMenu} from './lib/utils';
 import invariant from 'tiny-invariant';
@@ -61,7 +61,7 @@ export const links: LinksFunction = () => {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'icon', type: 'image/png', href: favicon},
   ];
 };
 
