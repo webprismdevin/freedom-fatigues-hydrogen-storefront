@@ -11,6 +11,7 @@ import {Text, Link, AddToCartButton} from '~/components';
 import {isDiscounted, isNewArrival} from '~/lib/utils';
 import {getProductPlaceholder} from '~/lib/placeholders';
 import type {MoneyV2, Product} from '@shopify/hydrogen/storefront-api-types';
+import StarRating from './StarRating';
 
 export function ProductCard({
   product,
@@ -109,6 +110,17 @@ export function ProductCard({
               </Text>
             </div>
           </div>
+          {/* for metafield captions later */}
+          <div>
+            <p className="text-sm text-slate-400">
+              Perfect for concealed carry
+            </p>
+            <p className="text-sm text-slate-400">Do elit proident.</p>
+          </div>
+        </div>
+        {/* star rating placeholder */}
+        <div>
+          <StarRating rating={5} count={100} />
         </div>
       </Link>
       {quickAdd && (
@@ -139,10 +151,6 @@ export type ProductRating = {
   rating: number;
   reviewCount: number;
 };
-
-export function StarRating({data}: {data: ProductRating}) {
-  return <div>StarRating</div>;
-}
 
 function CompareAtPrice({
   data,

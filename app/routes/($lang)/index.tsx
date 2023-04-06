@@ -12,6 +12,9 @@ import type {
 import {AnalyticsPageType} from '@shopify/hydrogen';
 import {sanity} from '~/lib/sanity';
 import HomeHero from '~/components/HomeHero';
+import ShippingAndReturns from '~/components/ShippingAndReturns';
+import SlideShow, {slidesData} from '~/components/Slideshow';
+import Marquee from '~/components/Marquee';
 
 interface HomeSeoData {
   shop: {
@@ -154,22 +157,11 @@ export default function Homepage() {
       )}
 
       {/* free shipping free returns */}
-      <div className="bg-gray-100 py-12">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-base font-semibold uppercase tracking-wide text-indigo-600">
-              Free shipping &amp; returns
-            </h2>
-            <p className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Free shipping on all orders over $100
-            </p>
-            <p className="mt-4 text-lg text-gray-500">
-              We offer free shipping on all orders over $100. We also offer free
-              returns on all orders.
-            </p>
-          </div>
-        </div>
-      </div>
+      <ShippingAndReturns />
+
+      <SlideShow slides={slidesData} />
+
+      <Marquee />
 
       {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
