@@ -1,7 +1,7 @@
 export default function Marquee() {
   return (
     <div>
-      <div className="align-center flex justify-start gap-x-4 overflow-hidden py-3">
+      <div className="align-center flex justify-start gap-x-4 overflow-hidden py-6">
         <MarqueeContent />
         <MarqueeContent />
         <MarqueeContent />
@@ -13,7 +13,7 @@ export default function Marquee() {
 
 function MarqueeContent() {
   return (
-    <div className="justify-space-between scroll flex h-12 w-full items-stretch gap-x-4 uppercase text-white">
+    <div className="justify-space-between scroll flex h-12 w-full items-center gap-x-4 uppercase text-white">
       <span className="whitespace-nowrap font-heading text-4xl">
         American Made
       </span>

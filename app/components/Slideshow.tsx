@@ -9,7 +9,6 @@ export interface Slide {
   image2?: string;
   title: string;
   description: string;
-  link: string;
   button: {
     text: string;
     link: string;
@@ -52,8 +51,8 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
           <div className="absolute z-10 grid h-full w-full place-items-center">
             <div className="text-center">
               <h2 className="font-heading text-6xl">{slides[index].title}</h2>
-              <p className="max-w-lg ">{slides[index].description}</p>
-              <Button className="mt-3">{slides[index].button.text}</Button>
+              <p className="mb-4 max-w-lg">{slides[index].description}</p>
+              <Button>{slides[index].button.text}</Button>
             </div>
           </div>
           <div
@@ -117,7 +116,7 @@ export const slidesData = [
     id: '2',
     image1:
       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
-    image2: null,
+    image2: undefined,
     title: 'Slide 2',
     description: 'Duis velit do magna proident qui irure ad exercitation.',
     button: {

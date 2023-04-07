@@ -1,7 +1,8 @@
+import {CollectionGrid} from '../../components/CollectionGrid';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
-import {ProductSwimlane, FeaturedCollections, Hero} from '~/components';
+import {ProductSwimlane, FeaturedCollections, Hero, Button} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import type {
@@ -163,7 +164,30 @@ export default function Homepage() {
 
       <Marquee />
 
-      {secondaryHero && (
+      <div className="flex-column align-center relative flex h-[700px] overflow-hidden p-24">
+        <div className="absolute bottom-0 left-0 z-0 h-full w-full">
+          <img
+            src={
+              'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761'
+            }
+            className="min-w-full object-cover object-bottom"
+            alt=""
+            loading="lazy"
+          />
+        </div>
+        <div className="z-1 relative self-center">
+          <p className="text-2xl font-bold">
+            Hand-Stitched Hats Built In America
+          </p>
+          <h2 className="mb-4 font-heading text-6xl uppercase">
+            American Craftsmanship
+          </h2>
+          <Button>Shop Hats</Button>
+        </div>
+      </div>
+
+      <CollectionGrid />
+      {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
             {({hero}) => {
@@ -172,9 +196,9 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
+      )} */}
 
-      {featuredCollections && (
+      {/* {featuredCollections && (
         <Suspense>
           <Await resolve={featuredCollections}>
             {({collections}) => {
@@ -188,7 +212,7 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
+      )} */}
 
       {tertiaryHero && (
         <Suspense fallback={<Hero {...skeletons[2]} />}>
