@@ -39,9 +39,9 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
     >
       <AnimatePresence mode="wait">
         <motion.div
-          initial={{x: -1800 * direction}}
-          animate={{x: 0}}
-          exit={{x: 1800 * direction}}
+          initial={{x: -1000 * direction, opacity: 0}}
+          animate={{x: 0, opacity: 1}}
+          exit={{x: 1000 * direction, opacity: 0}}
           custom={direction}
           key={page}
           className={`relative grid h-full w-full bg-white ${
@@ -50,7 +50,9 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
         >
           <div className="absolute z-10 grid h-full w-full place-items-center">
             <div className="text-center">
-              <h2 className="font-heading text-6xl">{slides[index].title}</h2>
+              <h2 className="font-heading text-6xl uppercase">
+                {slides[index].title}
+              </h2>
               <p className="mb-4 max-w-lg">{slides[index].description}</p>
               <Button>{slides[index].button.text}</Button>
             </div>
@@ -82,13 +84,13 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
       {/* back arrow */}
       <NavArrowLeft
         className="absolute left-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
-        ariaLabel="previous"
+        aria-label="previous"
         onClick={() => paginate(-1)}
       />
       {/* next arrow */}
       <NavArrowRight
         className="absolute right-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
-        ariaLabel="next"
+        aria-label="next"
         onClick={() => paginate(1)}
       />
     </motion.div>

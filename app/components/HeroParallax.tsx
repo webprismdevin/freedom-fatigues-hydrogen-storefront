@@ -12,7 +12,7 @@ function useParallax(value: MotionValue<number>, distance: number) {
   return useTransform(value, [0, 1], [-distance, distance]);
 }
 
-export function HeroParallax() {
+export function HeroParallax({image}: {image: {url: string; alt: string}}) {
   const ref = useRef<HTMLDivElement>(null);
   const {scrollYProgress} = useScroll({target: ref});
   const y = useParallax(scrollYProgress, 200);
@@ -24,11 +24,9 @@ export function HeroParallax() {
     >
       <motion.div className="absolute bottom-0 left-0 z-0 h-full w-full">
         <motion.img
-          src={
-            'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761'
-          }
+          src={image.url}
           className="top-300 absolute left-0 right-0 min-w-full"
-          alt=""
+          alt={image.alt}
           loading="lazy"
           //   style={{y}}
         />

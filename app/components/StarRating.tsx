@@ -14,11 +14,11 @@ export default function StarRating({
   );
 }
 
-export function IconStar() {
+export function IconStar({size}: {size?: number}) {
   return (
     <svg
-      width="16px"
-      height="16px"
+      width={size ? `${size}px` : '16px'}
+      height={size ? `${size}px` : '16px'}
       strokeWidth="1.5"
       viewBox="0 0 24 24"
       fill="#FFCC66"

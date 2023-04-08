@@ -142,6 +142,13 @@ export default function Homepage() {
         <Hero {...primaryHero} height="full" top loading="eager" />
       )} */}
 
+      <HeroParallax
+        image={{
+          url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
+          alt: '',
+        }}
+      />
+
       {featuredProducts && (
         <Suspense>
           <Await resolve={featuredProducts}>
@@ -166,11 +173,23 @@ export default function Homepage() {
 
       <Marquee />
 
-      <HeroParallax />
+      <HeroParallax
+        image={{
+          url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761',
+          alt: '',
+        }}
+      />
 
       <CollectionGrid />
 
       <ReviewsCarousel />
+
+      <HeroParallax
+        image={{
+          url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
+          alt: '',
+        }}
+      />
       {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
