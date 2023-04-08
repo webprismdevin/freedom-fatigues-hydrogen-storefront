@@ -1,3 +1,4 @@
+import {HeroParallax} from './../../components/HeroParallax';
 import {CollectionGrid} from '../../components/CollectionGrid';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
@@ -16,6 +17,7 @@ import HomeHero from '~/components/HomeHero';
 import ShippingAndReturns from '~/components/ShippingAndReturns';
 import SlideShow, {slidesData} from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
+import ReviewsCarousel from '~/components/ReviewsCarousel';
 
 interface HomeSeoData {
   shop: {
@@ -164,29 +166,11 @@ export default function Homepage() {
 
       <Marquee />
 
-      <div className="flex-column align-center relative flex h-[700px] overflow-hidden p-24">
-        <div className="absolute bottom-0 left-0 z-0 h-full w-full">
-          <img
-            src={
-              'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761'
-            }
-            className="min-w-full object-cover object-bottom"
-            alt=""
-            loading="lazy"
-          />
-        </div>
-        <div className="z-1 relative self-center">
-          <p className="text-2xl font-bold">
-            Hand-Stitched Hats Built In America
-          </p>
-          <h2 className="mb-4 font-heading text-6xl uppercase">
-            American Craftsmanship
-          </h2>
-          <Button>Shop Hats</Button>
-        </div>
-      </div>
+      <HeroParallax />
 
       <CollectionGrid />
+
+      <ReviewsCarousel />
       {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
@@ -214,7 +198,7 @@ export default function Homepage() {
         </Suspense>
       )} */}
 
-      {tertiaryHero && (
+      {/* {tertiaryHero && (
         <Suspense fallback={<Hero {...skeletons[2]} />}>
           <Await resolve={tertiaryHero}>
             {({hero}) => {
@@ -223,7 +207,7 @@ export default function Homepage() {
             }}
           </Await>
         </Suspense>
-      )}
+      )} */}
     </>
   );
 }

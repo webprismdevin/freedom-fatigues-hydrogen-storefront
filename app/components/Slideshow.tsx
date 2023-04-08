@@ -84,14 +84,12 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
         className="absolute left-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
         ariaLabel="previous"
         onClick={() => paginate(-1)}
-        color="white"
       />
       {/* next arrow */}
       <NavArrowRight
         className="absolute right-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
         ariaLabel="next"
         onClick={() => paginate(1)}
-        color="white"
       />
     </motion.div>
   );
@@ -127,32 +125,28 @@ export const slidesData = [
 ];
 
 export const NavArrowLeft = ({
-  onClick,
-  ariaLabel,
-  className,
   color,
+  size,
+  ...props
 }: {
-  onClick?: () => void;
-  ariaLabel: string;
-  className?: string;
   color?: string;
+  size?: number;
+  props: any;
 }) => {
   return (
     <svg
-      onClick={onClick}
-      aria-label={ariaLabel}
-      className={className}
-      width="24px"
-      height="24px"
+      {...props}
+      width={size ? size : 24}
+      height={size ? size : 24}
       strokeWidth="1.5"
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      color={color !== null ? color : '#1d1d1d'}
+      color={color !== undefined ? color : '#ffffff'}
     >
       <path
         d="M15 6l-6 6 6 6"
-        stroke={color !== null ? color : '#1d1d1d'}
+        stroke={color !== undefined ? color : '#ffffff'}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -162,32 +156,28 @@ export const NavArrowLeft = ({
 };
 
 export const NavArrowRight = ({
-  onClick,
-  ariaLabel,
-  className,
   color,
+  size,
+  ...props
 }: {
-  onClick?: () => void;
-  ariaLabel: string;
-  className?: string;
   color?: string;
+  size?: number;
+  props: any;
 }) => {
   return (
     <svg
-      onClick={onClick}
-      aria-label={ariaLabel}
-      className={className}
-      width="24px"
-      height="24px"
+      {...props}
+      width={size ? size : 24}
+      height={size ? size : 24}
       strokeWidth="1.5"
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      color={color !== null ? color : '#1d1d1d'}
+      color={color !== undefined ? color : '#ffffff'}
     >
       <path
         d="M9 6l6 6-6 6"
-        stroke={color !== null ? color : '#1d1d1d'}
+        stroke={color !== undefined ? color : '#ffffff'}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
