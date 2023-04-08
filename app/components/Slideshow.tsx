@@ -39,9 +39,9 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
     >
       <AnimatePresence mode="wait">
         <motion.div
-          initial={{x: -1000 * direction}}
+          initial={{x: -1800 * direction}}
           animate={{x: 0}}
-          exit={{x: 1000 * -direction}}
+          exit={{x: 1800 * direction}}
           custom={direction}
           key={page}
           className={`relative grid h-full w-full bg-white ${
