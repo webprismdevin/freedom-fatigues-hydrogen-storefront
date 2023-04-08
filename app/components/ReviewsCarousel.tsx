@@ -1,4 +1,4 @@
-import {motion} from 'framer-motion';
+import {AnimatePresence, motion} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
 import {Link} from './Link';
 import {useState} from 'react';
@@ -33,12 +33,21 @@ export default function ReviewsCarousel() {
   };
 
   return (
-    <div className="relative py-24 text-center">
+    <div className="relative h-[500px] p-24 text-center">
       <h2 className="font-heading text-4xl">1100+ 5-Star Reviews</h2>
       <Link to="/reviews">See all reviews</Link>
-      <motion.div className="mt-8">
-        <ReviewCard key={reviews[page].name} {...reviews[page]} />
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          className="pt-8"
+          initial={{x: -1400 * direction}}
+          animate={{x: 0}}
+          exit={{x: 1400 * direction}}
+          custom={direction}
+          key={page}
+        >
+          <ReviewCard {...reviews[index]} />
+        </motion.div>
+      </AnimatePresence>
       <NavArrowLeft
         className="absolute left-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
         ariaLabel="previous"
@@ -68,5 +77,5 @@ const reviews = [
     text: 'Great quality shirts and wonder customer service! I ordered the wrong size for my husband. Sent an email requesting an exchange and received an immediate response from Ryann with a return shipping label. Will definitely order from Freedom Fatigues again!',
     name: 'Melody N.',
     rating: 5,
-  }
+  },
 ];
