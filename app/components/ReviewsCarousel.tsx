@@ -1,7 +1,7 @@
 import {AnimatePresence, motion} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
 import {Link} from './Link';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {NavArrowLeft, NavArrowRight} from './Slideshow';
 import {IconStar} from './StarRating';
 
@@ -34,6 +34,14 @@ export default function ReviewsCarousel() {
   const paginate = (newDirection: number) => {
     setPage([page + newDirection, newDirection]);
   };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      paginate(1);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [page]);
 
   return (
     <div className="relative h-[500px] p-24 text-center">

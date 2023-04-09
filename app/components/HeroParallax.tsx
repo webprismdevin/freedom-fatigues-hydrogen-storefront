@@ -12,7 +12,20 @@ function useParallax(value: MotionValue<number>, distance: number) {
   return useTransform(value, [0, 1], [-distance, distance]);
 }
 
-export function HeroParallax({image}: {image: {url: string; alt: string}}) {
+export type Hero = {
+  image: {
+    url: string;
+    alt: string;
+  };
+  title: string;
+  caption: string;
+  cta: {
+    text: string;
+    to: string;
+  };
+};
+
+export function HeroParallax({image, title, caption, cta}: Hero) {
   const ref = useRef<HTMLDivElement>(null);
   const {scrollYProgress} = useScroll({target: ref});
   const y = useParallax(scrollYProgress, 200);
@@ -32,13 +45,9 @@ export function HeroParallax({image}: {image: {url: string; alt: string}}) {
         />
       </motion.div>
       <div className="z-1 relative self-center">
-        <p className="text-2xl font-bold">
-          Hand-Stitched Hats Built In America
-        </p>
-        <h2 className="mb-4 font-heading text-6xl uppercase">
-          American Craftsmanship
-        </h2>
-        <Button>Shop Hats</Button>
+        <p className="text-2xl font-bold">{caption}</p>
+        <h2 className="mb-4 font-heading text-6xl uppercase">{title}</h2>
+        <Button href={cta.to}>{cta.text}</Button>
       </div>
     </div>
   );
