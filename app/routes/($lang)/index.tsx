@@ -3,7 +3,13 @@ import {CollectionGrid} from '../../components/CollectionGrid';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
-import {ProductSwimlane, FeaturedCollections, Hero, Button} from '~/components';
+import {
+  ProductSwimlane,
+  FeaturedCollections,
+  Hero,
+  Button,
+  Link,
+} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {getHeroPlaceholder} from '~/lib/placeholders';
 import type {
@@ -81,14 +87,10 @@ export async function loader({params, context}: LoaderArgs) {
         language,
       },
     }),
-    secondaryHero: context.storefront.query<{hero: CollectionHero}>(
-      COLLECTION_HERO_QUERY,
+    saleProducts: context.storefront.query<{collection: CollectionConnection}>(
+      HOMEPAGE_SALE_PRODUCTS_QUERY,
       {
-        variables: {
-          handle: 'backcountry',
-          country,
-          language,
-        },
+        variables: {handle: 'sale'},
       },
     ),
     featuredCollections: context.storefront.query<{
@@ -119,11 +121,13 @@ export default function Homepage() {
   const {
     sanityHome,
     primaryHero,
-    secondaryHero,
+    saleProducts,
     tertiaryHero,
     featuredCollections,
     featuredProducts,
   } = useLoaderData<typeof loader>();
+
+  console.log(saleProducts);
 
   // TODO: skeletons vs placeholders
   const skeletons = getHeroPlaceholder([{}, {}, {}]);
@@ -137,22 +141,21 @@ export default function Homepage() {
 
   return (
     <>
-      {/* {sanityHome && <HomeHero data={sanityHome.hero} />}
-      {primaryHero && (
-        <Hero {...primaryHero} height="full" top loading="eager" />
-      )} */}
-
       <HeroParallax
         image={{
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
           alt: '',
         }}
+        caption={'We are American Made'}
+        title={'Unapologetically American-Made'}
+        cta={{text: 'Shop Sweatshirts', to: '/collections/sweatshirts'}}
       />
 
       {featuredProducts && (
         <Suspense>
           <Await resolve={featuredProducts}>
             {({products}) => {
+              console.log(products);
               if (!products?.nodes) return <></>;
               return (
                 <ProductSwimlane
@@ -166,7 +169,6 @@ export default function Homepage() {
         </Suspense>
       )}
 
-      {/* free shipping free returns */}
       <ShippingAndReturns />
 
       <SlideShow slides={slidesData} />
@@ -178,6 +180,9 @@ export default function Homepage() {
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761',
           alt: '',
         }}
+        caption={'Hand-Stitched Hats Built In America'}
+        title={'American Craftsmanship'}
+        cta={{text: 'Shop Hats', to: '/collections/hats'}}
       />
 
       <CollectionGrid />
@@ -189,7 +194,67 @@ export default function Homepage() {
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
           alt: '',
         }}
+        caption={'Hand-Stitched Hats Built In America'}
+        title={'American Craftsmanship'}
+        cta={{text: 'Shop Hats', to: '/collections/hats'}}
       />
+
+      <div className="grid grid-cols-2">
+        <div className="p-24">
+          <div className="text-center">
+            <p className="font-heading text-9xl">AMERICAN</p>
+            <p className="font-heading text-6xl">THROUGH AND THROUGH</p>
+          </div>
+          <div className="mx-auto mt-4 max-w-[500px]">
+            <p className="leading-loose">
+              Freedom Fatigues is committed to producing the highest quality
+              American-made apparel on the market.
+              <br />
+              <br />
+              We are a conscious American enterprise bent on bringing every
+              piece of the apparel manufacturing process back to domestic
+              businesses, and American families.
+            </p> 
+            <div className="mt-4">
+              <Link to={'/'}>Learn more</Link>
+            </div>
+          </div>
+        </div>
+        <div>
+          <img
+            src={
+              'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/mens-patriotic-shirts_d09401ab-5571-414f-8f23-7ed49b2604a6.png?v=1667298623'
+            }
+            alt=""
+          />
+        </div>
+      </div>
+
+      {saleProducts && (
+        <Suspense>
+          <Await resolve={saleProducts}>
+            {({collection}) => {
+              if (!collection?.products?.nodes) return <></>;
+              return (
+                <ProductSwimlane
+                  products={collection.products?.nodes}
+                  title="Soon to be Retired"
+                  count={4}
+                />
+              );
+            }}
+          </Await>
+        </Suspense>
+      )}
+
+      <div className="flex flex-col items-center justify-center gap-1 p-12 text-center">
+        <p className="text-2xl font-bold">God, Family, Country.</p>
+        <p className="text-lg font-bold">In that order.</p>
+        <div style={{width: 128}}>
+          <img src={'branding/logo_white.png'} alt="logo" />
+        </div>
+      </div>
+
       {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
@@ -212,17 +277,6 @@ export default function Homepage() {
                   title="Collections"
                 />
               );
-            }}
-          </Await>
-        </Suspense>
-      )} */}
-
-      {/* {tertiaryHero && (
-        <Suspense fallback={<Hero {...skeletons[2]} />}>
-          <Await resolve={tertiaryHero}>
-            {({hero}) => {
-              if (!hero) return <></>;
-              return <Hero {...hero} />;
             }}
           </Await>
         </Suspense>
@@ -276,10 +330,16 @@ const HOMEPAGE_SEO_QUERY = `#graphql
 
 const COLLECTION_HERO_QUERY = `#graphql
   ${COLLECTION_CONTENT_FRAGMENT}
+  ${PRODUCT_CARD_FRAGMENT}
   query collectionContent($handle: String, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
     hero: collection(handle: $handle) {
       ...CollectionContent
+      products(first: 20){
+        nodes {
+          ...ProductCard
+        }
+      }
     }
   }
 `;
@@ -292,6 +352,21 @@ export const HOMEPAGE_FEATURED_PRODUCTS_QUERY = `#graphql
     products(first: 8, sortKey: BEST_SELLING) {
       nodes {
         ...ProductCard
+      }
+    }
+  }
+`;
+
+// @see: https://shopify.dev/api/storefront/latest/queries/products
+export const HOMEPAGE_SALE_PRODUCTS_QUERY = `#graphql
+  ${PRODUCT_CARD_FRAGMENT}
+  query homepageSaleProducts($handle: String, $country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      products(first: 8, sortKey: BEST_SELLING) {
+        nodes {
+          ...ProductCard
+        }
       }
     }
   }
