@@ -516,7 +516,7 @@ function Badge({
   );
 }
 
-function Footer({menu}: {menu?: EnhancedMenu}) {
+function FooterOld({menu}: {menu?: EnhancedMenu}) {
   const isHome = useIsHomePath();
   const itemsCount = menu
     ? menu?.items?.length + 1 > 4
@@ -560,7 +560,7 @@ const FooterLink = ({item}: {item: EnhancedMenuItem}) => {
   );
 };
 
-function FooterMenu({menu}: {menu?: EnhancedMenu}) {
+function FooterMenuOld({menu}: {menu?: EnhancedMenu}) {
   const styles = {
     section: 'grid gap-4',
     nav: 'grid gap-2 pb-6',
@@ -608,3 +608,138 @@ function FooterMenu({menu}: {menu?: EnhancedMenu}) {
     </>
   );
 }
+
+const dummy_links = {
+  title: 'Shop',
+  links: [
+    {
+      title: 'All Products',
+      to: '/collections/all',
+    },
+    {
+      title: 'New Arrivals',
+      to: '/collections/new-arrivals',
+    },
+    {
+      title: 'Best Sellers',
+      to: '/collections/best-sellers',
+    },
+    {
+      title: 'Gift Cards',
+      to: '/collections/gift-cards',
+    },
+  ],
+};
+
+const Footer = ({menu}) => {
+  // const sectionCount = 1 + (menu?.items?.length || 3);
+  const sectionCount = 4;
+
+  const outlineStyle = 'outline outline-1 outline-[#ffffff66]';
+
+  return (
+    <div>
+      <div className={`grid w-screen grid-cols-${sectionCount}`}>
+        <div className={`p-12 ${outlineStyle}`}>
+          <LinkListTitle title={'Email'} />
+          <div className="my-2 leading-loose">
+            Laboris incididunt laborum cillum ut ex aute commodo duis veniam
+            anim elit sunt quis nulla ea.
+          </div>
+          <div>KLAVIYO PLACEHOLDER</div>
+          <div className="my-4 flex gap-2">
+            <IconInstagram />
+            <IconFacebook />
+          </div>
+          <img
+            src={'/branding/veteran_owned-footer_badge.png'}
+            alt="Veteran Owned"
+          />
+        </div>
+        <div className={`p-12 ${outlineStyle}`}>
+          <FooterLinkList linkList={dummy_links} />
+        </div>
+        <div className={`p-12 ${outlineStyle}`}>Menu 2</div>
+        <div className={`p-12 ${outlineStyle}`}>Menu 3</div>
+      </div>
+      <div className="p-4 text-center">
+        Freedom Fatigues © {new Date().getFullYear()}
+      </div>
+    </div>
+  );
+};
+
+const FooterLinkList = ({linkList}) => {
+  return (
+    <div>
+      <LinkListTitle title={linkList.title} />
+      <ul>
+        {linkList.links.map((link) => (
+          <li key={link.title} className={'my-2'}>
+            <Link to={link.to}>{link.title}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+const LinkListTitle = ({title}: {title: string}) => {
+  return <div className="text-xl font-bold">{title}</div>;
+};
+
+const IconInstagram = () => {
+  return (
+    <svg
+      width="24px"
+      height="24px"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      color="white"
+    >
+      <path
+        d="M12 16a4 4 0 100-8 4 4 0 000 8z"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M3 16V8a5 5 0 015-5h8a5 5 0 015 5v8a5 5 0 01-5 5H8a5 5 0 01-5-5z"
+        stroke="white"
+        strokeWidth="1.5"
+      ></path>
+      <path
+        d="M17.5 6.51l.01-.011"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+    </svg>
+  );
+};
+
+const IconFacebook = () => {
+  return (
+    <svg
+      width="24px"
+      height="24px"
+      strokeWidth="1.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      color="#ffffff"
+    >
+      <path
+        d="M17 2h-3a5 5 0 00-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3V2z"
+        stroke="#ffffff"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+    </svg>
+  );
+};
