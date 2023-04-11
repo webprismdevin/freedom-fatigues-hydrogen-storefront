@@ -1,11 +1,30 @@
 @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
-@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224');
-@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224');
-@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-It.otf?v=1680451224');
+/* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224'); */
+/* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224'); */
+/* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-It.otf?v=1680451224'); */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'Norwester-Regular';
+  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'AvenirNextLTPro-Regular';
+  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224');
+   font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'AvenirNextLTPro-Regular';
+  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224');
+  font-weight: bold;
+  font-style: normal;
+}
 
 /* Tokens */
 :root {
@@ -90,6 +109,7 @@ shop-pay-button {
 
   html {
     scroll-padding-top: 10rem;
+    @apply font-sans;
   }
 
   model-viewer::part(default-progress-mask) {

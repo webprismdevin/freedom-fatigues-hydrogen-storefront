@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+const defaultTheme = require('tailwindcss/defaultTheme');
+
 function withOpacityValue(variable) {
   return ({opacityValue}) => {
     if (opacityValue === undefined) {
@@ -10,6 +13,7 @@ function withOpacityValue(variable) {
 
 module.exports = {
   content: ['./app/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'media',
   theme: {
     extend: {
       colors: {
@@ -20,7 +24,7 @@ module.exports = {
       },
       fontFamily: {
         heading: ['Norwester-Regular', 'ui-sans-serif', 'system-ui'],
-        sans: ['Avenir Next LT Pro', 'ui-sans-serif', 'system-ui'],
+        sans: ['AvenirNextLTPro-Regular', ...defaultTheme.fontFamily.sans],
       },
       screens: {
         sm: '32em',
