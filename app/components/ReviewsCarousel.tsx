@@ -21,8 +21,8 @@ export const ReviewCard = ({text, name, rating}: Review) => {
             <IconStar key={i} size={24} />
           ))}
       </div>
-      <p className="text-2xl font-bold">{text}</p>
-      <p className="text-lg font-bold">{name}</p>
+      <p className="text-xl font-bold md:text-2xl">{text}</p>
+      <p className="text-md mt-2 font-bold lg:text-lg">{name}</p>
     </div>
   );
 };
@@ -44,7 +44,7 @@ export default function ReviewsCarousel() {
   }, [page]);
 
   return (
-    <div className="relative h-[500px] p-24 text-center">
+    <div className="relative px-12 py-8 text-center lg:h-[500px] lg:p-24">
       <h2 className="font-heading text-4xl">1100+ 5-Star Reviews</h2>
       <Link to="/reviews">See all reviews</Link>
       <AnimatePresence mode="wait">

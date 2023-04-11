@@ -160,17 +160,6 @@ export default function Collection() {
 
   return (
     <>
-      <PageHeader heading={collection.title}>
-        {collection?.description && (
-          <div className="flex items-baseline justify-between w-full">
-            <div>
-              <Text format width="narrow" as="p" className="inline-block">
-                {collection.description}
-              </Text>
-            </div>
-          </div>
-        )}
-      </PageHeader>
       <Section>
         <SortFilter
           filters={collection.products.filters as Filter[]}
@@ -184,6 +173,17 @@ export default function Collection() {
             data-test="product-grid"
           />
         </SortFilter>
+        <PageHeader heading={collection.title}>
+          {collection?.description && (
+            <div className="flex w-full items-baseline justify-between">
+              <div>
+                <Text format width="wide" as="p" className="inline-block">
+                  {collection.description}
+                </Text>
+              </div>
+            </div>
+          )}
+        </PageHeader>
       </Section>
     </>
   );

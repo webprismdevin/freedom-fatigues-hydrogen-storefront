@@ -1,3 +1,4 @@
+import {GodFamilyCountry} from './../../components/GodFamilyCountry';
 import {HeroParallax} from './../../components/HeroParallax';
 import {CollectionGrid} from '../../components/CollectionGrid';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
@@ -149,6 +150,7 @@ export default function Homepage() {
         caption={'We are American Made'}
         title={'Unapologetically American-Made'}
         cta={{text: 'Shop Sweatshirts', to: '/collections/sweatshirts'}}
+        layout="right"
       />
 
       {featuredProducts && (
@@ -199,10 +201,10 @@ export default function Homepage() {
         cta={{text: 'Shop Hats', to: '/collections/hats'}}
       />
 
-      <div className="grid grid-cols-2">
-        <div className="p-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1">
+        <div className="p-8 lg:p-24">
           <div className="text-center">
-            <p className="font-heading text-9xl">AMERICAN</p>
+            <p className="font-heading text-xl lg:text-9xl">AMERICAN</p>
             <p className="font-heading text-6xl">THROUGH AND THROUGH</p>
           </div>
           <div className="mx-auto mt-4 max-w-[500px]">
@@ -214,7 +216,7 @@ export default function Homepage() {
               We are a conscious American enterprise bent on bringing every
               piece of the apparel manufacturing process back to domestic
               businesses, and American families.
-            </p> 
+            </p>
             <div className="mt-4">
               <Link to={'/'}>Learn more</Link>
             </div>
@@ -246,14 +248,6 @@ export default function Homepage() {
           </Await>
         </Suspense>
       )}
-
-      <div className="flex flex-col items-center justify-center gap-1 p-12 text-center">
-        <p className="text-2xl font-bold">God, Family, Country.</p>
-        <p className="text-lg font-bold">In that order.</p>
-        <div style={{width: 128}}>
-          <img src={'branding/logo_white.png'} alt="logo" />
-        </div>
-      </div>
 
       {/* {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>

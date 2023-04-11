@@ -1,6 +1,6 @@
 export default function ShippingAndReturns() {
   return (
-    <div className="align-center grid grid-cols-3 p-12">
+    <div className="align-center grid grid-cols-1 gap-4 p-12 md:grid-cols-3 ">
       <div className="col-span-1 grid place-items-center">
         <div className="text-center">
           <h1 className="font-heading text-5xl uppercase">Easy Returns</h1>

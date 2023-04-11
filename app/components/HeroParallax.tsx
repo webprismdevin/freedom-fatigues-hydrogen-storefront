@@ -23,30 +23,39 @@ export type Hero = {
     text: string;
     to: string;
   };
+  layout?: 'left' | 'right';
 };
 
-export function HeroParallax({image, title, caption, cta}: Hero) {
+export function HeroParallax({image, title, caption, cta, layout}: Hero) {
   const ref = useRef<HTMLDivElement>(null);
   const {scrollYProgress} = useScroll({target: ref});
   const y = useParallax(scrollYProgress, 200);
 
   return (
     <div
-      className="flex-column align-center relative flex h-[700px] overflow-hidden p-24"
+      className={`flex-column align-center relative flex h-[700px] overflow-hidden p-8 lg:p-24 ${
+        layout === 'right' && 'justify-end'
+      }`}
       ref={ref}
     >
       <motion.div className="absolute bottom-0 left-0 z-0 h-full w-full">
         <motion.img
           src={image.url}
-          className="top-300 absolute left-0 right-0 min-w-full"
+          className="top-300 absolute left-0 right-0 min-h-full min-w-full object-cover"
           alt={image.alt}
           loading="lazy"
           //   style={{y}}
         />
       </motion.div>
-      <div className="z-1 relative self-center">
-        <p className="text-2xl font-bold">{caption}</p>
-        <h2 className="mb-4 font-heading text-6xl uppercase">{title}</h2>
+      <div
+        className={`${
+          layout === 'right' && 'text-right'
+        } z-1 relative self-center`}
+      >
+        <p className="text-xl font-bold lg:text-2xl">{caption}</p>
+        <h2 className="mb-4 font-heading text-4xl uppercase lg:text-6xl">
+          {title}
+        </h2>
         <Button href={cta.to}>{cta.text}</Button>
       </div>
     </div>

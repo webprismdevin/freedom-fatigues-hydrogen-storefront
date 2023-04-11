@@ -29,6 +29,7 @@ import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
 import {AnimatePresence, useCycle, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
+import {GodFamilyCountry} from './GodFamilyCountry';
 
 export function Layout({
   children,
@@ -52,6 +53,7 @@ export function Layout({
           {children}
         </main>
       </div>
+      <GodFamilyCountry />
       <Footer menu={layout?.footerMenu} />
     </>
   );
@@ -639,14 +641,20 @@ const Footer = ({menu}) => {
 
   return (
     <div>
-      <div className={`grid w-screen grid-cols-${sectionCount}`}>
+      <div className={`grid w-screen grid-cols-1 lg:grid-cols-${sectionCount}`}>
         <div className={`p-12 ${outlineStyle}`}>
           <LinkListTitle title={'Email'} />
           <div className="my-2 leading-loose">
             Laboris incididunt laborum cillum ut ex aute commodo duis veniam
             anim elit sunt quis nulla ea.
           </div>
-          <div>KLAVIYO PLACEHOLDER</div>
+          <div className="flex border-b-2 border-[#ffffff66]">
+            <input
+              className="flex-1 bg-transparent"
+              placeholder="Enter your email"
+            />
+            <button type="submit">Submit</button>
+          </div>
           <div className="my-4 flex gap-2">
             <IconInstagram />
             <IconFacebook />
@@ -659,8 +667,14 @@ const Footer = ({menu}) => {
         <div className={`p-12 ${outlineStyle}`}>
           <FooterLinkList linkList={dummy_links} />
         </div>
-        <div className={`p-12 ${outlineStyle}`}>Menu 2</div>
-        <div className={`p-12 ${outlineStyle}`}>Menu 3</div>
+        <div className={`p-12 ${outlineStyle}`}>
+          {' '}
+          <FooterLinkList linkList={dummy_links} />
+        </div>
+        <div className={`p-12 ${outlineStyle}`}>
+          {' '}
+          <FooterLinkList linkList={dummy_links} />
+        </div>
       </div>
       <div className="p-4 text-center">
         Freedom Fatigues © {new Date().getFullYear()}

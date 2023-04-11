@@ -44,11 +44,11 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
           exit={{x: 1000 * direction, opacity: 0}}
           custom={direction}
           key={page}
-          className={`relative grid h-full w-full bg-white ${
-            slides[index].image2 ? 'grid-cols-2' : 'grid-cols-1'
+          className={`relative grid h-full w-full grid-cols-1 bg-white ${
+            slides[index].image2 ? 'lg:grid-cols-2' : ''
           }`}
         >
-          <div className="absolute z-10 grid h-full w-full place-items-center">
+          <div className="absolute z-10 grid h-full w-full place-items-center px-12">
             <div className="text-center">
               <h2 className="font-heading text-6xl uppercase">
                 {slides[index].title}
@@ -58,20 +58,20 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
             </div>
           </div>
           <div
-            className={`h-full overflow-hidden ${
-              slides[index].image2 ? 'max-w-1/2' : 'min-w-full'
+            className={`h-full min-w-full max-w-full overflow-hidden ${
+              slides[index].image2 ? 'lg:max-w-1/2' : ''
             }`}
           >
             <img
               src={slides[index].image1}
-              className={`min-h-full object-cover ${
-                slides[index].image2 ? '' : 'min-w-full'
+              className={`min-h-full min-w-full object-cover ${
+                slides[index].image2 ? '' : 'lg:min-w-full'
               }`}
               alt={slides[index].description}
             />
           </div>
           {slides[index].image2 && (
-            <div className="max-w-1/2 h-full overflow-hidden">
+            <div className="max-w-1/2 hidden h-full overflow-hidden lg:block">
               <img
                 src={slides[index].image2}
                 className="min-h-full object-cover"
