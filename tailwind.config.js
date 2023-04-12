@@ -12,8 +12,8 @@ function withOpacityValue(variable) {
 }
 
 module.exports = {
+  darkMode: 'class',
   content: ['./app/**/*.{js,ts,jsx,tsx}'],
-  darkMode: 'media',
   theme: {
     extend: {
       colors: {

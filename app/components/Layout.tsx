@@ -29,7 +29,6 @@ import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
 import {AnimatePresence, useCycle, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
-import {GodFamilyCountry} from './GodFamilyCountry';
 
 export function Layout({
   children,
@@ -169,6 +168,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                         <Text as="span" size="copy">
                           {link.title}
                         </Text>
+                        /playlist/3pssMaeGgHWrWDfVDVRY94
                       </Link>
                     </li>
                   ))}
@@ -633,6 +633,22 @@ const dummy_links = {
   ],
 };
 
+export function GodFamilyCountry() {
+  return (
+    <div className="flex flex-col items-center justify-center gap-1 bg-primary p-12 text-center text-contrast">
+      <p className="text-2xl font-bold">God, Family, Country.</p>
+      <p className="text-lg font-bold">In that order.</p>
+      <div
+        style={{
+          width: 128,
+        }}
+      >
+        <img src={'/branding/logo_white.png'} alt="logo" />
+      </div>
+    </div>
+  );
+}
+
 const Footer = ({menu}) => {
   // const sectionCount = 1 + (menu?.items?.length || 3);
   const sectionCount = 4;
@@ -640,7 +656,7 @@ const Footer = ({menu}) => {
   const outlineStyle = 'outline outline-1 outline-[#ffffff66]';
 
   return (
-    <div>
+    <div className="bg-primary text-contrast">
       <div className={`grid w-screen grid-cols-1 lg:grid-cols-${sectionCount}`}>
         <div className={`p-12 ${outlineStyle}`}>
           <LinkListTitle title={'Email'} />

@@ -141,7 +141,7 @@ export default function Homepage() {
   // });
 
   return (
-    <>
+    <div className="bg-primary text-contrast">
       <HeroParallax
         image={{
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
@@ -275,7 +275,7 @@ export default function Homepage() {
           </Await>
         </Suspense>
       )} */}
-    </>
+    </div>
   );
 }
 

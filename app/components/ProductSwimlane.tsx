@@ -18,7 +18,7 @@ export function ProductSwimlane({
     <Section
       heading={title}
       padding="y"
-      className="bg-white text-contrast"
+      className="bg-contrast text-primary"
       {...props}
     >
       <div className="swimlane hiddenScroll md:scroll-px-8 md:px-8 md:pb-8 lg:scroll-px-12 lg:px-12">
