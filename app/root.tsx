@@ -44,7 +44,7 @@ const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: data?.layout?.shop?.name,
-    url: `https://hydrogen.shop${pathname}`,
+    url: `https://freedomfatigues.com/${pathname}`,
     logo: '/branding/logo_black.png',
   },
 });
