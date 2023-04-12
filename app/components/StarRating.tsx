@@ -6,10 +6,13 @@ export default function StarRating({
   count: number;
 }) {
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row items-center">
       {[...Array(5)].map((_, i) => (
         <IconStar key={i} />
-      ))}
+      ))}{' '}
+      <span className=" ml-2 text-xs text-slate-500">
+        {rating}/5 [{count}]
+      </span>
     </div>
   );
 }

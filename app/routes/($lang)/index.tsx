@@ -204,8 +204,8 @@ export default function Homepage() {
       <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1">
         <div className="p-8 lg:p-24">
           <div className="text-center">
-            <p className="font-heading text-xl lg:text-9xl">AMERICAN</p>
-            <p className="font-heading text-6xl">THROUGH AND THROUGH</p>
+            <p className="font-heading text-xl lg:text-8xl">AMERICAN</p>
+            <p className="font-heading text-5xl">THROUGH AND THROUGH</p>
           </div>
           <div className="mx-auto mt-4 max-w-[500px]">
             <p className="leading-loose">

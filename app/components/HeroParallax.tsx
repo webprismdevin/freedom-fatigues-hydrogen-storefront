@@ -56,7 +56,7 @@ export function HeroParallax({image, title, caption, cta, layout}: Hero) {
         <h2 className="mb-4 font-heading text-4xl uppercase lg:text-6xl">
           {title}
         </h2>
-        <Button href={cta.to}>{cta.text}</Button>
+        <Button href={cta.to} variant="secondary">{cta.text}</Button>
       </div>
     </div>
   );

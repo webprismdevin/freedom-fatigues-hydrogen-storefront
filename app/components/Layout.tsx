@@ -301,7 +301,7 @@ function DesktopHeader({
       style={{position: 'relative'}}
       className={`${
         isHome
-          ? 'bg-primary/80 text-contrast shadow-darkHeader dark:bg-contrast/60 dark:text-primary'
+          ? 'bg-primary text-contrast shadow-darkHeader'
           : 'bg-contrast/80 text-primary'
       } ${
         !isHome && y > 50 && ' shadow-lightHeader'
@@ -311,7 +311,9 @@ function DesktopHeader({
         <Link to="/" prefetch="intent">
           <div>
             <img
-              src={'/branding/logo_white.png'}
+              src={
+                isHome ? '/branding/logo_white.png' : '/branding/logo_black.png'
+              }
               alt="logo"
               height={96}
               width={96}

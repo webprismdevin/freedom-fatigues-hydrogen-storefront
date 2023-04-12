@@ -1,6 +1,6 @@
 import {type ReactNode, useRef, Suspense, useMemo} from 'react';
 import {Disclosure, Listbox} from '@headlessui/react';
-import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, LinksFunction, type LoaderArgs} from '@shopify/remix-oxygen';
 import {
   useLoaderData,
   Await,
@@ -45,6 +45,8 @@ import type {
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import type {Storefront} from '~/lib/type';
 import type {Product} from 'schema-dts';
+import {fromGID} from '~/lib/gidUtils';
+import StarRating from '~/components/StarRating';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -129,14 +131,24 @@ export default function Product() {
   return (
     <>
       <Section padding="x" className="px-0">
-        <div className="grid items-start md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-20">
-          <ProductGallery
-            media={media.nodes}
-            className="w-screen md:w-full lg:col-span-2"
-          />
-          <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav">
+        <div className="grid items-start md:grid-cols-2 md:gap-6 lg:grid-cols-5 lg:gap-10">
+          <div className="w-screen md:w-full lg:col-span-3">
+            <ProductGallery media={media.nodes} />
+            <script
+              async
+              src="//loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com"
+            ></script>
+            <div
+              className="w-full"
+              key={product.id}
+              id="looxReviews"
+              data-product-id={fromGID(product.id)}
+            ></div>
+          </div>
+          <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-sm md:px-0">
               <div className="grid gap-2">
+                <StarRating rating={5} count={2} />
                 <Heading as="h1" className="whitespace-normal">
                   {title}
                 </Heading>
@@ -166,6 +178,11 @@ export default function Product() {
                     learnMore={`/policies/${refundPolicy.handle}`}
                   />
                 )}
+                {/* <ProductDetail
+                  title="Supporting"
+                  content={getExcerpt(refundPolicy.body)}
+                  learnMore={`/policies/${refundPolicy.handle}`}
+                /> */}
               </div>
             </section>
           </div>
@@ -403,7 +420,7 @@ function ProductOptions({
                           optionValue={value}
                           searchParams={searchParamsWithDefaults}
                           className={clsx(
-                            'cursor-pointer border-b-[1.5px] py-1 leading-none transition-all duration-200',
+                            'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
                             checked ? 'border-primary/50' : 'border-primary/0',
                           )}
                         />
@@ -562,6 +579,12 @@ const PRODUCT_QUERY = `#graphql
       }
       selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions) {
         ...ProductVariantFragment
+      }
+      avg_rating: metafield(namespace: "loox", key: "avg_rating") {
+        value
+      }
+      num_reviews: metafield(namespace: "loox", key: "num_reviews") {
+        value
       }
       media(first: 7) {
         nodes {

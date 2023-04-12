@@ -54,7 +54,7 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
                 {slides[index].title}
               </h2>
               <p className="mb-4 max-w-lg">{slides[index].description}</p>
-              <Button>{slides[index].button.text}</Button>
+              <Button variant="secondary" to={slides[index].button.link}>{slides[index].button.text}</Button>
             </div>
           </div>
           <div
@@ -109,7 +109,7 @@ export const slidesData = [
       'Pariatur aliqua nostrud pariatur consectetur laborum dolore anim laboris adipisicing et pariatur veniam magna magna.',
     button: {
       text: 'Shop Now',
-      link: '/',
+      link: '/all',
     },
   },
   {
