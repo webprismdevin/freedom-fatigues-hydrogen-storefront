@@ -135,11 +135,11 @@ export default function Product() {
           <div className="w-screen md:w-full lg:col-span-3">
             <ProductGallery media={media.nodes} />
             <script
-              async
+              defer
               src="//loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com"
             ></script>
             <div
-              className="w-full"
+              className="hidden w-full md:block"
               key={product.id}
               id="looxReviews"
               data-product-id={fromGID(product.id)}
@@ -183,6 +183,12 @@ export default function Product() {
                   content={getExcerpt(refundPolicy.body)}
                   learnMore={`/policies/${refundPolicy.handle}`}
                 /> */}
+                <div
+                  className="w-full md:hidden"
+                  key={product.id}
+                  id="looxReviews"
+                  data-product-id={fromGID(product.id)}
+                ></div>
               </div>
             </section>
           </div>
