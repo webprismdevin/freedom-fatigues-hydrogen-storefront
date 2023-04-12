@@ -36,7 +36,7 @@ import {getSiteSettings, sanity} from './lib/sanity';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.layout?.shop?.name,
-  titleTemplate: '%s | Hydrogen Demo Store',
+  titleTemplate: '%s',
   description: data?.layout?.shop?.description,
   handle: '@shopify',
   url: `https://hydrogen.shop${pathname}`,
