@@ -11,7 +11,7 @@ export default function StarRating({
         <IconStar key={i} />
       ))}{' '}
       <span className=" ml-2 text-xs text-slate-500">
-        {rating}/5 [{count}]
+        {rating} [{count}]
       </span>
     </div>
   );

@@ -1,6 +1,7 @@
 import type {MediaEdge} from '@shopify/hydrogen/storefront-api-types';
 import {ATTR_LOADING_EAGER} from '~/lib/const';
 import type {MediaImage} from '@shopify/hydrogen/storefront-api-types';
+import {Image} from '@shopify/hydrogen';
 
 /**
  * A client component that defines a media gallery for hosting images, 3D models, and videos of products
@@ -18,7 +19,7 @@ export function ProductGallery({
 
   return (
     <div
-      className={`swimlane md:grid-flow-row hiddenScroll md:p-0 md:overflow-x-auto md:grid-cols-2 ${className}`}
+      className={`swimlane hiddenScroll md:grid-flow-row md:grid-cols-2 md:overflow-x-auto md:p-0 ${className}`}
     >
       {media.map((med, i) => {
         let mediaProps: Record<string, any> = {};
@@ -84,11 +85,12 @@ export function ProductGallery({
           >
             {/* TODO: Replace with MediaFile when it's available */}
             {(med as MediaImage).image && (
-              <img
-                src={data.image!.url}
-                alt={data.image!.altText!}
-                className="w-full h-full aspect-square fadeIn object-cover"
-              />
+              // <img
+              //   src={data.image!.url}
+              //   alt={data.image!.altText!}
+              //   className="fadeIn aspect-square h-full w-full object-cover"
+              // />
+              <Image data={data.image!} />
             )}
             {/* <MediaFile
               tabIndex="0"
