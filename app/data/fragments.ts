@@ -42,6 +42,12 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
     title
     publishedAt
     handle
+    avg_rating: metafield(namespace: "loox", key: "avg_rating") {
+      value
+    }
+    num_reviews: metafield(namespace: "loox", key: "num_reviews") {
+      value
+    }
     variants(first: 1) {
       nodes {
         id

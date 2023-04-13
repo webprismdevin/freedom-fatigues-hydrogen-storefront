@@ -120,7 +120,10 @@ export function ProductCard({
         </div>
         {/* star rating placeholder */}
         <div>
-          <StarRating rating={5} count={100} />
+          <StarRating
+            rating={Number(product.avg_rating.value)}
+            count={Number(product.num_reviews.value)}
+          />
         </div>
       </Link>
       {quickAdd && (

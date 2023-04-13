@@ -121,10 +121,10 @@ export async function loader({params, context}: LoaderArgs) {
 export default function Homepage() {
   const {
     sanityHome,
-    primaryHero,
+    // primaryHero,
     saleProducts,
-    tertiaryHero,
-    featuredCollections,
+    // tertiaryHero,
+    // featuredCollections,
     featuredProducts,
   } = useLoaderData<typeof loader>();
 

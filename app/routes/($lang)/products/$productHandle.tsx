@@ -152,7 +152,10 @@ export default function Product() {
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
-                <StarRating rating={5} count={2} />
+                <StarRating
+                  rating={Number(product.avg_rating.value)}
+                  count={Number(product.num_reviews.value)}
+                />
                 <Heading as="h1" className="whitespace-normal">
                   {title}
                 </Heading>
