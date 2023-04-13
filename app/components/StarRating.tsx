@@ -2,9 +2,11 @@ export default function StarRating({
   rating,
   count,
 }: {
-  rating: number;
-  count: number;
+  rating?: number;
+  count?: number;
 }) {
+  if (!rating || !count) return null;
+
   return (
     <div className="flex flex-row items-center">
       {[...Array(5)].map((_, i) => (

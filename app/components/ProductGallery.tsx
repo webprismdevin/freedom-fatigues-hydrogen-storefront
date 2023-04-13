@@ -90,7 +90,7 @@ export function ProductGallery({
               //   alt={data.image!.altText!}
               //   className="fadeIn aspect-square h-full w-full object-cover"
               // />
-              <Image data={data.image!} />
+              <Image data={data.image!} loading={mediaProps.loading} />
             )}
             {/* <MediaFile
               tabIndex="0"

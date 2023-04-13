@@ -12,18 +12,21 @@
   src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
   font-family: 'AvenirNextLTPro-Regular';
   src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224');
    font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
   font-family: 'AvenirNextLTPro-Regular';
   src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 /* Tokens */

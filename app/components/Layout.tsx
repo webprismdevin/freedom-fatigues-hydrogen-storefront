@@ -299,7 +299,6 @@ function DesktopHeader({
   return (
     <header
       role="banner"
-      style={{position: 'relative'}}
       className={`${
         isHome
           ? 'bg-primary text-contrast shadow-darkHeader'

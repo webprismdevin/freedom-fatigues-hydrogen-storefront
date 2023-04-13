@@ -121,8 +121,8 @@ export function ProductCard({
         {/* star rating placeholder */}
         <div>
           <StarRating
-            rating={Number(product.avg_rating.value)}
-            count={Number(product.num_reviews.value)}
+            rating={Number(product.avg_rating?.value)}
+            count={Number(product.num_reviews?.value)}
           />
         </div>
       </Link>
