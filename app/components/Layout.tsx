@@ -168,7 +168,6 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                         <Text as="span" size="copy">
                           {link.title}
                         </Text>
-                        /playlist/3pssMaeGgHWrWDfVDVRY94
                       </Link>
                     </li>
                   ))}
@@ -538,7 +537,7 @@ function FooterOld({menu}: {menu?: EnhancedMenu}) {
       className={`grid min-h-[25rem] w-full grid-flow-row grid-cols-1 items-start gap-6 px-6 py-8 md:grid-cols-2 md:gap-8 md:px-8 lg:gap-12 lg:px-12 lg:grid-cols-${itemsCount}
         overflow-hidden bg-primary text-contrast dark:bg-contrast dark:text-primary`}
     >
-      <FooterMenu menu={menu} />
+      <FooterMenuOld menu={menu} />
       <CountrySelector />
       <div
         className={`self-end pt-8 opacity-50 md:col-span-2 lg:col-span-${itemsCount}`}

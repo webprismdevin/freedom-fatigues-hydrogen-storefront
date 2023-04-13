@@ -1,4 +1,4 @@
-import {type ReactNode, useRef, Suspense, useMemo} from 'react';
+import {type ReactNode, useRef, Suspense, useMemo, useEffect} from 'react';
 import {Disclosure, Listbox} from '@headlessui/react';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {
@@ -128,16 +128,20 @@ export default function Product() {
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src =
+      'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com';
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <>
-      <Section padding="x" className="px-0">
-        <div className="grid items-start md:grid-cols-2 md:gap-6 lg:grid-cols-5 lg:gap-10">
-          <div className="w-screen md:w-full lg:col-span-3">
+      <Section className="px-0">
+        <div className="grid grid-cols-1 items-start md:grid-cols-2 md:gap-6 lg:grid-cols-5 lg:gap-10">
+          <div className="col-span-1 lg:col-span-3">
             <ProductGallery media={media.nodes} />
-            <script
-              defer
-              src="//loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com"
-            ></script>
             <div
               className="hidden w-full md:block"
               key={product.id}
@@ -146,15 +150,12 @@ export default function Product() {
             ></div>
           </div>
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
-            <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-sm md:px-0">
+            <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
                 <StarRating rating={5} count={2} />
                 <Heading as="h1" className="whitespace-normal">
                   {title}
                 </Heading>
-                {vendor && (
-                  <Text className={'font-medium opacity-50'}>{vendor}</Text>
-                )}
               </div>
               <ProductForm />
               <div className="grid gap-4 py-4">
@@ -184,7 +185,7 @@ export default function Product() {
                   learnMore={`/policies/${refundPolicy.handle}`}
                 /> */}
                 <div
-                  className="w-full md:hidden"
+                  className="block w-full md:hidden"
                   key={product.id}
                   id="looxReviews"
                   data-product-id={fromGID(product.id)}
@@ -312,6 +313,7 @@ export function ProductForm() {
             </AddToCartButton>
             {!isOutOfStock && (
               <ShopPayButton
+                width="100%"
                 storeDomain="freedom-fatigues.myshopify.com"
                 variantIds={[selectedVariant?.id!]}
               />
