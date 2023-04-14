@@ -44,7 +44,6 @@ export function HeroParallax({image, title, caption, cta, layout}: Hero) {
           className="top-300 absolute left-0 right-0 min-h-full min-w-full object-cover"
           alt={image.alt}
           loading="lazy"
-          //   style={{y}}
         />
       </motion.div>
       <div

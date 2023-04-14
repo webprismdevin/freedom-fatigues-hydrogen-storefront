@@ -29,6 +29,7 @@ import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
 import {AnimatePresence, useCycle, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
+import AnnouncementBar from './AnnouncementBar';
 
 export function Layout({
   children,
@@ -47,6 +48,7 @@ export function Layout({
             Skip to content
           </a>
         </div>
+        {/* <AnnouncementBar interval={2900} data={layout.announcements} /> */}
         <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}
