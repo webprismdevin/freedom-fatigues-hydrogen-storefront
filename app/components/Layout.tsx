@@ -324,6 +324,7 @@ function DesktopHeader({
 
   return (
     <header
+      onMouseLeave={() => setMegaMenu({open: false, menu: null})}
       role="banner"
       className={`${
         isHome

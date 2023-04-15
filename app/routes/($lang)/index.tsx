@@ -146,6 +146,7 @@ export default function Homepage() {
         image={{
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
           alt: '',
+          loading: 'eager',
         }}
         caption={'We are American Made'}
         title={'Unapologetically American-Made'}

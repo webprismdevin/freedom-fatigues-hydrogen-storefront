@@ -16,6 +16,7 @@ export type Hero = {
   image: {
     url: string;
     alt: string;
+    loading?: 'lazy' | 'eager';
   };
   title: string;
   caption: string;
@@ -43,7 +44,7 @@ export function HeroParallax({image, title, caption, cta, layout}: Hero) {
           src={image.url}
           className="top-300 absolute left-0 right-0 min-h-full min-w-full object-cover"
           alt={image.alt}
-          loading="lazy"
+          loading={image.loading ? image.loading : 'lazy'}
         />
       </motion.div>
       <div
@@ -55,7 +56,9 @@ export function HeroParallax({image, title, caption, cta, layout}: Hero) {
         <h2 className="mb-4 font-heading text-4xl uppercase lg:text-6xl">
           {title}
         </h2>
-        <Button href={cta.to} variant="secondary">{cta.text}</Button>
+        <Button href={cta.to} variant="secondary">
+          {cta.text}
+        </Button>
       </div>
     </div>
   );

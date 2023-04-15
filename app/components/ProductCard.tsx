@@ -143,13 +143,9 @@ export function ProductCard({
             totalValue: parseFloat(productAnalytics.price),
           }}
         >
-          {product.availableForSale ? (
-            <Text as="span" className="flex items-center justify-center gap-2">
-              Add to Bag
-            </Text>
-          ) : (
-            <Text>Sold out</Text>
-          )}
+          <Text as="span" className="flex items-center justify-center gap-2">
+            Add to Bag
+          </Text>
         </AddToCartButton>
       )}
     </div>
