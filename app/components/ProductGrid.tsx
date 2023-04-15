@@ -73,7 +73,7 @@ export function ProductGrid({
       </Grid>
 
       {nextPage && (
-        <div className="flex items-center justify-center mt-6">
+        <div className="mt-6 flex items-center justify-center">
           <Button
             disabled={fetcher.state !== 'idle'}
             variant="secondary"

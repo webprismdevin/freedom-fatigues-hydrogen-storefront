@@ -23,7 +23,7 @@ import {
 import {useParams, Form, Await, useMatches} from '@remix-run/react';
 import {useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
-import {Suspense, useEffect, useMemo} from 'react';
+import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
@@ -285,6 +285,16 @@ function MobileHeader({
   );
 }
 
+type MegaMenuType = {
+  open: boolean;
+  menu: {
+    _key: string;
+    collectionLinks: [any];
+    megaMenuFeatures: [any];
+    title: string;
+  } | null;
+};
+
 function DesktopHeader({
   isHome,
   menu,
@@ -299,16 +309,29 @@ function DesktopHeader({
   const params = useParams();
   const {y} = useWindowScroll();
 
+  const [megaMenu, setMegaMenu] = useState<MegaMenuType>({
+    open: false,
+    menu: null,
+  });
+
+  const handleMegaMenu = (menu: any) => {
+    if (menu._key === megaMenu.menu?._key) {
+      setMegaMenu({open: !megaMenu.open, menu});
+    } else {
+      setMegaMenu({open: true, menu});
+    }
+  };
+
   return (
     <header
       role="banner"
       className={`${
         isHome
-          ? 'bg-primary text-contrast shadow-darkHeader'
-          : 'bg-contrast/80 text-primary'
+          ? 'bg-primary/95 text-contrast shadow-darkHeader'
+          : 'bg-contrast/95 text-primary'
       } ${
         !isHome && y > 50 && ' shadow-lightHeader'
-      } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none backdrop-blur-lg transition duration-300 lg:flex`}
+      } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
       <div className="flex items-center gap-12 font-heading">
         <Link to="/" prefetch="intent">
@@ -323,11 +346,18 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex items-center gap-4">
+        <nav className="flex select-none items-start gap-4">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
             if (item._type === 'collectionGroup') {
-              return <MegaMenu key={item._key} item={item} isHome={isHome} />;
+              return (
+                <MegaMenuLink
+                  menu={item}
+                  key={item._key}
+                  open={item._key === megaMenu.menu?._key && megaMenu.open}
+                  onClick={() => handleMegaMenu(item)}
+                />
+              );
             }
             if (item._type === 'linkInternal') {
               return (
@@ -379,6 +409,7 @@ function DesktopHeader({
         </Link>
         <CartCount isHome={isHome} openCart={openCart} />
       </div>
+      <MegaMenu menu={megaMenu.menu} open={megaMenu.open} isHome={isHome} />
     </header>
   );
 }
@@ -387,39 +418,56 @@ function LinkTitle({text}: {text: string}) {
   return <span className="text-lg font-bold uppercase">{text}</span>;
 }
 
-function MegaMenu({item, isHome}: {item: any; isHome: boolean;}) {
-  const [open, cycleOpen] = useCycle(0, 1);
-
+function MegaMenuLink({
+  menu,
+  open,
+  ...props
+}: {
+  menu: any;
+  open: boolean;
+  props?: any;
+}) {
   return (
-    <div>
-      {/* eslint-disable-next-line */}
-      <div
-        onClick={() => cycleOpen()}
-        className="flex cursor-pointer items-center"
-      >
-        <LinkTitle text={item.title} />{' '}
-        <IconCaret direction={open ? 'up' : 'down'} />
-      </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            onClick={() => cycleOpen(0)}
-            initial={{opacity: 0, y: 20}}
-            animate={{opacity: 1, y: 0}}
-            exit={{opacity: 0, y: 20}}
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'white',
-              color: 'black',
-            }}
-            className="flex items-center justify-between gap-8 px-12 py-8"
-          >
+    <div {...props} className="flex cursor-pointer items-center">
+      <LinkTitle text={menu.title} />{' '}
+      <IconCaret direction={open ? 'up' : 'down'} />
+    </div>
+  );
+}
+
+function MegaMenu({
+  menu,
+  isHome,
+  open,
+}: {
+  menu: any;
+  isHome: boolean;
+  open: boolean;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{opacity: 0, y: 20}}
+          animate={{opacity: 1, y: 0}}
+          exit={{opacity: 0, y: 20}}
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+          }}
+          className={`z-100 flex items-center justify-between gap-8 px-12 py-4 ${
+            isHome
+              ? 'bg-primary/95 text-contrast'
+              : 'bg-contrast/95 text-primary'
+          }`}
+        >
+          <div className="text-lg">
+            <p className="font-bold text-red-500">{menu.menuTitle}</p>
             <ul>
-              {item.collectionLinks.map((link: any) => (
-                <li key={link._key} className="my-2">
+              {menu.collectionLinks.map((link: any) => (
+                <li key={link._key} className="my-4">
                   <Link
                     to={link.slug}
                     target="_parent"
@@ -433,29 +481,35 @@ function MegaMenu({item, isHome}: {item: any; isHome: boolean;}) {
                 </li>
               ))}
             </ul>
-            <div className="flex justify-center gap-8">
-              {item.megaMenuFeatures &&
-                item.megaMenuFeatures.map((feature: any) => (
+          </div>
+          <div className="grid grid-cols-2 gap-8 self-stretch">
+            {menu.megaMenuFeatures &&
+              menu.megaMenuFeatures.map((feature: any) => (
+                <Link to={feature.link.slug} key={feature._key}>
                   <div
-                    key={feature._key}
-                    className="relative grid place-items-center"
+                    className={`relative grid place-items-center ${
+                      menu.megaMenuFeatures?.length === 1 && 'col-span-2'
+                    }`}
                   >
                     <img
+                      className="h-full"
                       src={urlFor(feature.image)
-                        .height(128)
-                        .width(128)
+                        .height(164)
+                        .width(192)
                         .quality(100)
                         .url()}
                       alt=""
                     />
-                    <div className="absolute">{feature.title}</div>
+                    <div className="text-bold absolute font-heading text-2xl text-white">
+                      {feature.title}
+                    </div>
                   </div>
-                ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+                </Link>
+              ))}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

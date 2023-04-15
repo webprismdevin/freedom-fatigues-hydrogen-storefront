@@ -38,11 +38,11 @@ export function SortFilter({
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
-      <div className="flex items-center justify-between w-full">
+      <div className="flex w-full items-center justify-between">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={
-            'relative flex items-center justify-center w-8 h-8 focus:ring-primary/5'
+            'relative flex h-8 w-8 items-center justify-center focus:ring-primary/5'
           }
         >
           <IconFilters />
@@ -53,8 +53,8 @@ export function SortFilter({
         <div
           className={`transition-all duration-200 ${
             isOpen
-              ? 'opacity-100 min-w-full md:min-w-[240px] md:w-[240px] md:pr-8 max-h-full'
-              : 'opacity-0 md:min-w-[0px] md:w-[0px] pr-0 max-h-0 md:max-h-full'
+              ? 'max-h-full min-w-full opacity-100 md:w-[240px] md:min-w-[240px] md:pr-8'
+              : 'max-h-0 pr-0 opacity-0 md:max-h-full md:w-[0px] md:min-w-[0px]'
           }`}
         >
           <FiltersDrawer
@@ -105,7 +105,7 @@ export function FiltersDrawer({
         );
         return (
           <Link
-            className="focus:underline hover:underline"
+            className="hover:underline focus:underline"
             prefetch="intent"
             to={to}
           >
@@ -120,7 +120,7 @@ export function FiltersDrawer({
       <li key={collection.handle} className="pb-4">
         <Link
           to={`/collections/${collection.handle}`}
-          className="focus:underline hover:underline"
+          className="hover:underline focus:underline"
           key={collection.handle}
           prefetch="intent"
         >
@@ -149,7 +149,7 @@ export function FiltersDrawer({
                 <Disclosure as="div" key={filter.id} className="w-full">
                   {({open}) => (
                     <>
-                      <Disclosure.Button className="flex justify-between w-full py-4">
+                      <Disclosure.Button className="flex w-full justify-between py-4">
                         <Text size="lead">{filter.label}</Text>
                         <IconCaret direction={open ? 'up' : 'down'} />
                       </Disclosure.Button>
@@ -188,7 +188,7 @@ function AppliedFilters({filters = []}: {filters: AppliedFilter[]}) {
           return (
             <Link
               to={getAppliedFilterLink(filter, params, location)}
-              className="flex px-2 border rounded-full gap"
+              className="gap flex rounded-full border px-2"
               key={`${filter.label}-${filter.urlParam}`}
             >
               <span className="flex-grow">{filter.label}</span>
@@ -371,7 +371,7 @@ export default function SortMenu() {
   const activeItem = items.find((item) => item.key === params.get('sort'));
 
   return (
-    <Menu as="div" className="relative z-40">
+    <Menu as="div" className="z-1 relative">
       <Menu.Button className="flex items-center">
         <span className="px-2">
           <span className="px-2 font-medium">Sort by:</span>
@@ -382,13 +382,13 @@ export default function SortMenu() {
 
       <Menu.Items
         as="nav"
-        className="absolute right-0 flex flex-col p-4 text-right rounded-sm bg-contrast"
+        className="absolute right-0 z-40 flex flex-col rounded-sm bg-contrast p-4 text-right"
       >
         {items.map((item) => (
           <Menu.Item key={item.label}>
             {() => (
               <Link
-                className={`block text-sm pb-2 px-3 ${
+                className={`block px-3 pb-2 text-sm ${
                   activeItem?.key === item.key ? 'font-bold' : 'font-normal'
                 }`}
                 to={getSortLink(item.key, params, location)}

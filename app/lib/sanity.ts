@@ -45,20 +45,20 @@ export const COLLECTION = groq`
   "vector": collection->vector.asset->url,
 `;
 
-export const COLLECTION_GROUP = groq`
-  _key,
-  _type,
-  ...,
-  collectionLinks[]{
-    _key,
-    megaMenuFeatures,
-    "title": displayTitle,
-    ${COLLECTION}
+export const LINK = groq`
+  "documentType": _type,
+  (_type == "collection") => {
+    "slug": "/collections/" + store.slug.current,
   },
-  collectionProducts->{
-    ${COLLECTION}
+  (_type == "home") => {
+    "slug": "/",
   },
-  title,
+  (_type == "page") => {
+    "slug": "/pages/" + slug.current,
+  },
+  (_type == "product" && store.isEnabled && store.status == "active") => {
+    "slug": "/products/" + store.slug.current,
+  },
 `;
 
 export const LINK_INTERNAL = groq`
@@ -66,18 +66,29 @@ export const LINK_INTERNAL = groq`
   _type,
   title,
   ...reference-> {
-    "documentType": _type,
-    (_type == "collection") => {
-      "slug": "/collections/" + store.slug.current,
-    },
-    (_type == "home") => {
-      "slug": "/",
-    },
-    (_type == "page") => {
-      "slug": "/pages/" + slug.current,
-    },
-    (_type == "product" && store.isEnabled && store.status == "active") => {
-      "slug": "/products/" + store.slug.current,
-    },
+    ${LINK}
   }
+`;
+
+export const COLLECTION_GROUP = groq`
+  _key,
+  _type,
+  ...,
+  megaMenuFeatures[]{
+    _key,
+    title,
+    image,
+    link->{
+      ${LINK}
+    }
+  },
+  collectionLinks[]{
+    _key,
+    "title": displayTitle,
+    ${COLLECTION}
+  },
+  collectionProducts->{
+    ${COLLECTION}
+  },
+  title,
 `;

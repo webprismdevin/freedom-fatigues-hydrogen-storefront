@@ -166,12 +166,14 @@ export default function Collection() {
           appliedFilters={appliedFilters}
           collections={collections as CollectionType[]}
         >
-          <ProductGrid
-            key={collection.id}
-            collection={collection as CollectionType}
-            url={`/collections/${collection.handle}`}
-            data-test="product-grid"
-          />
+          <div className="z-0">
+            <ProductGrid
+              key={collection.id}
+              collection={collection as CollectionType}
+              url={`/collections/${collection.handle}`}
+              data-test="product-grid"
+            />
+          </div>
         </SortFilter>
         <PageHeader heading={collection.title}>
           {collection?.description && (
