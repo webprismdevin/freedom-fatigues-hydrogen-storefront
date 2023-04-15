@@ -147,7 +147,8 @@ export function MenuDrawer({
 function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
-      {/* Top level menu items */}
+      {/* Top level menu items */} yes, I seen her surgery. Amazing shorebird
+      changing so much. Yeah, this part of the space doesn't move. Yeah.
       {(menu || []).map((item) => (
         <div key={item._key}>
           {item.collectionLinks && (
@@ -322,27 +323,27 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex gap-4">
+        <nav className="flex items-center gap-4">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
-            return (
-              <div key={item._key}>
-                {item.collectionLinks && <MegaMenu item={item} />}
-                {item._type === 'linkInternal' && (
-                  <Link
-                    key={item._key}
-                    to={item.slug}
-                    target="_parent"
-                    prefetch="intent"
-                    className={({isActive}) =>
-                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
-                    }
-                  >
-                    <LinkTitle text={item.title} />
-                  </Link>
-                )}
-              </div>
-            );
+            if (item._type === 'collectionGroup') {
+              return <MegaMenu key={item._key} item={item} isHome={isHome} />;
+            }
+            if (item._type === 'linkInternal') {
+              return (
+                <Link
+                  key={item._key}
+                  to={item.slug}
+                  target="_parent"
+                  prefetch="intent"
+                  className={({isActive}) =>
+                    isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                  }
+                >
+                  <LinkTitle text={item.title} />
+                </Link>
+              );
+            }
           })}
         </nav>
       </div>
@@ -383,20 +384,26 @@ function DesktopHeader({
 }
 
 function LinkTitle({text}: {text: string}) {
-  return <span className="font-bold uppercase">{text}</span>;
+  return <span className="text-lg font-bold uppercase">{text}</span>;
 }
 
-function MegaMenu({item}: {item: any}) {
+function MegaMenu({item, isHome}: {item: any; isHome: boolean;}) {
   const [open, cycleOpen] = useCycle(0, 1);
+
   return (
     <div>
-      <div onMouseEnter={() => cycleOpen()}>
-        <LinkTitle text={item.title} />
+      {/* eslint-disable-next-line */}
+      <div
+        onClick={() => cycleOpen()}
+        className="flex cursor-pointer items-center"
+      >
+        <LinkTitle text={item.title} />{' '}
+        <IconCaret direction={open ? 'up' : 'down'} />
       </div>
       <AnimatePresence>
         {open && (
           <motion.div
-            onMouseLeave={() => cycleOpen()}
+            onClick={() => cycleOpen(0)}
             initial={{opacity: 0, y: 20}}
             animate={{opacity: 1, y: 0}}
             exit={{opacity: 0, y: 20}}

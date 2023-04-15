@@ -31,6 +31,7 @@ import {DEFAULT_LOCALE, parseMenu, type EnhancedMenu} from './lib/utils';
 import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
+import AnnouncementBar from './components/AnnouncementBar';
 import {getSiteSettings, sanity} from './lib/sanity';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
@@ -83,10 +84,11 @@ export async function loader({context}: LoaderArgs) {
     getLayoutData(context),
   ]);
 
-  // const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
+  const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
   const settings = await getSiteSettings();
 
   return defer({
+    announcements,
     settings,
     layout,
     selectedLocale: context.storefront.i18n,
@@ -103,8 +105,6 @@ export default function App() {
   const locale = data.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
 
-  console.log(data, 'data');
-
   useAnalytics(hasUserConsent, locale);
 
   return (
@@ -115,6 +115,10 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <AnnouncementBar
+          interval={data.announcements.interval}
+          data={data.announcements.announcements}
+        />
         <Layout
           settings={data.settings}
           layout={data.layout as LayoutData}
@@ -212,7 +216,7 @@ const LAYOUT_QUERY = `#graphql
         }
       }
     }
-    announcements: metaobjects(type: $type, first: 10) {
+    announcementsMeta: metaobjects(type: $type, first: 10) {
       nodes {
         fields {
           key
@@ -234,7 +238,6 @@ const LAYOUT_QUERY = `#graphql
 export interface LayoutData {
   headerMenu: EnhancedMenu;
   footerMenu: EnhancedMenu;
-  announcements: any;
   shop: Shop;
   cart?: Promise<Cart>;
 }
@@ -272,9 +275,7 @@ async function getLayoutData({storefront}: AppLoadContext) {
     ? parseMenu(data.footerMenu, customPrefixes)
     : undefined;
 
-  const announcements = data?.announcements ? data.announcements : undefined;
-
-  return {shop: data.shop, headerMenu, footerMenu, announcements};
+  return {shop: data.shop, headerMenu, footerMenu};
 }
 
 const CART_QUERY = `#graphql

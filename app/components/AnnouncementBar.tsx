@@ -39,11 +39,11 @@ export default function AnnouncementBar({
         exit={{backgroundColor: 'transparent'}}
         transition={{backgroundColor: {duration: 0.2}}}
       >
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
           <motion.div
-            initial={{opacity: 0, x: -1000}}
-            animate={{opacity: 1, x: 0}}
-            exit={{opacity: 0, x: 1000}}
+            initial={{x: -1000}}
+            animate={{x: 0}}
+            exit={{x: 1000}}
             custom={direction}
             key={page}
             className="absolute flex h-12 w-full items-center justify-center text-white"

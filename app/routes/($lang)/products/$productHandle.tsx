@@ -41,6 +41,7 @@ import type {
   ProductConnection,
   MediaConnection,
   MediaImage,
+  Metafield,
 } from '@shopify/hydrogen/storefront-api-types';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import type {Storefront} from '~/lib/type';
@@ -82,7 +83,11 @@ export async function loader({params, request, context}: LoaderArgs) {
   });
 
   const {shop, product} = await context.storefront.query<{
-    product: ProductType & {selectedVariant?: ProductVariant};
+    product: ProductType & {
+      selectedVariant?: ProductVariant;
+      caption?: Metafield;
+      fabric_fit?: Metafield;
+    };
     shop: Shop;
   }>(PRODUCT_QUERY, {
     variables: {
@@ -152,41 +157,66 @@ export default function Product() {
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
+                <Heading
+                  as="h1"
+                  className="whitespace-normal font-heading text-2xl md:text-3xl lg:text-4xl"
+                >
+                  {title}
+                </Heading>
+                {product.caption && (
+                  <div className="text-slate-600">{product.caption?.value}</div>
+                )}
                 <StarRating
                   rating={Number(product.avg_rating?.value)}
                   count={Number(product.num_reviews?.value)}
                 />
-                <Heading as="h1" className="whitespace-normal">
-                  {title}
-                </Heading>
               </div>
               <ProductForm />
               <div className="grid gap-4 py-4">
+                <hr />
                 {descriptionHtml && (
-                  <ProductDetail
-                    title="Product Details"
-                    content={descriptionHtml}
-                  />
+                  <>
+                    <ProductDetail
+                      title="Product Details"
+                      content={descriptionHtml}
+                    />
+                    <hr />
+                  </>
                 )}
                 {shippingPolicy?.body && (
-                  <ProductDetail
-                    title="Shipping"
-                    content={getExcerpt(shippingPolicy.body)}
-                    learnMore={`/policies/${shippingPolicy.handle}`}
-                  />
+                  <>
+                    <ProductDetail
+                      title="Shipping"
+                      content={getExcerpt(shippingPolicy.body)}
+                      learnMore={`/policies/${shippingPolicy.handle}`}
+                    />
+                    <hr />
+                  </>
                 )}
                 {refundPolicy?.body && (
-                  <ProductDetail
-                    title="Returns"
-                    content={getExcerpt(refundPolicy.body)}
-                    learnMore={`/policies/${refundPolicy.handle}`}
-                  />
+                  <>
+                    <ProductDetail
+                      title="Returns + Exchanges"
+                      content={getExcerpt(refundPolicy.body)}
+                      learnMore={`/policies/${refundPolicy.handle}`}
+                    />
+                    <hr />
+                  </>
                 )}
-                {/* <ProductDetail
-                  title="Supporting"
-                  content={getExcerpt(refundPolicy.body)}
-                  learnMore={`/policies/${refundPolicy.handle}`}
-                /> */}
+                {product.fabric_fit && (
+                  <>
+                    <ProductDetail
+                      title="Fabric + Fit"
+                      content={product.fabric_fit?.value}
+                    />
+                    <hr />
+                  </>
+                )}
+                <ProductDetail
+                  title="Supporting Veterans + First Responders"
+                  content="We donate 10% of our profits to support veterans and first responders."
+                />
+                <hr />
                 <div
                   className="block w-full md:hidden"
                   key={product.id}
@@ -198,17 +228,60 @@ export default function Product() {
           </div>
         </div>
       </Section>
+      <ThreeColumns data={defaultColumnData} />
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
           resolve={recommended}
         >
           {(products) => (
-            <ProductSwimlane title="Related Products" products={products} />
+            <ProductSwimlane title="You Might Also Like" products={products} />
           )}
         </Await>
       </Suspense>
     </>
+  );
+}
+
+const defaultColumnData = [
+  {
+    title: 'Veteran + LEO Owned',
+    content:
+      "Freedom Fatigues is a veteran and LE owned and operated company producing only American-made apparel and accessories. We don't just print in the USA - we MAKE all our products here!",
+  },
+  {
+    title: 'Supporting First Responders',
+    content:
+      "With every purchase, we're able to give back to organizations that support the mental health of our veterans and first responders. We're proud to be a partner in the fight against hero suicide.",
+  },
+  {
+    title: 'American-Made',
+    content:
+      'Our sweatshirts are American-made, right down to the knitting of the fabric, and screen printed in our Detriot, MI warehouse',
+  },
+];
+
+function ThreeColumns({
+  data,
+}: {
+  data: {
+    title: string;
+    content: string;
+  }[];
+}) {
+  return (
+    <section className="bg-slate-100 p-8 md:p-12 lg:p-24">
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
+        {data.map((item: any) => (
+          <div key={item.title}>
+            <h3 className="mb-4 text-center text-2xl font-bold md:text-3xl">
+              {item.title}
+            </h3>
+            <p className="text-center">{item.content}</p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -267,6 +340,8 @@ export function ProductForm() {
     quantity: 1,
   };
 
+  const quantityAvailable = selectedVariant?.quantityAvailable;
+
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -276,6 +351,15 @@ export function ProductForm() {
         />
         {selectedVariant && (
           <div className="grid items-stretch gap-4">
+            {quantityAvailable && quantityAvailable > 0 && (
+              <div
+                className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
+              >
+                {quantityAvailable < 10 && <span>Only&nbsp;</span>}
+                <span className="font-bold">{quantityAvailable}&nbsp;</span>left
+                in this size
+              </div>
+            )}
             <AddToCartButton
               lines={[
                 {
@@ -317,10 +401,15 @@ export function ProductForm() {
             {!isOutOfStock && (
               <ShopPayButton
                 width="100%"
+                className="rounded-none"
                 storeDomain="freedom-fatigues.myshopify.com"
                 variantIds={[selectedVariant?.id!]}
               />
             )}
+            <div className="flex justify-between">
+              <div>Free Shipping on orders 99+</div>
+              <div>Easy Returns</div>
+            </div>
           </div>
         )}
       </div>
@@ -540,6 +629,7 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
       name
       value
     }
+    quantityAvailable
     image {
       id
       url
@@ -595,6 +685,12 @@ const PRODUCT_QUERY = `#graphql
         value
       }
       num_reviews: metafield(namespace: "loox", key: "num_reviews") {
+        value
+      }
+      caption: metafield(namespace: "page", key: "caption") {
+        value
+      }
+      fabric_fit: metafield(namespace: "page", key: "fabric_fit") {
         value
       }
       media(first: 7) {

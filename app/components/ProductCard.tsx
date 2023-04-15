@@ -21,7 +21,11 @@ export function ProductCard({
   onClick,
   quickAdd,
 }: {
-  product: SerializeFrom<Product>;
+  product: SerializeFrom<Product> & {
+    caption?: {value: string};
+    avg_rating?: {value: string};
+    num_reviews?: {value: string};
+  };
   label?: string;
   className?: string;
   loading?: HTMLImageElement['loading'];
@@ -96,7 +100,7 @@ export function ProductCard({
               className="col-span-2 w-full overflow-hidden text-ellipsis capitalize"
               as="h3"
             >
-              {product.title}
+              {product.title.toLocaleLowerCase()}
             </Text>
             <div className="flex place-items-start justify-end gap-4">
               <Text className="flex gap-4">
@@ -112,10 +116,8 @@ export function ProductCard({
           </div>
           {/* for metafield captions later */}
           <div>
-            <p className="text-sm text-slate-400">
-              Perfect for concealed carry
-            </p>
-            <p className="text-sm text-slate-400">Do elit proident.</p>
+            <p className="text-sm text-slate-400">{product.caption?.value}</p>
+            {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
           </div>
         </div>
         {/* star rating placeholder */}
