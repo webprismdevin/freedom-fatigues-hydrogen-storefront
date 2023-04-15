@@ -716,7 +716,7 @@ export function GodFamilyCountry() {
 
 const Footer = ({menu}) => {
   // const sectionCount = 1 + (menu?.items?.length || 3);
-  const sectionCount = 4;
+  const sectionCount = menu.length + 1;
 
   const outlineStyle = 'outline outline-1 outline-[#ffffff66]';
 
