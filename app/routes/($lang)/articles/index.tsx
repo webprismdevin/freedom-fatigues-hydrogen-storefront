@@ -5,11 +5,11 @@ import type {Article, Blog} from '@shopify/hydrogen/storefront-api-types';
 import {Grid, PageHeader, Section, Link} from '~/components';
 import {getImageLoadingPriority, PAGINATION_SIZE} from '~/lib/const';
 
-const BLOG_HANDLE = 'Journal';
+const BLOG_HANDLE = 'Articles';
 
 export const handle = {
   seo: {
-    title: 'Journal',
+    title: 'Articles',
   },
 };
 

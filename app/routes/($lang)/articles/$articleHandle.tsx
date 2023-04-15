@@ -14,7 +14,7 @@ import {ATTR_LOADING_EAGER} from '~/lib/const';
 // import styles from '../../../styles/custom-font.css';
 import type {SeoHandleFunction} from '@shopify/hydrogen';
 
-const BLOG_HANDLE = 'journal';
+const BLOG_HANDLE = 'articles';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.article?.seo?.title,
@@ -29,14 +29,14 @@ export const handle = {
 export async function loader({params, context}: LoaderArgs) {
   const {language, country} = context.storefront.i18n;
 
-  invariant(params.journalHandle, 'Missing journal handle');
+  invariant(params.articleHandle, 'Missing journal handle');
 
   const {blog} = await context.storefront.query<{
     blog: Blog;
   }>(ARTICLE_QUERY, {
     variables: {
       blogHandle: BLOG_HANDLE,
-      articleHandle: params.journalHandle,
+      articleHandle: params.articleHandle,
       language,
     },
   });

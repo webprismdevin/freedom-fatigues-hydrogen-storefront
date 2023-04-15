@@ -24,6 +24,34 @@ export async function getSiteSettings() {
       (_type == 'linkInternal') => {
         ${LINK_INTERNAL}
       },
+    },
+    "footerText": footer.text,
+    "footerMenu": footer.links[]{
+      title,
+      _type,
+      _key,
+      (_type == 'collectionGroup') => {
+        collectionLinks[]{
+          _key,
+          "title": displayTitle,
+          "gid": collection->store.gid,
+          "to": "/collections/" + collection->store.slug.current,
+          "vector": collection->vector.asset->url,
+        }
+      },
+      (_type == 'linkGroup') => {
+        links[] {
+          title,
+          (_type == 'linkExternal')=>{
+            _key,
+            "to": url,
+            newWindow
+          },
+          (_type == 'link')=>{
+            "to": link-> slug.current
+          }
+        }
+      }
     }
   }`;
 
@@ -91,4 +119,12 @@ export const COLLECTION_GROUP = groq`
     ${COLLECTION}
   },
   title,
+`;
+
+export const LINK_EXTERNAL = groq`
+    _key,
+    _type,
+    newWindow,
+    title,
+    url,
 `;

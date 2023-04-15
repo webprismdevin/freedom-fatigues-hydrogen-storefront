@@ -29,6 +29,7 @@ import {
   Text,
   Link,
   AddToCartButton,
+  ProductCard,
 } from '~/components';
 import {getExcerpt} from '~/lib/utils';
 import invariant from 'tiny-invariant';
@@ -45,7 +46,7 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import type {Storefront} from '~/lib/type';
-import type {Product} from 'schema-dts';
+import type {Product, Product} from 'schema-dts';
 import {fromGID} from '~/lib/gidUtils';
 import StarRating from '~/components/StarRating';
 
@@ -153,6 +154,9 @@ export default function Product() {
               id="looxReviews"
               data-product-id={fromGID(product.id)}
             ></div>
+            {product.complete_the_look?.references && (
+              <CompleteTheLook product={product} />
+            )}
           </div>
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
@@ -243,6 +247,31 @@ export default function Product() {
   );
 }
 
+function CompleteTheLook({
+  product,
+}: {
+  product: Product & {complete_the_look: any};
+}) {
+  const {nodes} = product.complete_the_look.references;
+
+  return (
+    <div>
+      <h3 className="mb-4 text-center font-heading text-3xl font-bold md:text-4xl">
+        Complete The Look
+      </h3>
+      <div
+        className={`mx-auto grid max-w-xl grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-${nodes.length}`}
+      >
+        {nodes.map((product: any) => (
+          <div key={product.id}>
+            <ProductCard product={product} quickAdd={false} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const defaultColumnData = [
   {
     title: 'Veteran + LEO Owned',
@@ -329,6 +358,7 @@ export function ProductForm() {
    */
   const selectedVariant = product.selectedVariant ?? firstVariant;
   const isOutOfStock = !selectedVariant?.availableForSale;
+  const availableForSale = selectedVariant?.availableForSale;
 
   const isOnSale =
     selectedVariant?.price?.amount &&
@@ -351,7 +381,7 @@ export function ProductForm() {
         />
         {selectedVariant && (
           <div className="grid items-stretch gap-4">
-            {quantityAvailable && quantityAvailable > 0 && (
+            {availableForSale !== false && (
               <div
                 className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
               >
@@ -661,6 +691,7 @@ const PRODUCT_VARIANT_FRAGMENT = `#graphql
 const PRODUCT_QUERY = `#graphql
   ${MEDIA_FRAGMENT}
   ${PRODUCT_VARIANT_FRAGMENT}
+  ${PRODUCT_CARD_FRAGMENT}
   query Product(
     $country: CountryCode
     $language: LanguageCode
@@ -674,6 +705,7 @@ const PRODUCT_QUERY = `#graphql
       handle
       descriptionHtml
       description
+      availableForSale
       options {
         name
         values
@@ -692,6 +724,14 @@ const PRODUCT_QUERY = `#graphql
       }
       fabric_fit: metafield(namespace: "page", key: "fabric_fit") {
         value
+      }
+      complete_the_look: metafield(namespace: "custom", key: "complete_the_look") {
+        references(first:10) {
+          nodes {
+            __typename
+            ...ProductCard
+          }
+        }
       }
       media(first: 7) {
         nodes {

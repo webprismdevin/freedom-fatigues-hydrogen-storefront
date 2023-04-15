@@ -55,7 +55,7 @@ export function Layout({
         </main>
       </div>
       <GodFamilyCountry />
-      <Footer menu={layout?.footerMenu} />
+      <Footer menu={settings?.footerMenu} />
     </>
   );
 }
@@ -745,17 +745,23 @@ const Footer = ({menu}) => {
             alt="Veteran Owned"
           />
         </div>
-        <div className={`p-12 ${outlineStyle}`}>
-          <FooterLinkList linkList={dummy_links} />
-        </div>
-        <div className={`p-12 ${outlineStyle}`}>
-          {' '}
-          <FooterLinkList linkList={dummy_links} />
-        </div>
-        <div className={`p-12 ${outlineStyle}`}>
-          {' '}
-          <FooterLinkList linkList={dummy_links} />
-        </div>
+        {menu.map((submenu) => (
+          <div key={submenu._key} className={`p-12 ${outlineStyle}`}>
+            {submenu._type === 'linkGroup' && (
+              <FooterLinkList
+                linkList={{title: submenu.title, links: submenu.links}}
+              />
+            )}
+            {submenu._type === 'collectionGroup' && (
+              <FooterLinkList
+                linkList={{
+                  title: submenu.title,
+                  links: submenu.collectionLinks,
+                }}
+              />
+            )}
+          </div>
+        ))}
       </div>
       <div className="p-4 text-center">
         Freedom Fatigues © {new Date().getFullYear()}

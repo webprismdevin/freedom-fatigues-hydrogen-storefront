@@ -97,10 +97,10 @@ export function ProductCard({
           </div>
           <div className="grid grid-cols-3 gap-1">
             <Text
-              className="col-span-2 w-full overflow-hidden text-ellipsis capitalize"
+              className="col-span-2 w-full overflow-hidden text-ellipsis uppercase"
               as="h3"
             >
-              {product.title.toLocaleLowerCase()}
+              {product.title}
             </Text>
             <div className="flex place-items-start justify-end gap-4">
               <Text className="flex gap-4">
@@ -143,9 +143,13 @@ export function ProductCard({
             totalValue: parseFloat(productAnalytics.price),
           }}
         >
-          <Text as="span" className="flex items-center justify-center gap-2">
-            Add to Bag
-          </Text>
+          {product.availableForSale ? (
+            <Text as="span" className="flex items-center justify-center gap-2">
+              Add to Bag
+            </Text>
+          ) : (
+            <Text>Sold out</Text>
+          )}
         </AddToCartButton>
       )}
     </div>
