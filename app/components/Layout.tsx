@@ -147,8 +147,7 @@ export function MenuDrawer({
 function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
-      {/* Top level menu items */} yes, I seen her surgery. Amazing shorebird
-      changing so much. Yeah, this part of the space doesn't move. Yeah.
+      {/* Top level menu items */}
       {(menu || []).map((item) => (
         <div key={item._key}>
           {item.collectionLinks && (
@@ -156,6 +155,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
               <Disclosure.Button className="pb-1 font-heading">
                 {item.title}
               </Disclosure.Button>
+              {/* sublevel menus */}
               <Disclosure.Panel>
                 <ul className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
                   {item.collectionLinks.map((link) => (
