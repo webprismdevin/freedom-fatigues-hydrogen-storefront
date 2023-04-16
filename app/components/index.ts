@@ -17,7 +17,7 @@ export {AccountAddressBook} from './AccountAddressBook';
 export {Modal} from './Modal';
 export {Link} from './Link';
 export {FeaturedCollections} from './FeaturedCollections';
-export {Hero} from './Hero';
+export {Hero} from './HeroShopify';
 export {SortFilter} from './SortFilter';
 export {Grid} from './Grid';
 export {FeaturedProducts} from './FeaturedProducts';

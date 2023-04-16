@@ -128,3 +128,28 @@ export const LINK_EXTERNAL = groq`
     title,
     url,
 `;
+
+//homepage fragments
+export const HERO_FRAGMENT = groq`
+  hero {
+    ...,
+    cta {
+      "text": title,
+      ...reference-> {
+        "documentType": _type,
+        (_type == "collection") => {
+          "to": "/collections/" + store.slug.current,
+        },
+        (_type == "home") => {
+          "to": "/",
+        },
+        (_type == "page") => {
+          "to": "/pages/" + slug.current,
+        },
+        (_type == "product" && store.isEnabled && store.status == "active") => {
+          "to": "/products/" + store.slug.current,
+        },
+      }
+    }
+  }
+`;
