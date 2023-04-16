@@ -15,6 +15,7 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
+    "@cloudflare/kv-asset-handler": "^0.3.0",
     "@headlessui/react": "^1.7.2",
     "@next-boost/hybrid-disk-cache": "^0.3.0",
     "@popmotion/popcorn": "^0.4.4",
