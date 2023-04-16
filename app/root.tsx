@@ -26,6 +26,7 @@ import {NotFound} from './components/NotFound';
 
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
+import remixImageStyles from 'remix-image/remix-image.css';
 
 import {DEFAULT_LOCALE, parseMenu, type EnhancedMenu} from './lib/utils';
 import invariant from 'tiny-invariant';
@@ -69,6 +70,7 @@ export const links: LinksFunction = () => {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/png', href: favicon},
+    {rel: 'stylesheet', href: remixImageStyles},
   ];
 };
 
