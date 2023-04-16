@@ -17,7 +17,8 @@ import {COLLECTION, HERO_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
 import ShippingAndReturns from '~/components/ShippingAndReturns';
 import SlideShow, {slidesData} from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
-import ReviewsCarousel from '~/components/ReviewsCarousel';
+import ReviewCarousel from '~/components/ReviewCarousel';
+import Collection from './collections/$collectionHandle';
 
 interface HomeSeoData {
   shop: {
@@ -53,7 +54,9 @@ export async function loader({params, context}: LoaderArgs) {
   const home = await sanity.fetch(`
     *[_type == "home"][0]{
       ...,
-      ${HERO_FRAGMENT},
+      hero {
+        ${HERO_FRAGMENT}
+      },
       "modules": modules[]{
         ...,
         (_type == 'component.swimlane') => {
@@ -92,22 +95,22 @@ export async function loader({params, context}: LoaderArgs) {
   });
 }
 
-const moduleSwitch = (module) => {
+export type PageModule = any;
+
+const moduleSwitch = (module: PageModule) => {
   switch (module._type) {
     case 'component.textWithImage':
-      return <div>Text with Image</div>;
+      return <TextWithImage />;
     case 'component.hero':
       return <Hero data={module} />;
     case 'component.collectionGrid':
-      return <div>Collection Grid</div>;
+      return <CollectionGrid />;
     case 'component.shippingAndReturns':
       return <ShippingAndReturns />;
-    case 'component.slideshow':
-      return <div>Slideshow</div>;
     case 'component.marquee':
-      return <div>Marquee</div>;
-    case 'component.reviewsCarousel':
-      return <div>Reviews Carousel</div>;
+      return <Marquee />;
+    case 'component.reviewCarousel':
+      return <ReviewCarousel />;
     case 'component.slides':
       return <SlideShow slides={slidesData} />;
     // case 'component.swimlane':
@@ -153,7 +156,7 @@ export default function Homepage() {
         </Suspense>
       )}
 
-      {home.modules.map((module) => moduleSwitch(module))}
+      {home.modules.map((module: PageModule) => moduleSwitch(module))}
 
       {/* <ShippingAndReturns />
 
@@ -173,7 +176,7 @@ export default function Homepage() {
 
       {/* <CollectionGrid />
 
-      <ReviewsCarousel /> */}
+      <ReviewCarousel /> */}
 
       {/* <Hero
         image={{

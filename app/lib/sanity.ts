@@ -131,7 +131,6 @@ export const LINK_EXTERNAL = groq`
 
 //homepage fragments
 export const HERO_FRAGMENT = groq`
-  hero {
     ...,
     image {
       ...,
@@ -156,5 +155,4 @@ export const HERO_FRAGMENT = groq`
         },
       }
     }
-  }
 `;

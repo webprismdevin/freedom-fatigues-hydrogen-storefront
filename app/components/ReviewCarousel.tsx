@@ -27,7 +27,7 @@ export const ReviewCard = ({text, name, rating}: Review) => {
   );
 };
 
-export default function ReviewsCarousel() {
+export default function ReviewCarousel() {
   const [[page, direction], setPage] = useState([0, 0]);
   const index = wrap(0, reviews.length, page);
 
