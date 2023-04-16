@@ -97,22 +97,7 @@ export default function Homepage() {
 
   return (
     <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
-      <Hero
-        image={{
-          url: urlFor(hero.image)
-            .format('webp')
-            .height(840)
-            .width(1440)
-            .auto('format')
-            .url(),
-          alt: hero.image.alt,
-          loading: hero.image.loading,
-        }}
-        caption={hero.caption}
-        title={hero.title}
-        cta={hero.cta}
-        layout={hero.layout}
-      />
+      <Hero data={hero}/>
 
       {featuredProducts && (
         <Suspense>
@@ -137,7 +122,7 @@ export default function Homepage() {
 
       <Marquee />
 
-      <Hero
+      {/* <Hero
         image={{
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761',
           alt: '',
@@ -145,13 +130,13 @@ export default function Homepage() {
         caption={'Hand-Stitched Hats Built In America'}
         title={'American Craftsmanship'}
         cta={{text: 'Shop Hats', to: '/collections/hats'}}
-      />
+      /> */}
 
       <CollectionGrid />
 
       <ReviewsCarousel />
 
-      <Hero
+      {/* <Hero
         image={{
           url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
           alt: '',
@@ -159,7 +144,7 @@ export default function Homepage() {
         caption={'Hand-Stitched Hats Built In America'}
         title={'American Craftsmanship'}
         cta={{text: 'Shop Hats', to: '/collections/hats'}}
-      />
+      /> */}
 
       <TextWithImage />
 

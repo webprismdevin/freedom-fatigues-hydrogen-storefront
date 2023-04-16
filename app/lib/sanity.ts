@@ -11,7 +11,7 @@ export const sanity = createClient({
 
 const builder = imageUrlBuilder(sanity);
 
-export const urlFor = (source: string) => {
+export const urlFor = (source) => {
   return builder.image(source);
 };
 
@@ -133,6 +133,11 @@ export const LINK_EXTERNAL = groq`
 export const HERO_FRAGMENT = groq`
   hero {
     ...,
+    image {
+      ...,
+      "height": asset-> metadata.dimensions.height,
+      "width": asset-> metadata.dimensions.width
+    },
     cta {
       "text": title,
       ...reference-> {
