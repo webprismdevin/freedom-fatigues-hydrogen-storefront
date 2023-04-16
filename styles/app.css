@@ -1,4 +1,4 @@
-@import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
+/* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100'); */
 /* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Regular.otf?v=1680451224'); */
 /* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-Bold.otf?v=1680451224'); */
 /* @import url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/AvenirNextLTPro-It.otf?v=1680451224'); */
@@ -9,7 +9,10 @@
 
 @font-face {
   font-family: 'Norwester-Regular';
-  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100');
+  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/norwester.woff?v=1681662075')
+      format('woff'),
+    url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100')
+      format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
