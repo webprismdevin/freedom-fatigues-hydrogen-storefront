@@ -99,7 +99,12 @@ export default function Homepage() {
     <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
       <Hero
         image={{
-          url: urlFor(hero.image).format('webp').auto('format').url(),
+          url: urlFor(hero.image)
+            .format('webp')
+            .height(840)
+            .width(1440)
+            .auto('format')
+            .url(),
           alt: hero.image.alt,
           loading: hero.image.loading,
         }}

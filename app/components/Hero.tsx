@@ -28,6 +28,8 @@ export function Hero({image, title, caption, cta, layout}: Hero) {
           className="top-300 absolute left-0 right-0 min-h-full min-w-full object-cover"
           alt={image.alt}
           loading={image.loading ? image.loading : 'lazy'}
+          height={800}
+          width={1440}
         />
       </div>
       <div
