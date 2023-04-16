@@ -15,7 +15,6 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
-    "@cloudflare/kv-asset-handler": "^0.3.0",
     "@headlessui/react": "^1.7.2",
     "@popmotion/popcorn": "^0.4.4",
     "@remix-run/react": "^1.14.0",
