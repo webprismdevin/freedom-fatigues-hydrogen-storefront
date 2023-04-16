@@ -13,7 +13,7 @@ import type {
   ProductConnection,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
-import {HERO_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
+import {COLLECTION, HERO_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
 import ShippingAndReturns from '~/components/ShippingAndReturns';
 import SlideShow, {slidesData} from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
@@ -50,17 +50,29 @@ export async function loader({params, context}: LoaderArgs) {
     throw new Response(null, {status: 404});
   }
 
+  const home = await sanity.fetch(`
+    *[_type == "home"][0]{
+      ...,
+      ${HERO_FRAGMENT},
+      "modules": modules[]{
+        ...,
+        (_type == 'component.swimlane') => {
+            "gid": collection->store.gid,
+            "to": "/collections/" + collection->store.slug.current,
+            "handle": collection->store.slug.current,
+        },
+        (_type == 'component.hero') => {
+          ${HERO_FRAGMENT}
+        }
+      },
+  }
+`);
+
   const {shop} = await context.storefront.query<{
     shop: HomeSeoData;
   }>(HOMEPAGE_SEO_QUERY, {
     variables: {handle: 'new-releases'},
   });
-
-  const home = await sanity.fetch(`
-    *[_type == "home"][0]{
-      ${HERO_FRAGMENT}
-    }
-  `);
 
   return defer({
     shop,
@@ -80,6 +92,31 @@ export async function loader({params, context}: LoaderArgs) {
   });
 }
 
+const moduleSwitch = (module) => {
+  switch (module._type) {
+    case 'component.textWithImage':
+      return <div>Text with Image</div>;
+    case 'component.hero':
+      return <Hero data={module} />;
+    case 'component.collectionGrid':
+      return <div>Collection Grid</div>;
+    case 'component.shippingAndReturns':
+      return <ShippingAndReturns />;
+    case 'component.slideshow':
+      return <div>Slideshow</div>;
+    case 'component.marquee':
+      return <div>Marquee</div>;
+    case 'component.reviewsCarousel':
+      return <div>Reviews Carousel</div>;
+    case 'component.slides':
+      return <SlideShow slides={slidesData} />;
+    // case 'component.swimlane':
+    //   return <div>Swimlane</div>;
+    default:
+      return <div>Default</div>;
+  }
+};
+
 export default function Homepage() {
   const {home, featuredProducts, saleProducts} = useLoaderData<typeof loader>();
 
@@ -97,7 +134,7 @@ export default function Homepage() {
 
   return (
     <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
-      <Hero data={hero}/>
+      <Hero data={hero} />
 
       {featuredProducts && (
         <Suspense>
@@ -116,7 +153,9 @@ export default function Homepage() {
         </Suspense>
       )}
 
-      <ShippingAndReturns />
+      {home.modules.map((module) => moduleSwitch(module))}
+
+      {/* <ShippingAndReturns />
 
       <SlideShow slides={slidesData} />
 
@@ -132,9 +171,9 @@ export default function Homepage() {
         cta={{text: 'Shop Hats', to: '/collections/hats'}}
       /> */}
 
-      <CollectionGrid />
+      {/* <CollectionGrid />
 
-      <ReviewsCarousel />
+      <ReviewsCarousel /> */}
 
       {/* <Hero
         image={{
@@ -146,7 +185,7 @@ export default function Homepage() {
         cta={{text: 'Shop Hats', to: '/collections/hats'}}
       /> */}
 
-      <TextWithImage />
+      {/* <TextWithImage /> */}
 
       {saleProducts && (
         <Suspense>

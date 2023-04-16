@@ -11,7 +11,7 @@ export function CollectionGrid() {
         <img
           className={imageClass}
           src={
-            'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/mens-arid-camo-american-flag-oversized-hoodie.png?v=1673590867Í'
+            'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/mens-arid-camo-american-flag-oversized-hoodie.png?v=1673590867'
           }
           alt=""
           loading="lazy"
