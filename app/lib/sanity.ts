@@ -188,6 +188,10 @@ modules[]{
       ...,
       "to":'/collections/' + collection->store.slug.current
     }
+  },
+  (_type == 'component.textWithImage') => {
+    ...,
+    ${CTA_FRAGMENT}
   }
 }
 `;

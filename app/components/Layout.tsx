@@ -626,9 +626,7 @@ const Footer = ({menu, text}) => {
       <div className={`grid w-screen grid-cols-1 lg:grid-cols-${sectionCount}`}>
         <div className={`p-12 ${outlineStyle}`}>
           <LinkListTitle title={'Email'} />
-          <div className="my-2 leading-loose">
-              {text && <p>{text}</p>}
-          </div>
+          <div className="my-2 leading-loose">{text && <p>{text}</p>}</div>
           <div className="flex border-b-2 border-[#ffffff66]">
             <input
               className="flex-1 bg-transparent"
@@ -637,8 +635,12 @@ const Footer = ({menu, text}) => {
             <button type="submit">Submit</button>
           </div>
           <div className="my-4 flex gap-2">
-            <IconInstagram />
-            <IconFacebook />
+            <a href="https://www.instagram.com/freedomfatigues/">
+              <IconInstagram />
+            </a>
+            <a href="https://www.facebook.com/freedomfatigues">
+              <IconFacebook />
+            </a>
           </div>
           <img
             src={'/branding/veteran_owned-footer_badge.png'}
