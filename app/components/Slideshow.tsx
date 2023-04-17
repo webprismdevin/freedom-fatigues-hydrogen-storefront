@@ -63,8 +63,8 @@ export default function SlideShow({data}: {data: any}) {
           >
             <img
               src={urlFor(slides[index].image)
-                .width(slides[index].image.height)
-                .height(slides[index].image.width)
+                .width(1200)
+                .height(1200)
                 .format('webp')
                 .quality(80)
                 .url()}
@@ -80,8 +80,8 @@ export default function SlideShow({data}: {data: any}) {
             <div className="max-w-1/2 hidden h-full overflow-hidden lg:block">
               <img
                 src={urlFor(slides[index].image2)
-                  .width(slides[index].image2.height)
-                  .height(slides[index].image2.width)
+                  .width(1200)
+                  .height(1200)
                   .format('webp')
                   .quality(80)
                   .url()}
