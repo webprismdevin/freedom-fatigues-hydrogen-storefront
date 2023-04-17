@@ -6,12 +6,12 @@ import {NavArrowLeft, NavArrowRight} from './Slideshow';
 import {IconStar} from './StarRating';
 
 export type Review = {
-  text: string;
+  review: string;
   name: string;
   rating: number;
 };
 
-export const ReviewCard = ({text, name, rating}: Review) => {
+export const ReviewCard = ({review, name, rating}: Review) => {
   return (
     <div className="mx-auto max-w-[770px]">
       <div className="mb-2 flex flex-row justify-center gap-1">
@@ -21,13 +21,15 @@ export const ReviewCard = ({text, name, rating}: Review) => {
             <IconStar key={i} size={24} />
           ))}
       </div>
-      <p className="text-xl font-bold md:text-2xl">{text}</p>
+      <p className="text-xl font-bold md:text-2xl">{review}</p>
       <p className="text-md mt-2 font-bold lg:text-lg">{name}</p>
     </div>
   );
 };
 
-export default function ReviewCarousel() {
+export default function ReviewCarousel({data}: {data: any}) {
+  const {reviews} = data;
+
   const [[page, direction], setPage] = useState([0, 0]);
   const index = wrap(0, reviews.length, page);
 
@@ -44,8 +46,11 @@ export default function ReviewCarousel() {
   }, [page]);
 
   return (
-    <div className="relative px-12 py-8 text-center lg:h-[500px] lg:p-24">
-      <h2 className="font-heading text-4xl">1100+ 5-Star Reviews</h2>
+    <div
+      className="relative px-12 py-8 text-center lg:h-[500px] lg:p-24"
+      key={data._key}
+    >
+      <h2 className="font-heading text-4xl">{data.title}</h2>
       <Link to="/reviews">See all reviews</Link>
       <AnimatePresence mode="wait">
         <motion.div
@@ -73,20 +78,20 @@ export default function ReviewCarousel() {
   );
 }
 
-const reviews = [
-  {
-    text: 'The look is perfect and the cotton material is so comfortable. It washes without shrinking and I love the look!',
-    name: 'Gail Leslie Q.',
-    rating: 5,
-  },
-  {
-    text: "This is a quality hat, fit, finish and feels as good as it looks. You can really see and feel the quality of this hat. I'm looking forward to wearing it when weather warms up a bit.",
-    name: 'Brian H.',
-    rating: 5,
-  },
-  {
-    text: 'Great quality shirts and wonder customer service! I ordered the wrong size for my husband. Sent an email requesting an exchange and received an immediate response from Ryann with a return shipping label. Will definitely order from Freedom Fatigues again!',
-    name: 'Melody N.',
-    rating: 5,
-  },
-];
+// const reviews = [
+//   {
+//     text: 'The look is perfect and the cotton material is so comfortable. It washes without shrinking and I love the look!',
+//     name: 'Gail Leslie Q.',
+//     rating: 5,
+//   },
+//   {
+//     text: "This is a quality hat, fit, finish and feels as good as it looks. You can really see and feel the quality of this hat. I'm looking forward to wearing it when weather warms up a bit.",
+//     name: 'Brian H.',
+//     rating: 5,
+//   },
+//   {
+//     text: 'Great quality shirts and wonder customer service! I ordered the wrong size for my husband. Sent an email requesting an exchange and received an immediate response from Ryann with a return shipping label. Will definitely order from Freedom Fatigues again!',
+//     name: 'Melody N.',
+//     rating: 5,
+//   },
+// ];

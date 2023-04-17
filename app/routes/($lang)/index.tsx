@@ -13,12 +13,11 @@ import type {
   ProductConnection,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
-import {COLLECTION, HERO_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
+import {CTA_FRAGMENT, HERO_FRAGMENT, sanity} from '~/lib/sanity';
 import ShippingAndReturns from '~/components/ShippingAndReturns';
-import SlideShow, {slidesData} from '~/components/Slideshow';
+import SlideShow from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
 import ReviewCarousel from '~/components/ReviewCarousel';
-import Collection from './collections/$collectionHandle';
 
 interface HomeSeoData {
   shop: {
@@ -52,22 +51,47 @@ export async function loader({params, context}: LoaderArgs) {
   }
 
   const home = await sanity.fetch(`
-    *[_type == "home"][0]{
+  *[_type == "home"][0]{
+    ...,
+    hero {
+      ${HERO_FRAGMENT}
+    },
+    "modules": modules[]{
       ...,
-      hero {
+      _type,
+      (_type == 'component.swimlane') => {
+          "gid": collection->store.gid,
+          "to": "/collections/" + collection->store.slug.current,
+          "handle": collection->store.slug.current,
+      },
+      (_type == 'component.hero') => {
         ${HERO_FRAGMENT}
       },
-      "modules": modules[]{
+      (_type == 'component.slides') => {
         ...,
-        (_type == 'component.swimlane') => {
-            "gid": collection->store.gid,
-            "to": "/collections/" + collection->store.slug.current,
-            "handle": collection->store.slug.current,
-        },
-        (_type == 'component.hero') => {
-          ${HERO_FRAGMENT}
+        slides[]{
+          ...,
+          ${CTA_FRAGMENT},
+          image {
+            ...,
+            "height": asset-> metadata.dimensions.height,
+            "width": asset-> metadata.dimensions.width
+          },
+          image2 {
+            ...,
+            "height": asset-> metadata.dimensions.height,
+            "width": asset-> metadata.dimensions.width
+          }
         }
       },
+      (_type == 'component.collectionGrid') => {
+        ...,
+        collections[]{
+          ...,
+          "to":'/collections/' + collection->store.slug.current
+        }
+      }
+    },
   }
 `);
 
@@ -100,23 +124,23 @@ export type PageModule = any;
 const moduleSwitch = (module: PageModule) => {
   switch (module._type) {
     case 'component.textWithImage':
-      return <TextWithImage />;
+      return <TextWithImage data={module} />;
     case 'component.hero':
       return <Hero data={module} />;
     case 'component.collectionGrid':
-      return <CollectionGrid />;
+      return <CollectionGrid data={module} />;
     case 'component.shippingAndReturns':
-      return <ShippingAndReturns />;
+      return <ShippingAndReturns data={module} />;
     case 'component.marquee':
-      return <Marquee />;
+      return <Marquee data={module} />;
     case 'component.reviewCarousel':
-      return <ReviewCarousel />;
+      return <ReviewCarousel data={module} />;
     case 'component.slides':
-      return <SlideShow slides={slidesData} />;
+      return <SlideShow data={module} />;
     // case 'component.swimlane':
     //   return <div>Swimlane</div>;
     default:
-      return <div>Default</div>;
+      return null;
   }
 };
 

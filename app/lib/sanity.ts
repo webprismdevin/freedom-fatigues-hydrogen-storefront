@@ -129,6 +129,27 @@ export const LINK_EXTERNAL = groq`
     url,
 `;
 
+export const CTA_FRAGMENT = groq`
+  cta {
+    "text": title,
+    ...reference-> {
+      "documentType": _type,
+      (_type == "collection") => {
+        "to": "/collections/" + store.slug.current,
+      },
+      (_type == "home") => {
+        "to": "/",
+      },
+      (_type == "page") => {
+        "to": "/pages/" + slug.current,
+      },
+      (_type == "product" && store.isEnabled && store.status == "active") => {
+        "to": "/products/" + store.slug.current,
+      },
+    }
+  }
+`;
+
 //homepage fragments
 export const HERO_FRAGMENT = groq`
     ...,
@@ -137,22 +158,5 @@ export const HERO_FRAGMENT = groq`
       "height": asset-> metadata.dimensions.height,
       "width": asset-> metadata.dimensions.width
     },
-    cta {
-      "text": title,
-      ...reference-> {
-        "documentType": _type,
-        (_type == "collection") => {
-          "to": "/collections/" + store.slug.current,
-        },
-        (_type == "home") => {
-          "to": "/",
-        },
-        (_type == "page") => {
-          "to": "/pages/" + slug.current,
-        },
-        (_type == "product" && store.isEnabled && store.status == "active") => {
-          "to": "/products/" + store.slug.current,
-        },
-      }
-    }
+    ${CTA_FRAGMENT}
 `;

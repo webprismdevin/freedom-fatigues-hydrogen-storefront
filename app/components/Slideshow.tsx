@@ -2,20 +2,23 @@ import {AnimatePresence, motion} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
 import {useEffect, useState} from 'react';
 import {Button} from './Button';
+import {urlFor} from '~/lib/sanity';
 
 export interface Slide {
   id: string;
-  image1: string;
-  image2?: string;
+  image: any;
+  image2?: any;
   title: string;
-  description: string;
-  button: {
+  caption: string;
+  cta: {
     text: string;
-    link: string;
+    to: string;
   };
 }
 
-export default function SlideShow({slides}: {slides: Slide[]}) {
+export default function SlideShow({data}: {data: any}) {
+  const {slides}: {slides: Slide[]} = data;
+
   const [[page, direction], setPage] = useState([0, 0]);
   const index = wrap(0, slides.length, page);
 
@@ -23,13 +26,7 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
     setPage([page + newDirection, newDirection]);
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     paginate(1);
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, [page]);
+  // return <div>Send data</div>;
 
   return (
     <motion.div
@@ -50,11 +47,13 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
         >
           <div className="absolute z-10 grid h-full w-full place-items-center px-12">
             <div className="text-center">
-              <h2 className="font-heading text-6xl uppercase">
+              <p className="mb-4">{slides[index].caption}</p>
+              <h2 className="mb-6 max-w-xl text-center font-heading text-6xl uppercase">
                 {slides[index].title}
               </h2>
-              <p className="mb-4 max-w-lg">{slides[index].description}</p>
-              <Button variant="secondary" to={slides[index].button.link}>{slides[index].button.text}</Button>
+              <Button variant="secondary" to={slides[index].cta.to}>
+                {slides[index].cta.text}
+              </Button>
             </div>
           </div>
           <div
@@ -63,19 +62,33 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
             }`}
           >
             <img
-              src={slides[index].image1}
+              src={urlFor(slides[index].image)
+                .width(slides[index].image.height)
+                .height(slides[index].image.width)
+                .format('webp')
+                .quality(80)
+                .url()}
+              height={slides[index].image.height}
+              width={slides[index].image.width}
               className={`min-h-full min-w-full object-cover ${
                 slides[index].image2 ? '' : 'lg:min-w-full'
               }`}
-              alt={slides[index].description}
+              alt={slides[index].image?.alt}
             />
           </div>
           {slides[index].image2 && (
             <div className="max-w-1/2 hidden h-full overflow-hidden lg:block">
               <img
-                src={slides[index].image2}
+                src={urlFor(slides[index].image2)
+                  .width(slides[index].image2.height)
+                  .height(slides[index].image2.width)
+                  .format('webp')
+                  .quality(80)
+                  .url()}
+                height={slides[index].image2.height}
+                width={slides[index].image2.width}
                 className="min-h-full object-cover"
-                alt={slides[index].description}
+                alt={slides[index].image2?.alt}
               />
             </div>
           )}
@@ -97,34 +110,34 @@ export default function SlideShow({slides}: {slides: Slide[]}) {
   );
 }
 
-export const slidesData = [
-  {
-    id: '1',
-    image1:
-      'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
-    image2:
-      'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_New_Keychain_5751c8bd-27bb-4876-adf2-6c7b72efd672.png?v=1675453521',
-    title: 'Slide 1',
-    description:
-      'Pariatur aliqua nostrud pariatur consectetur laborum dolore anim laboris adipisicing et pariatur veniam magna magna.',
-    button: {
-      text: 'Shop Now',
-      link: '/all',
-    },
-  },
-  {
-    id: '2',
-    image1:
-      'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
-    image2: undefined,
-    title: 'Slide 2',
-    description: 'Duis velit do magna proident qui irure ad exercitation.',
-    button: {
-      text: 'Shop Now',
-      link: '/',
-    },
-  },
-];
+// export const slidesData = [
+//   {
+//     id: '1',
+//     image1:
+//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
+//     image2:
+//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_New_Keychain_5751c8bd-27bb-4876-adf2-6c7b72efd672.png?v=1675453521',
+//     title: 'Slide 1',
+//     description:
+//       'Pariatur aliqua nostrud pariatur consectetur laborum dolore anim laboris adipisicing et pariatur veniam magna magna.',
+//     button: {
+//       text: 'Shop Now',
+//       link: '/all',
+//     },
+//   },
+//   {
+//     id: '2',
+//     image1:
+//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
+//     image2: undefined,
+//     title: 'Slide 2',
+//     description: 'Duis velit do magna proident qui irure ad exercitation.',
+//     button: {
+//       text: 'Shop Now',
+//       link: '/',
+//     },
+//   },
+// ];
 
 export const NavArrowLeft = ({
   color,

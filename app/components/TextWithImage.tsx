@@ -1,35 +1,33 @@
 import {Link} from '~/components/Link';
+import {urlFor} from '~/lib/sanity';
+import {PortableText} from '@portabletext/react';
 
-export function TextWithImage() {
+export function TextWithImage({data}: {data: any}) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1">
+    <div
+      className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1"
+      key={data._key}
+    >
       <div className="p-8 lg:p-24">
         <div>
-          <p className="font-heading text-xl lg:text-8xl">AMERICAN</p>
-          <p className="font-heading text-5xl">THROUGH AND THROUGH</p>
+          <p className="font-heading text-6xl lg:text-8xl">{data.title}</p>
+          <p className="font-heading text-3xl lg:text-5xl">{data.caption}</p>
         </div>
         <div className="mt-4">
-          <p className="leading-loose">
-            Freedom Fatigues is committed to producing the highest quality
-            American-made apparel on the market.
-            <br />
-            <br />
-            We are a conscious American enterprise bent on bringing every piece
-            of the apparel manufacturing process back to domestic businesses,
-            and American families.
-          </p>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: data.content,
+            }}
+          />
           <div className="mt-4">
-            <Link to={'/'}>Learn more</Link>
+            <Link to={'/'} className="border-b-2 border-white">
+              Learn more
+            </Link>
           </div>
         </div>
       </div>
       <div>
-        <img
-          src={
-            'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/mens-patriotic-shirts_d09401ab-5571-414f-8f23-7ed49b2604a6.png?v=1667298623'
-          }
-          alt=""
-        />
+        <img src={urlFor(data.image).format('webp').url()} alt="" />
       </div>
     </div>
   );

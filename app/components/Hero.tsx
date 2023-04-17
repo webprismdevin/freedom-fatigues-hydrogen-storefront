@@ -3,6 +3,7 @@ import {Button} from './Button';
 import {SanityImageAssetDocument} from '@sanity/client';
 
 export type Hero = {
+  _key: string;
   image: {
     asset: SanityImageAssetDocument;
     alt: string;
@@ -25,6 +26,7 @@ export function Hero({data}: {data: Hero}) {
 
   return (
     <div
+      key={data._key}
       className={`flex-column align-center relative flex h-[700px] overflow-hidden p-8 lg:p-24 ${
         layout === 'right' && 'justify-end'
       } ${layout === 'center' && 'justify-center text-center'}`}

@@ -220,9 +220,9 @@ function MobileHeader({
       role="banner"
       className={`${
         isHome
-          ? 'bg-primary/80 text-contrast shadow-darkHeader dark:bg-contrast/60 dark:text-primary'
-          : 'bg-contrast/80 text-primary'
-      } sticky top-0 z-40 flex h-nav w-full items-center justify-between gap-4 px-4 leading-none backdrop-blur-lg md:px-8 lg:hidden`}
+          ? 'bg-primary/90 text-contrast shadow-darkHeader'
+          : 'bg-contrast/90 text-primary'
+      } sticky top-0 z-40 flex h-nav w-full items-center justify-between gap-4 px-4 leading-none backdrop-blur-md md:px-8 lg:hidden`}
     >
       <div className="flex w-full items-center justify-start gap-4">
         <button
