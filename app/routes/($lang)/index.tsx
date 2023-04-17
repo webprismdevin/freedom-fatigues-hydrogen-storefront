@@ -18,6 +18,7 @@ import ShippingAndReturns from '~/components/ShippingAndReturns';
 import SlideShow from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
 import ReviewCarousel from '~/components/ReviewCarousel';
+import {getSession} from '~/session';
 
 interface HomeSeoData {
   shop: {
@@ -38,7 +39,7 @@ export interface CollectionHero {
   top?: boolean;
 }
 
-export async function loader({params, context}: LoaderArgs) {
+export async function loader({params, context, request}: LoaderArgs) {
   const {language, country} = context.storefront.i18n;
 
   if (
@@ -50,14 +51,24 @@ export async function loader({params, context}: LoaderArgs) {
     throw new Response(null, {status: 404});
   }
 
-  const hero = await sanity.fetch(`
+  const session = await getSession(request.headers.get('Cookie'));
+  const preview = session.get('preview');
+
+  const heroQuery = `
   *[_type == "home"][0]{
     ...,
     hero {
       ${HERO_FRAGMENT}
     },
   }
-`);
+`;
+
+  // Preview session cookie found, return early and query client-side!
+  if (preview) {
+    return {preview: true, heroQuery};
+  }
+
+  const hero = await sanity.fetch(heroQuery);
 
   const modules = await sanity.fetch(`
   *[_type == "home"][0]{
