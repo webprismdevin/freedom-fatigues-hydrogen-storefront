@@ -1,6 +1,5 @@
 import {Link} from '~/components/Link';
 import {urlFor} from '~/lib/sanity';
-import {PortableText} from '@portabletext/react';
 
 export function TextWithImage({data}: {data: any}) {
   return (
@@ -8,6 +7,11 @@ export function TextWithImage({data}: {data: any}) {
       className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1"
       key={data._key}
     >
+      {data.layout == 'right' && (
+        <div>
+          <img src={urlFor(data.image).format('webp').url()} alt="" />
+        </div>
+      )}
       <div className="p-8 lg:p-24">
         <div>
           <p className="font-heading text-6xl lg:text-8xl">{data.title}</p>
@@ -19,16 +23,20 @@ export function TextWithImage({data}: {data: any}) {
               __html: data.content,
             }}
           />
-          <div className="mt-4">
-            <Link to={'/'} className="border-b-2 border-white">
-              Learn more
-            </Link>
-          </div>
+          {data.cta && (
+            <div className="mt-4">
+              <Link to={data.cta.to} className="border-b-2 border-white">
+                Learn more
+              </Link>
+            </div>
+          )}
         </div>
       </div>
-      <div>
-        <img src={urlFor(data.image).format('webp').url()} alt="" />
-      </div>
+      {data.layout == 'left' && (
+        <div>
+          <img src={urlFor(data.image).format('webp').url()} alt="" />
+        </div>
+      )}
     </div>
   );
 }

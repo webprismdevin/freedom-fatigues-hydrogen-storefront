@@ -6,6 +6,7 @@ import {
   type AppLoadContext,
 } from '@shopify/remix-oxygen';
 import {
+  Await,
   Links,
   Meta,
   Outlet,
@@ -33,6 +34,7 @@ import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import AnnouncementBar from './components/AnnouncementBar';
 import {getSiteSettings, sanity} from './lib/sanity';
+import {Suspense} from 'react';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.layout?.shop?.name,
@@ -101,8 +103,9 @@ export async function loader({context}: LoaderArgs) {
 }
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
-  const locale = data.selectedLocale ?? DEFAULT_LOCALE;
+  const {announcements, settings, layout, selectedLocale} =
+    useLoaderData<typeof loader>();
+  const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
 
   useAnalytics(hasUserConsent, locale);
@@ -115,13 +118,17 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <AnnouncementBar
-          interval={data.announcements.interval}
-          data={data.announcements.announcements}
-        />
+        <Suspense fallback={<div className="h-12"></div>}>
+          <Await resolve={announcements}>
+            <AnnouncementBar
+              interval={announcements.interval}
+              data={announcements.announcements}
+            />
+          </Await>
+        </Suspense>
         <Layout
-          settings={data.settings}
-          layout={data.layout as LayoutData}
+          settings={settings}
+          layout={layout as LayoutData}
           key={`${locale.language}-${locale.country}`}
         >
           <Outlet />
