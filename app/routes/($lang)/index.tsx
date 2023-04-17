@@ -50,13 +50,18 @@ export async function loader({params, context}: LoaderArgs) {
     throw new Response(null, {status: 404});
   }
 
-  const home = await sanity.fetch(`
+  const hero = await sanity.fetch(`
   *[_type == "home"][0]{
     ...,
     hero {
       ${HERO_FRAGMENT}
     },
-    "modules": modules[]{
+  }
+`);
+
+  const modules = await sanity.fetch(`
+  *[_type == "home"][0]{
+    modules[]{
       ...,
       _type,
       (_type == 'component.swimlane') => {
@@ -93,7 +98,7 @@ export async function loader({params, context}: LoaderArgs) {
       }
     },
   }
-`);
+  `);
 
   const {shop} = await context.storefront.query<{
     shop: HomeSeoData;
@@ -103,7 +108,8 @@ export async function loader({params, context}: LoaderArgs) {
 
   return defer({
     shop,
-    home,
+    hero,
+    modules,
     featuredProducts: context.storefront.query<{
       products: ProductConnection;
     }>(HOMEPAGE_FEATURED_PRODUCTS_QUERY),
@@ -124,19 +130,19 @@ export type PageModule = any;
 const moduleSwitch = (module: PageModule) => {
   switch (module._type) {
     case 'component.textWithImage':
-      return <TextWithImage data={module} />;
+      return <TextWithImage data={module} key={module._key} />;
     case 'component.hero':
-      return <Hero data={module} />;
+      return <Hero data={module} key={module._key} />;
     case 'component.collectionGrid':
-      return <CollectionGrid data={module} />;
+      return <CollectionGrid data={module} key={module._key} />;
     case 'component.shippingAndReturns':
-      return <ShippingAndReturns data={module} />;
+      return <ShippingAndReturns data={module} key={module._key} />;
     case 'component.marquee':
-      return <Marquee data={module} />;
+      return <Marquee data={module} key={module._key} />;
     case 'component.reviewCarousel':
-      return <ReviewCarousel data={module} />;
+      return <ReviewCarousel data={module} key={module._key} />;
     case 'component.slides':
-      return <SlideShow data={module} />;
+      return <SlideShow data={module} key={module._key} />;
     // case 'component.swimlane':
     //   return <div>Swimlane</div>;
     default:
@@ -145,12 +151,11 @@ const moduleSwitch = (module: PageModule) => {
 };
 
 export default function Homepage() {
-  const {home, featuredProducts, saleProducts} = useLoaderData<typeof loader>();
+  const {hero, modules, featuredProducts, saleProducts} =
+    useLoaderData<typeof loader>();
 
   // TODO: skeletons vs placeholders
   const skeletons = getHeroPlaceholder([{}, {}, {}]);
-
-  const {hero} = home;
 
   // TODO: analytics
   // useServerAnalytics({
@@ -161,7 +166,7 @@ export default function Homepage() {
 
   return (
     <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
-      <Hero data={hero} />
+      <Hero data={hero.hero} />
 
       {featuredProducts && (
         <Suspense>
@@ -180,39 +185,13 @@ export default function Homepage() {
         </Suspense>
       )}
 
-      {home.modules.map((module: PageModule) => moduleSwitch(module))}
-
-      {/* <ShippingAndReturns />
-
-      <SlideShow slides={slidesData} />
-
-      <Marquee />
-
-      {/* <Hero
-        image={{
-          url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Group_Shot2.jpg?v=1680878761',
-          alt: '',
-        }}
-        caption={'Hand-Stitched Hats Built In America'}
-        title={'American Craftsmanship'}
-        cta={{text: 'Shop Hats', to: '/collections/hats'}}
-      /> */}
-
-      {/* <CollectionGrid />
-
-      <ReviewCarousel /> */}
-
-      {/* <Hero
-        image={{
-          url: 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
-          alt: '',
-        }}
-        caption={'Hand-Stitched Hats Built In America'}
-        title={'American Craftsmanship'}
-        cta={{text: 'Shop Hats', to: '/collections/hats'}}
-      /> */}
-
-      {/* <TextWithImage /> */}
+      {modules && (
+        <Suspense>
+          <Await resolve={modules}>
+            {modules.modules.map((module: PageModule) => moduleSwitch(module))}
+          </Await>
+        </Suspense>
+      )}
 
       {saleProducts && (
         <Suspense>
