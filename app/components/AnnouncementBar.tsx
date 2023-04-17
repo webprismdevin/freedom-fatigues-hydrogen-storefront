@@ -1,12 +1,15 @@
 import {motion, AnimatePresence} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
 import {useEffect, useState} from 'react';
+import {useIsHomePath} from '~/lib/utils';
 
 export default function AnnouncementBar({
   data: announcements,
   internal: slideInterval,
 }: any) {
   const [[page, direction], setPage] = useState([0, 0]);
+  const isHome = useIsHomePath();
+
   const index = wrap(0, announcements.length, page);
 
   const paginate = (newDirection: number) => {
@@ -25,20 +28,12 @@ export default function AnnouncementBar({
   }, [page]);
 
   return (
-    <div className="h-12 overflow-hidden">
-      <motion.div
-        style={{
-          position: 'relative',
-          zIndex: 1,
-          height: '100%',
-        }}
-        custom={direction}
-        key={page}
-        initial={{backgroundColor: 'transparent'}}
-        animate={{backgroundColor: announcements[index].color}}
-        exit={{backgroundColor: 'transparent'}}
-        transition={{backgroundColor: {duration: 0.2}}}
-      >
+    <div
+      className={`h-12 overflow-hidden ${
+        isHome ? 'bg-contrast' : 'bg-primary'
+      }`}
+    >
+      <motion.div className="z-1 relative h-full" custom={direction} key={page}>
         <AnimatePresence>
           <motion.div
             initial={{x: -1000}}
@@ -46,7 +41,9 @@ export default function AnnouncementBar({
             exit={{x: 1000}}
             custom={direction}
             key={page}
-            className="absolute flex h-12 w-full items-center justify-center text-white"
+            className={`absolute flex h-12 w-full items-center justify-center ${
+              isHome ? 'text-primary' : 'text-contrast'
+            }`}
           >
             <span>{announcements[index].title}</span>
           </motion.div>

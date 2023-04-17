@@ -1,6 +1,6 @@
 import {AnimatePresence, motion} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {Button} from './Button';
 import {urlFor} from '~/lib/sanity';
 

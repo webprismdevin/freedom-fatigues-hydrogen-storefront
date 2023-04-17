@@ -53,7 +53,7 @@ export const loader = async ({context: {storefront}}: LoaderArgs) => {
 
 export const meta: MetaFunction = () => {
   return {
-    title: 'All Journals',
+    title: 'All Articles',
   };
 };
 

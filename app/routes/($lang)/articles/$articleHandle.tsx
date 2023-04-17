@@ -19,7 +19,7 @@ const BLOG_HANDLE = 'articles';
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.article?.seo?.title,
   description: data?.article?.seo?.description,
-  titleTemplate: '%s | Journal',
+  titleTemplate: '%s | Articles',
 });
 
 export const handle = {

@@ -13,7 +13,7 @@ export type Hero = {
   };
   title: string;
   caption: string;
-  cta: {
+  cta?: {
     text: string;
     to: string;
   };
@@ -78,15 +78,17 @@ export function Hero({data}: {data: Hero}) {
       <div
         className={`${
           layout === 'right' && 'text-right'
-        } z-1 relative self-center`}
+        } z-1 relative self-center text-contrast`}
       >
         <p className="text-xl font-bold lg:text-2xl">{caption}</p>
         <h2 className="mb-4 font-heading text-4xl uppercase lg:text-6xl">
           {title}
         </h2>
-        <Button to={cta.to} variant="secondary">
-          {cta.text}
-        </Button>
+        {cta?.to && (
+          <Button to={cta.to} variant="secondary">
+            {cta.text}
+          </Button>
+        )}
       </div>
     </div>
   );

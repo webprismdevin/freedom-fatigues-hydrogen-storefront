@@ -5,10 +5,14 @@ import {
   type LoaderArgs,
 } from '@shopify/remix-oxygen';
 import type {Page as PageType} from '@shopify/hydrogen/storefront-api-types';
-import {useLoaderData} from '@remix-run/react';
+import {Await, useLoaderData} from '@remix-run/react';
 import invariant from 'tiny-invariant';
 import {PageHeader} from '~/components';
+import {Hero} from '~/components/Hero';
 import type {SeoHandleFunction} from '@shopify/hydrogen';
+import {HERO_FRAGMENT, MODULE_FRAGMENT, sanity} from '~/lib/sanity';
+import {Suspense} from 'react';
+import Modules from '~/components/Modules';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.page?.seo?.title,
@@ -22,19 +26,29 @@ export const handle = {
 export async function loader({request, params, context}: LoaderArgs) {
   invariant(params.pageHandle, 'Missing page handle');
 
-  const {page} = await context.storefront.query<{page: PageType}>(PAGE_QUERY, {
-    variables: {
-      handle: params.pageHandle,
-      language: context.storefront.i18n.language,
-    },
-  });
+  const sanityPage = await sanity.fetch(
+    `*[_type == 'page' && slug.current == '${params.pageHandle}'][0]{
+      ${HERO_FRAGMENT},
+      ${MODULE_FRAGMENT},
+    }`,
+  );
 
-  if (!page) {
+  const {page: shopPage} = await context.storefront.query<{page: PageType}>(
+    PAGE_QUERY,
+    {
+      variables: {
+        handle: params.pageHandle,
+        language: context.storefront.i18n.language,
+      },
+    },
+  );
+
+  if (!shopPage && !sanityPage) {
     throw new Response(null, {status: 404});
   }
 
   return json(
-    {page},
+    {sanityPage, shopPage},
     {
       headers: {
         // TODO cacheLong()
@@ -44,17 +58,39 @@ export async function loader({request, params, context}: LoaderArgs) {
 }
 
 export default function Page() {
-  const {page} = useLoaderData<typeof loader>();
+  const {sanityPage, shopPage} = useLoaderData<typeof loader>();
+
+  if (sanityPage && !shopPage) return <SanityPage page={sanityPage} />;
+  if (shopPage) return <ShopPage page={shopPage} />;
+}
+
+function SanityPage({page}: {page: any}) {
+  const {hero, modules} = page;
 
   return (
     <>
-      <PageHeader heading={page.title}>
-        <div
-          dangerouslySetInnerHTML={{__html: page.body}}
-          className="prose dark:prose-invert"
-        />
-      </PageHeader>
+      {page.showHero && <Hero data={hero} />}
+      <Suspense>
+        <Await resolve={modules}>
+          <Modules modules={modules} />
+        </Await>
+      </Suspense>
+      {/* <div
+        dangerouslySetInnerHTML={{__html: page.body}}
+        className="prose dark:prose-invert"
+      /> */}
     </>
+  );
+}
+
+function ShopPage({page}: {page: PageType}) {
+  return (
+    <PageHeader heading={page.title}>
+      <div
+        dangerouslySetInnerHTML={{__html: page.body}}
+        className="prose dark:prose-invert"
+      />
+    </PageHeader>
   );
 }
 

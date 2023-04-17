@@ -12,7 +12,7 @@ import type {CollectionHero} from '~/routes/($lang)/index';
 /**
  * Hero component that renders metafields attached to collection resources
  **/
-export function Hero({
+export function HeroShopify({
   byline,
   cta,
   handle,

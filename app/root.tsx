@@ -148,6 +148,7 @@ export function CatchBoundary() {
       </head>
       <body>
         <Layout
+          settings={root?.data.settings}
           layout={root?.data?.layout}
           key={`${locale.language}-${locale.country}`}
         >
@@ -177,7 +178,7 @@ export function ErrorBoundary({error}: {error: Error}) {
         <Links />
       </head>
       <body>
-        <Layout layout={root?.data?.layout}>
+        <Layout layout={root?.data?.layout} settings={root?.data.settings}>
           <GenericError error={error} />
         </Layout>
         <Scripts />

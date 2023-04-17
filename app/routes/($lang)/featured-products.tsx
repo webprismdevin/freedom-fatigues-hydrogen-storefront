@@ -49,7 +49,7 @@ const FEATURED_QUERY = `#graphql
         }
       }
     }
-    featuredProducts: products(first: 12) {
+    featuredProducts: products(first: 12, sortKey: BEST_SELLING) {
       nodes {
         ...ProductCard
       }

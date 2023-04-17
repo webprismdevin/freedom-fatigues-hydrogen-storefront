@@ -13,12 +13,12 @@ import type {
   ProductConnection,
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
-import {CTA_FRAGMENT, HERO_FRAGMENT, sanity} from '~/lib/sanity';
+import {HERO_FRAGMENT, MODULE_FRAGMENT, sanity} from '~/lib/sanity';
 import ShippingAndReturns from '~/components/ShippingAndReturns';
 import SlideShow from '~/components/Slideshow';
 import Marquee from '~/components/Marquee';
 import ReviewCarousel from '~/components/ReviewCarousel';
-import {getSession} from '~/session';
+import Modules from '~/components/Modules';
 
 interface HomeSeoData {
   shop: {
@@ -39,7 +39,7 @@ export interface CollectionHero {
   top?: boolean;
 }
 
-export async function loader({params, context, request}: LoaderArgs) {
+export async function loader({params, context}: LoaderArgs) {
   const {language, country} = context.storefront.i18n;
 
   if (
@@ -51,63 +51,18 @@ export async function loader({params, context, request}: LoaderArgs) {
     throw new Response(null, {status: 404});
   }
 
-  const session = await getSession(request.headers.get('Cookie'));
-  const preview = session.get('preview');
-
-  const heroQuery = `
+  const hero = await sanity.fetch(`
   *[_type == "home"][0]{
     ...,
     hero {
       ${HERO_FRAGMENT}
     },
   }
-`;
-
-  // Preview session cookie found, return early and query client-side!
-  if (preview) {
-    return {preview: true, heroQuery};
-  }
-
-  const hero = await sanity.fetch(heroQuery);
+`);
 
   const modules = await sanity.fetch(`
   *[_type == "home"][0]{
-    modules[]{
-      ...,
-      _type,
-      (_type == 'component.swimlane') => {
-          "gid": collection->store.gid,
-          "to": "/collections/" + collection->store.slug.current,
-          "handle": collection->store.slug.current,
-      },
-      (_type == 'component.hero') => {
-        ${HERO_FRAGMENT}
-      },
-      (_type == 'component.slides') => {
-        ...,
-        slides[]{
-          ...,
-          ${CTA_FRAGMENT},
-          image {
-            ...,
-            "height": asset-> metadata.dimensions.height,
-            "width": asset-> metadata.dimensions.width
-          },
-          image2 {
-            ...,
-            "height": asset-> metadata.dimensions.height,
-            "width": asset-> metadata.dimensions.width
-          }
-        }
-      },
-      (_type == 'component.collectionGrid') => {
-        ...,
-        collections[]{
-          ...,
-          "to":'/collections/' + collection->store.slug.current
-        }
-      }
-    },
+    ${MODULE_FRAGMENT}
   }
   `);
 
@@ -138,28 +93,28 @@ export async function loader({params, context, request}: LoaderArgs) {
 
 export type PageModule = any;
 
-const moduleSwitch = (module: PageModule) => {
-  switch (module._type) {
-    case 'component.textWithImage':
-      return <TextWithImage data={module} key={module._key} />;
-    case 'component.hero':
-      return <Hero data={module} key={module._key} />;
-    case 'component.collectionGrid':
-      return <CollectionGrid data={module} key={module._key} />;
-    case 'component.shippingAndReturns':
-      return <ShippingAndReturns data={module} key={module._key} />;
-    case 'component.marquee':
-      return <Marquee data={module} key={module._key} />;
-    case 'component.reviewCarousel':
-      return <ReviewCarousel data={module} key={module._key} />;
-    case 'component.slides':
-      return <SlideShow data={module} key={module._key} />;
-    // case 'component.swimlane':
-    //   return <div>Swimlane</div>;
-    default:
-      return null;
-  }
-};
+// const moduleSwitch = (module: PageModule) => {
+//   switch (module._type) {
+//     case 'component.textWithImage':
+//       return <TextWithImage data={module} key={module._key} />;
+//     case 'component.hero':
+//       return <Hero data={module} key={module._key} />;
+//     case 'component.collectionGrid':
+//       return <CollectionGrid data={module} key={module._key} />;
+//     case 'component.shippingAndReturns':
+//       return <ShippingAndReturns data={module} key={module._key} />;
+//     case 'component.marquee':
+//       return <Marquee data={module} key={module._key} />;
+//     case 'component.reviewCarousel':
+//       return <ReviewCarousel data={module} key={module._key} />;
+//     case 'component.slides':
+//       return <SlideShow data={module} key={module._key} />;
+//     // case 'component.swimlane':
+//     //   return <div>Swimlane</div>;
+//     default:
+//       return null;
+//   }
+// };
 
 export default function Homepage() {
   const {hero, modules, featuredProducts, saleProducts} =
@@ -199,7 +154,7 @@ export default function Homepage() {
       {modules && (
         <Suspense>
           <Await resolve={modules}>
-            {modules.modules.map((module: PageModule) => moduleSwitch(module))}
+            <Modules modules={modules.modules} />
           </Await>
         </Suspense>
       )}

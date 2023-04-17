@@ -1,4 +1,6 @@
-export async function loader() {
+import {LoaderArgs} from '@shopify/remix-oxygen';
+
+export async function loader({params}: LoaderArgs) {
   throw new Response('Not found', {status: 404});
 }
 

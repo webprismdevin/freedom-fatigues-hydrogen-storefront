@@ -1,5 +1,5 @@
 {
-  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx", "app/routes/($lang)/api/image.js", "app/routes/($lang)/api/image.ts.bak"],
+  "include": ["./**/*.d.ts", "./**/*.ts", "./**/*.tsx", "app/routes/($lang)/api/image.js", "app/routes/($lang)/api/image.ts.bak", "app/routes/($lang)/$.tsx.bak"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "isolatedModules": true,

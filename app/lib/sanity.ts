@@ -1,4 +1,4 @@
-import {createClient} from '@sanity/client';
+import {SanityImageAssetDocument, createClient} from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import {z} from 'zod';
 import groq from 'groq';
@@ -11,7 +11,7 @@ export const sanity = createClient({
 
 const builder = imageUrlBuilder(sanity);
 
-export const urlFor = (source) => {
+export const urlFor = (source: SanityImageAssetDocument) => {
   return builder.image(source);
 };
 
@@ -48,7 +48,7 @@ export async function getSiteSettings() {
             newWindow
           },
           (_type == 'link')=>{
-            "to": link-> slug.current
+            "to": "/pages/" + link->slug.current
           }
         }
       }
@@ -58,16 +58,8 @@ export async function getSiteSettings() {
   return sanity.fetch(query);
 }
 
-export const COLOR_THEME = groq`
-  'background': background.hex,
-  'text': text.hex,
-`;
-
 export const COLLECTION = groq`
   _id,
-  colorTheme->{
-    ${COLOR_THEME}
-  },
   "gid": collection->store.gid,
   "slug": "/collections/" + collection->store.slug.current,
   "vector": collection->vector.asset->url,
@@ -159,4 +151,43 @@ export const HERO_FRAGMENT = groq`
       "width": asset-> metadata.dimensions.width
     },
     ${CTA_FRAGMENT}
+`;
+
+export const MODULE_FRAGMENT = groq`
+modules[]{
+  ...,
+  _type,
+  (_type == 'component.swimlane') => {
+      "gid": collection->store.gid,
+      "to": "/collections/" + collection->store.slug.current,
+      "handle": collection->store.slug.current,
+  },
+  (_type == 'component.hero') => {
+    ${HERO_FRAGMENT}
+  },
+  (_type == 'component.slides') => {
+    ...,
+    slides[]{
+      ...,
+      ${CTA_FRAGMENT},
+      image {
+        ...,
+        "height": asset-> metadata.dimensions.height,
+        "width": asset-> metadata.dimensions.width
+      },
+      image2 {
+        ...,
+        "height": asset-> metadata.dimensions.height,
+        "width": asset-> metadata.dimensions.width
+      }
+    }
+  },
+  (_type == 'component.collectionGrid') => {
+    ...,
+    collections[]{
+      ...,
+      "to":'/collections/' + collection->store.slug.current
+    }
+  }
+}
 `;
