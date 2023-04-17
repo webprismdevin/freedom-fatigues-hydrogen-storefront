@@ -72,7 +72,13 @@ function SanityPage({page}: {page: any}) {
       {page.showHero && <Hero data={hero} />}
       <Suspense>
         <Await resolve={modules}>
-          <Modules modules={modules} />
+          <div
+            className={`py-10 ${
+              page.theme === 'dark' ? 'bg-primary text-contrast' : ''
+            }`}
+          >
+            <Modules modules={modules} />
+          </div>
         </Await>
       </Suspense>
       {/* <div

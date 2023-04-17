@@ -4,15 +4,12 @@ import {urlFor} from '~/lib/sanity';
 export function TextWithImage({data}: {data: any}) {
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-1"
+      className={`flex flex-col lg:flex-row ${
+        data.layout === 'right' && 'lg:flex-row-reverse'
+      }`}
       key={data._key}
     >
-      {data.layout == 'right' && (
-        <div>
-          <img src={urlFor(data.image).format('webp').url()} alt="" />
-        </div>
-      )}
-      <div className="p-8 lg:p-24">
+      <div className="max-w-full self-center p-8 lg:max-w-[50%] lg:p-24">
         <div>
           <p className="font-heading text-6xl lg:text-8xl">{data.title}</p>
           <p className="font-heading text-3xl lg:text-5xl">{data.caption}</p>
@@ -32,11 +29,13 @@ export function TextWithImage({data}: {data: any}) {
           )}
         </div>
       </div>
-      {data.layout == 'left' && (
-        <div>
-          <img src={urlFor(data.image).format('webp').url()} alt="" />
-        </div>
-      )}
+      <div className="">
+        <img
+          src={urlFor(data.image).format('webp').url()}
+          alt=""
+          className="object-cover"
+        />
+      </div>
     </div>
   );
 }
