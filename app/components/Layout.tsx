@@ -298,7 +298,6 @@ function DesktopHeader({
   isHome,
   menu,
   openCart,
-  title,
 }: {
   isHome: boolean;
   openCart: () => void;
@@ -464,7 +463,9 @@ function MegaMenu({
           }`}
         >
           <div className="text-lg">
-            <p className="font-bold text-red-500">{menu.menuTitle}</p>
+            <Link to={menu.megaMenuTitle.to} className="font-bold text-red-500">
+              {menu.megaMenuTitle.title}
+            </Link>
             <ul>
               {menu.collectionLinks.map((link: any) => (
                 <li key={link._key} className="my-4">

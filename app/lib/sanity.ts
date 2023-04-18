@@ -35,7 +35,7 @@ export async function getSiteSettings() {
           _key,
           "title": displayTitle,
           "gid": collection->store.gid,
-          "to": "/collections/" + collection->store.slug.current,
+          ${COLLECTION_LINK},
           "vector": collection->vector.asset->url,
         }
       },
@@ -52,7 +52,8 @@ export async function getSiteSettings() {
           }
         }
       }
-    }
+    },
+    "announcements": announcements[],
   }`;
 
   return sanity.fetch(query);
@@ -64,6 +65,9 @@ export const COLLECTION = groq`
   "slug": "/collections/" + collection->store.slug.current,
   "vector": collection->vector.asset->url,
 `;
+
+const COLLECTION_LINK = groq`
+"to":'/collections/' + collection->store.slug.current`;
 
 export const LINK = groq`
   "documentType": _type,
@@ -109,6 +113,10 @@ export const COLLECTION_GROUP = groq`
   },
   collectionProducts->{
     ${COLLECTION}
+  },
+  megaMenuTitle {
+    title,
+    ${COLLECTION_LINK}
   },
   title,
 `;
@@ -186,7 +194,7 @@ modules[]{
     ...,
     collections[]{
       ...,
-      "to":'/collections/' + collection->store.slug.current
+      ${COLLECTION_LINK}
     }
   },
   (_type == 'component.textWithImage') => {

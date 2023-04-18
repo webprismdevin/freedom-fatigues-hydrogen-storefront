@@ -428,14 +428,6 @@ export function ProductForm() {
                 </Text>
               )}
             </AddToCartButton>
-            {!isOutOfStock && (
-              <ShopPayButton
-                width="100%"
-                className="rounded-none"
-                storeDomain="freedom-fatigues.myshopify.com"
-                variantIds={[selectedVariant?.id!]}
-              />
-            )}
             <div className="flex justify-between">
               <div>Free Shipping on orders 99+</div>
               <div>Easy Returns</div>

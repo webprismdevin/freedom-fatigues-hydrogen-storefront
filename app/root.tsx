@@ -37,15 +37,15 @@ import {getSiteSettings, sanity} from './lib/sanity';
 import {Suspense} from 'react';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
-  title: data?.layout?.shop?.name,
+  title: data?.shop?.shop?.name,
   titleTemplate: '%s',
-  description: data?.layout?.shop?.description,
+  description: data?.shop?.shop?.description,
   handle: '@shopify',
   url: `https://freedomfatigues.com${pathname}`,
   jsonLd: {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: data?.layout?.shop?.name,
+    name: data?.shop?.shop?.name,
     url: `https://freedomfatigues.com${pathname}`,
     logo: '/branding/logo_black.png',
   },
@@ -81,30 +81,29 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({context}: LoaderArgs) {
-  const [cartId, layout] = await Promise.all([
+  const [cartId, shop] = await Promise.all([
     context.session.get('cartId'),
-    getLayoutData(context),
+    getShopData(context),
   ]);
 
-  const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
+  // const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
   const settings = await getSiteSettings();
 
   return defer({
-    announcements,
+    // announcements,
     settings,
-    layout,
+    shop,
     selectedLocale: context.storefront.i18n,
     cart: cartId ? getCart(context, cartId) : undefined,
     analytics: {
       shopifySalesChannel: ShopifySalesChannel.hydrogen,
-      shopId: layout.shop.id,
+      shopId: shop.shop.id,
     },
   });
 }
 
 export default function App() {
-  const {announcements, settings, layout, selectedLocale} =
-    useLoaderData<typeof loader>();
+  const {settings, shop, selectedLocale} = useLoaderData<typeof loader>();
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
 
@@ -119,16 +118,16 @@ export default function App() {
       </head>
       <body>
         <Suspense fallback={<div className="h-12"></div>}>
-          <Await resolve={announcements}>
+          <Await resolve={settings.announcements}>
             <AnnouncementBar
-              interval={announcements.interval}
-              data={announcements.announcements}
+              interval={settings.announcements.interval}
+              data={settings.announcements.announcements}
             />
           </Await>
         </Suspense>
         <Layout
           settings={settings}
-          layout={layout as LayoutData}
+          layout={shop as ShopData}
           key={`${locale.language}-${locale.country}`}
         >
           <Outlet />
@@ -156,7 +155,7 @@ export function CatchBoundary() {
       <body>
         <Layout
           settings={root?.data.settings}
-          layout={root?.data?.layout}
+          layout={root?.data?.shop}
           key={`${locale.language}-${locale.country}`}
         >
           {isNotFound ? (
@@ -185,7 +184,7 @@ export function ErrorBoundary({error}: {error: Error}) {
         <Links />
       </head>
       <body>
-        <Layout layout={root?.data?.layout} settings={root?.data.settings}>
+        <Layout layout={root?.data?.shop} settings={root?.data.settings}>
           <GenericError error={error} />
         </Layout>
         <Scripts />
@@ -197,93 +196,32 @@ export function ErrorBoundary({error}: {error: Error}) {
 const LAYOUT_QUERY = `#graphql
   query layoutMenus(
     $language: LanguageCode
-    $headerMenuHandle: String!
-    $footerMenuHandle: String!
-    $type: String!
   ) @inContext(language: $language) {
     shop {
       id
       name
       description
     }
-    headerMenu: menu(handle: $headerMenuHandle) {
-      id
-      items {
-        ...MenuItem
-        items {
-          ...MenuItem
-        }
-      }
-    }
-    footerMenu: menu(handle: $footerMenuHandle) {
-      id
-      items {
-        ...MenuItem
-        items {
-          ...MenuItem
-        }
-      }
-    }
-    announcementsMeta: metaobjects(type: $type, first: 10) {
-      nodes {
-        fields {
-          key
-          value
-        }
-      }
-    }
-  }
-  fragment MenuItem on MenuItem {
-    id
-    resourceId
-    tags
-    title
-    type
-    url
   }
 `;
 
-export interface LayoutData {
-  headerMenu: EnhancedMenu;
-  footerMenu: EnhancedMenu;
+export interface ShopData {
   shop: Shop;
   cart?: Promise<Cart>;
 }
 
-async function getLayoutData({storefront}: AppLoadContext) {
-  const HEADER_MENU_HANDLE = 'main-menu';
-  const FOOTER_MENU_HANDLE = 'footer';
-
-  const data = await storefront.query<LayoutData>(LAYOUT_QUERY, {
+async function getShopData({storefront}: AppLoadContext) {
+  const data = await storefront.query<ShopData>(LAYOUT_QUERY, {
     variables: {
-      headerMenuHandle: HEADER_MENU_HANDLE,
-      footerMenuHandle: FOOTER_MENU_HANDLE,
       language: storefront.i18n.language,
-      type: 'announcements',
     },
   });
 
   invariant(data, 'No data returned from Shopify API');
 
-  /*
-    Modify specific links/routes (optional)
-    @see: https://shopify.dev/api/storefront/unstable/enums/MenuItemType
-    e.g here we map:
-      - /blogs/news -> /news
-      - /blog/news/blog-post -> /news/blog-post
-      - /collections/all -> /products
-  */
-  const customPrefixes = {BLOG: '', CATALOG: 'products'};
-
-  const headerMenu = data?.headerMenu
-    ? parseMenu(data.headerMenu, customPrefixes)
-    : undefined;
-
-  const footerMenu = data?.footerMenu
-    ? parseMenu(data.footerMenu, customPrefixes)
-    : undefined;
-
-  return {shop: data.shop, headerMenu, footerMenu};
+  return {
+    shop: data.shop,
+  };
 }
 
 const CART_QUERY = `#graphql
