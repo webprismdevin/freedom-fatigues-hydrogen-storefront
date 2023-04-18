@@ -463,9 +463,18 @@ function MegaMenu({
           }`}
         >
           <div className="text-lg">
-            <Link to={menu.megaMenuTitle.to} className="font-bold text-red-500">
-              {menu.megaMenuTitle.title}
-            </Link>
+            {menu.megaMenuTitle?.to ? (
+              <Link
+                to={menu.megaMenuTitle.to}
+                className="font-bold text-red-500"
+              >
+                {menu.megaMenuTitle.title}
+              </Link>
+            ) : (
+              <div className="font-bold text-red-500">
+                {menu.megaMenuTitle.title}
+              </div>
+            )}
             <ul>
               {menu.collectionLinks.map((link: any) => (
                 <li key={link._key} className="my-4">
