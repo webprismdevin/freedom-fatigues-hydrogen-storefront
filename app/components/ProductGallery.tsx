@@ -39,8 +39,7 @@ export function ProductGallery({
         switch (med.mediaContentType) {
           case 'IMAGE':
             mediaProps = {
-              width: 800,
-              widths: [400, 800, 1200, 1600, 2000, 2400],
+              sizes: '50vw',
             };
             break;
           case 'VIDEO':
@@ -90,7 +89,12 @@ export function ProductGallery({
               //   alt={data.image!.altText!}
               //   className="fadeIn aspect-square h-full w-full object-cover"
               // />
-              <Image data={data.image!} loading={mediaProps.loading} />
+              <Image
+                aspectRatio={'4/5'}
+                data={data.image!}
+                sizes="50vw"
+                loading={mediaProps.loading}
+              />
             )}
             {/* <MediaFile
               tabIndex="0"
