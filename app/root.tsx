@@ -39,7 +39,7 @@ import {Suspense} from 'react';
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
   titleTemplate: '%s',
-  description: data?.shop?.shop?.description,
+  description: data?.shop?.shop?.description?.substring(0, 154),
   handle: '@shopify',
   url: `https://freedomfatigues.com${pathname}`,
   jsonLd: {
@@ -48,6 +48,10 @@ const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
     name: data?.shop?.shop?.name,
     url: `https://freedomfatigues.com${pathname}`,
     logo: '/branding/logo_black.png',
+    sameAs: [
+      'https://www.facebook.com/freedomfatigues',
+      'https://www.instagram.com/freedomfatigues/',
+    ],
   },
 });
 

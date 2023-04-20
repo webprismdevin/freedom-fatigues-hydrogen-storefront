@@ -7,6 +7,7 @@ import ShippingAndReturns from './ShippingAndReturns';
 import Marquee from './Marquee';
 import ReviewCarousel from './ReviewCarousel';
 import SlideShow from './Slideshow';
+import {Columns} from './Columns';
 
 export type PageModule = any;
 
@@ -26,6 +27,8 @@ const moduleSwitch = (module: PageModule) => {
       return <ReviewCarousel data={module} key={module._key} />;
     case 'component.slides':
       return <SlideShow data={module} key={module._key} />;
+    case 'component.columns':
+      return <Columns data={module} key={module._key} />;
     // case 'component.swimlane':
     //   return <div>Swimlane</div>;
     default:

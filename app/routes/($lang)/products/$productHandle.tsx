@@ -1,3 +1,4 @@
+import {ThreeColumns} from './../../../components/Columns';
 import {type ReactNode, useRef, Suspense, useMemo, useEffect} from 'react';
 import {Disclosure, Listbox} from '@headlessui/react';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
@@ -46,9 +47,11 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import type {Storefront} from '~/lib/type';
-import type {Product, Product} from 'schema-dts';
+import type {Product} from 'schema-dts';
 import {fromGID} from '~/lib/gidUtils';
 import StarRating from '~/components/StarRating';
+import {sanity} from '~/lib/sanity';
+import Modules from '~/components/Modules';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -64,6 +67,15 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => {
       '@type': 'Product',
       brand: data?.product?.vendor,
       name: data?.product?.title,
+      description: data?.product?.description,
+      image: media?.image?.url,
+      offers: {
+        '@type': 'Offer',
+        price: data?.product?.variants.nodes[0]?.price?.amount,
+        priceCurrency: data?.product?.variants.nodes[0]?.price?.currencyCode,
+        availability: data?.product?.availableForSale,
+        url: data?.product?.url,
+      },
     },
   } satisfies SeoConfig<Product>;
 };
@@ -85,9 +97,12 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const {shop, product} = await context.storefront.query<{
     product: ProductType & {
-      selectedVariant?: ProductVariant;
+      variants[0]?: ProductVariant;
       caption?: Metafield;
       fabric_fit?: Metafield;
+      complete_the_look?: Metafield & {
+        references: any;
+      };
     };
     shop: Shop;
   }>(PRODUCT_QUERY, {
@@ -102,6 +117,12 @@ export async function loader({params, request, context}: LoaderArgs) {
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
+
+  const modules =
+    await sanity.fetch(`*[_type == 'product' && store.slug.current == '${productHandle}'][0]{
+      "modules" : modules[]
+    }
+  `);
 
   const recommended = getRecommendedProducts(context.storefront, product.id);
   const firstVariant = product.variants.nodes[0];
@@ -119,6 +140,7 @@ export async function loader({params, request, context}: LoaderArgs) {
   return defer({
     product,
     shop,
+    modules,
     recommended,
     analytics: {
       pageType: AnalyticsPageType.product,
@@ -130,7 +152,7 @@ export async function loader({params, request, context}: LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, shop, recommended} = useLoaderData<typeof loader>();
+  const {product, shop, recommended, modules} = useLoaderData<typeof loader>();
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
 
@@ -232,7 +254,7 @@ export default function Product() {
           </div>
         </div>
       </Section>
-      <ThreeColumns data={defaultColumnData} />
+      <Modules modules={modules.modules} />
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
@@ -269,48 +291,6 @@ function CompleteTheLook({
         ))}
       </div>
     </div>
-  );
-}
-
-const defaultColumnData = [
-  {
-    title: 'Veteran + LEO Owned',
-    content:
-      "Freedom Fatigues is a veteran and LE owned and operated company producing only American-made apparel and accessories. We don't just print in the USA - we MAKE all our products here!",
-  },
-  {
-    title: 'Supporting First Responders',
-    content:
-      "With every purchase, we're able to give back to organizations that support the mental health of our veterans and first responders. We're proud to be a partner in the fight against hero suicide.",
-  },
-  {
-    title: 'American-Made',
-    content:
-      'Our sweatshirts are American-made, right down to the knitting of the fabric, and screen printed in our Detriot, MI warehouse',
-  },
-];
-
-function ThreeColumns({
-  data,
-}: {
-  data: {
-    title: string;
-    content: string;
-  }[];
-}) {
-  return (
-    <section className="bg-slate-100 p-8 md:p-12 lg:p-24">
-      <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
-        {data.map((item: any) => (
-          <div key={item.title}>
-            <h3 className="mb-4 text-center text-2xl font-bold md:text-3xl">
-              {item.title}
-            </h3>
-            <p className="text-center">{item.content}</p>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -429,8 +409,8 @@ export function ProductForm() {
               )}
             </AddToCartButton>
             <div className="flex justify-between">
-              <div>Free Shipping on orders 99+</div>
-              <div>Easy Returns</div>
+              <div className="text-xs">Free Shipping on orders 99+</div>
+              <div className="text-xs">Easy Returns</div>
             </div>
           </div>
         )}

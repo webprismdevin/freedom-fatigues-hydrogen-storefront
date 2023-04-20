@@ -74,14 +74,15 @@ export function ProductCard({
             {image && (
               <Image
                 className="fadeIn aspect-[4/5] w-full object-cover"
-                widths={[320]}
+                // widths={[320]}
                 sizes="320px"
-                loaderOptions={{
-                  crop: 'center',
-                  scale: 2,
-                  width: 320,
-                  height: 400,
-                }}
+                aspectRatio="4/5"
+                // loaderOptions={{
+                //   crop: 'center',
+                //   scale: 2,
+                //   width: 320,
+                //   height: 400,
+                // }}
                 data={image}
                 alt={image.altText || `Picture of ${product.title}`}
                 loading={loading}

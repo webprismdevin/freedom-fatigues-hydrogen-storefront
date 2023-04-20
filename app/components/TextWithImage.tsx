@@ -29,11 +29,11 @@ export function TextWithImage({data}: {data: any}) {
           )}
         </div>
       </div>
-      <div className="">
+      <div className=" relative aspect-square min-w-[50%]">
         <img
           src={urlFor(data.image).format('webp').url()}
           alt=""
-          className="object-cover"
+          className="absolute h-full w-full object-cover object-center"
         />
       </div>
     </div>

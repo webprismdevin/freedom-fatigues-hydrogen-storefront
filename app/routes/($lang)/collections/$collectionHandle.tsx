@@ -26,13 +26,25 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
     width: data?.collection?.image?.width,
     altText: data?.collection?.image?.altText,
   },
+  jsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    description: data?.collection?.seo?.description,
+    image: {
+      '@type': 'ImageObject',
+      url: data?.collection?.image?.url,
+      height: data?.collection?.image?.height,
+      width: data?.collection?.image?.width,
+    },
+    name: data?.collection?.seo?.title,
+  }
 });
 
 export const handle = {
   seo,
 };
 
-const PAGINATION_SIZE = 48;
+const PAGINATION_SIZE = 64;
 
 type VariantFilterParam = Record<string, string | boolean>;
 type PriceFiltersQueryParam = Record<'price', {max?: number; min?: number}>;
