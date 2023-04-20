@@ -46,7 +46,7 @@ const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: data?.shop?.shop?.name,
-    url: `https://freedomfatigues.com${pathname}`,
+    url: `https://freedomfatigues.com/`,
     logo: '/branding/logo_black.png',
     sameAs: [
       'https://www.facebook.com/freedomfatigues',
