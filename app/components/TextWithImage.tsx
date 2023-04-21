@@ -1,3 +1,4 @@
+import {Image} from '@shopify/hydrogen';
 import {Link} from '~/components/Link';
 import {urlFor} from '~/lib/sanity';
 
@@ -30,9 +31,10 @@ export function TextWithImage({data}: {data: any}) {
         </div>
       </div>
       <div className=" relative aspect-square min-w-[50%]">
-        <img
+        <Image
           src={urlFor(data.image).format('webp').url()}
-          alt=""
+          alt={data.image.alt ? data.image.alt : 'Image'}
+          sizes="(min-width: 1024px) 50vw, 100vw"
           className="absolute h-full w-full object-cover object-center"
         />
       </div>

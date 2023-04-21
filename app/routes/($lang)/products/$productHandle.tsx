@@ -84,6 +84,20 @@ export const handle = {
   seo,
 };
 
+type CustomQueryParams = {
+  variants: ProductVariant[];
+  caption?: Metafield | undefined;
+  fabric_fit?: Metafield | undefined;
+  complete_the_look?: Metafield & {
+    references: any;
+  };
+};
+
+type ProductQueryType = {
+  product: ProductType extends CustomQueryParams;
+  shop: Shop;
+};
+
 export async function loader({params, request, context}: LoaderArgs) {
   const {productHandle} = params;
   invariant(productHandle, 'Missing productHandle param, check route filename');
@@ -95,24 +109,17 @@ export async function loader({params, request, context}: LoaderArgs) {
     selectedOptions.push({name, value});
   });
 
-  const {shop, product} = await context.storefront.query<{
-    product: ProductType & {
-      variants[0]?: ProductVariant;
-      caption?: Metafield;
-      fabric_fit?: Metafield;
-      complete_the_look?: Metafield & {
-        references: any;
-      };
-    };
-    shop: Shop;
-  }>(PRODUCT_QUERY, {
-    variables: {
-      handle: productHandle,
-      selectedOptions,
-      country: context.storefront.i18n.country,
-      language: context.storefront.i18n.language,
+  const {shop, product} = await context.storefront.query<ProductQueryType>(
+    PRODUCT_QUERY,
+    {
+      variables: {
+        handle: productHandle,
+        selectedOptions,
+        country: context.storefront.i18n.country,
+        language: context.storefront.i18n.language,
+      },
     },
-  });
+  );
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
