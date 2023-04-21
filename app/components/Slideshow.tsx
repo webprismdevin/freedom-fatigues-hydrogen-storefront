@@ -3,6 +3,7 @@ import {wrap} from '@popmotion/popcorn';
 import {useState} from 'react';
 import {Button} from './Button';
 import {urlFor} from '~/lib/sanity';
+import {Image} from '@shopify/hydrogen';
 
 export interface Slide {
   id: string;
@@ -61,15 +62,14 @@ export default function SlideShow({data}: {data: any}) {
               slides[index].image2 ? 'lg:max-w-1/2' : ''
             }`}
           >
-            <img
+            <Image
               src={urlFor(slides[index].image)
                 .width(1200)
                 .height(1200)
                 .format('webp')
                 .quality(80)
                 .url()}
-              height={slides[index].image.height}
-              width={slides[index].image.width}
+              sizes={slides[index].image2 ? '50vw' : '100vw'}
               className={`min-h-full min-w-full object-cover ${
                 slides[index].image2 ? '' : 'lg:min-w-full'
               }`}
@@ -78,13 +78,14 @@ export default function SlideShow({data}: {data: any}) {
           </div>
           {slides[index].image2 && (
             <div className="max-w-1/2 hidden h-full overflow-hidden lg:block">
-              <img
+              <Image
                 src={urlFor(slides[index].image2)
                   .width(1200)
                   .height(1200)
                   .format('webp')
                   .quality(80)
                   .url()}
+                sizes={'50vw'}
                 height={slides[index].image2.height}
                 width={slides[index].image2.width}
                 className="min-h-full object-cover"
