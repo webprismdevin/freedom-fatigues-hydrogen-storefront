@@ -1,4 +1,4 @@
-import {json, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import type {
   Collection as CollectionType,
@@ -14,6 +14,8 @@ import invariant from 'tiny-invariant';
 import {PageHeader, Section, Text, SortFilter} from '~/components';
 import {ProductGrid} from '~/components/ProductGrid';
 import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
+import {sanity} from '~/lib/sanity';
+import Modules from '~/components/Modules';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.collection?.seo?.title,
@@ -37,7 +39,7 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
       width: data?.collection?.image?.width,
     },
     name: data?.collection?.seo?.title,
-  }
+  },
 });
 
 export const handle = {
@@ -132,6 +134,19 @@ export async function loader({params, request, context}: LoaderArgs) {
     });
   }
 
+  const modules =
+    await sanity.fetch(`*[_type == 'collection' && store.slug.current == '${collectionHandle}'][0]{
+    modules[]{
+      (_type == 'component.collectionGrid') => {
+        ...,
+        collections[]{
+          ...,
+          "to":'/collections/' + collection->store.slug.current
+        }
+      }
+    }
+  }`);
+
   const {collection, collections} = await context.storefront.query<{
     collection: CollectionType;
     collections: CollectionConnection;
@@ -156,6 +171,7 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   return json({
     collection,
+    modules,
     appliedFilters,
     collections: collectionNodes,
     analytics: {
@@ -167,11 +183,14 @@ export async function loader({params, request, context}: LoaderArgs) {
 }
 
 export default function Collection() {
-  const {collection, collections, appliedFilters} =
+  const {collection, collections, appliedFilters, modules} =
     useLoaderData<typeof loader>();
 
   return (
     <>
+      <div className="p-2 md:p-4 lg:p-8">
+        <Modules modules={modules.modules} />
+      </div>
       <Section>
         <SortFilter
           filters={collection.products.filters as Filter[]}

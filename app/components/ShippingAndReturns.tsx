@@ -1,3 +1,4 @@
+import {Image} from '@shopify/hydrogen';
 import {urlFor} from '~/lib/sanity';
 
 export default function ShippingAndReturns({
@@ -24,10 +25,10 @@ export default function ShippingAndReturns({
           </div>
         </div>
         <div className="col-span-1 grid place-items-center">
-          <img
+          <Image
             src={urlFor(image).width(200).height(166).format('webp').url()}
-            height={166 / 1.5}
-            width={200 / 1.5}
+            height={166 / 1.8}
+            width={200 / 1.8}
             loading="lazy"
             className="invert"
             alt="Freedom Fatigues branded American flag"
@@ -54,10 +55,10 @@ export default function ShippingAndReturns({
         </div>
       </div>
       <div className="col-span-1 grid place-items-center">
-        <img
+        <Image
           src={urlFor(image).width(200).height(166).format('webp').url()}
-          height={166 / 1.5}
-          width={200 / 1.5}
+          height={166 / 1.8}
+          width={200 / 1.8}
           loading="lazy"
           alt="Freedom Fatigues branded American flag"
         />

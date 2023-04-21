@@ -161,6 +161,16 @@ export const HERO_FRAGMENT = groq`
     ${CTA_FRAGMENT}
 `;
 
+export const COLLECTION_GRID_FRAGMENT = groq`
+(_type == 'component.collectionGrid') => {
+  ...,
+  collections[]{
+    ...,
+    ${COLLECTION_LINK}
+  }
+}
+`;
+
 export const MODULE_FRAGMENT = groq`
 modules[]{
   ...,
@@ -190,13 +200,7 @@ modules[]{
       }
     }
   },
-  (_type == 'component.collectionGrid') => {
-    ...,
-    collections[]{
-      ...,
-      ${COLLECTION_LINK}
-    }
-  },
+  ${COLLECTION_GRID_FRAGMENT},
   (_type == 'component.textWithImage') => {
     ...,
     ${CTA_FRAGMENT}

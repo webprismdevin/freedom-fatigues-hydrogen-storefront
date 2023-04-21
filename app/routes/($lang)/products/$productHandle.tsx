@@ -1,5 +1,11 @@
-import {ThreeColumns} from './../../../components/Columns';
-import {type ReactNode, useRef, Suspense, useMemo, useEffect} from 'react';
+import {
+  type ReactNode,
+  useRef,
+  Suspense,
+  useMemo,
+  useEffect,
+  useState,
+} from 'react';
 import {Disclosure, Listbox} from '@headlessui/react';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {
@@ -89,12 +95,12 @@ type CustomQueryParams = {
   caption?: Metafield | undefined;
   fabric_fit?: Metafield | undefined;
   complete_the_look?: Metafield & {
-    references: any;
+    references: ProductType;
   };
 };
 
 type ProductQueryType = {
-  product: ProductType extends CustomQueryParams;
+  product: ProductType & CustomQueryParams;
   shop: Shop;
 };
 
@@ -167,7 +173,7 @@ export default function Product() {
     const script = document.createElement('script');
     script.src =
       'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com';
-    script.async = true;
+    script.defer = true;
     document.body.appendChild(script);
   }, []);
 
@@ -177,15 +183,19 @@ export default function Product() {
         <div className="grid grid-cols-1 items-start md:grid-cols-2 md:gap-6 lg:grid-cols-5 lg:gap-10">
           <div className="col-span-1 lg:col-span-3">
             <ProductGallery media={media.nodes} />
-            <div
-              className="hidden w-full md:block"
-              key={product.id}
-              id="looxReviews"
-              data-product-id={fromGID(product.id)}
-            ></div>
-            {product.complete_the_look?.references && (
-              <CompleteTheLook product={product} />
-            )}
+            <ResponsiveBrowserWidget breakpoint={1024} greaterThan={true}>
+              <div
+                className="w-full"
+                key={product.id}
+                id="looxReviews"
+                data-product-id={fromGID(product.id)}
+              ></div>
+            </ResponsiveBrowserWidget>
+            <div className="hidden lg:block">
+              {product.complete_the_look?.references && (
+                <CompleteTheLook product={product} />
+              )}
+            </div>
           </div>
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
@@ -250,12 +260,14 @@ export default function Product() {
                   content="We donate 10% of our profits to support veterans and first responders."
                 />
                 <hr />
-                <div
-                  className="block w-full md:hidden"
-                  key={product.id}
-                  id="looxReviews"
-                  data-product-id={fromGID(product.id)}
-                ></div>
+                <ResponsiveBrowserWidget breakpoint={768}>
+                  <div
+                    className="w-full"
+                    key={product.id}
+                    id="looxReviews"
+                    data-product-id={fromGID(product.id)}
+                  ></div>
+                </ResponsiveBrowserWidget>
               </div>
             </section>
           </div>
@@ -274,6 +286,33 @@ export default function Product() {
       </Suspense>
     </>
   );
+}
+
+let isHydrating = true;
+
+function ResponsiveBrowserWidget({
+  breakpoint,
+  children,
+  greaterThan = false,
+}: {
+  breakpoint: number;
+  children: ReactNode;
+  greaterThan?: boolean;
+}) {
+  const [isHydrated, setIsHydrated] = useState(!isHydrating);
+
+  useEffect(() => {
+    isHydrating = false;
+    setIsHydrated(true);
+  }, []);
+
+  if (isHydrated && greaterThan) {
+    return <>{window.innerWidth > breakpoint && children}</>;
+  } else if (isHydrated && !greaterThan) {
+    return <>{window.innerWidth < breakpoint && children}</>;
+  } else {
+    return <div>loading...</div>;
+  }
 }
 
 function CompleteTheLook({
