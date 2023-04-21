@@ -74,15 +74,8 @@ export function ProductCard({
             {image && (
               <Image
                 className="fadeIn aspect-[4/5] w-full object-cover"
-                // widths={[320]}
                 sizes="320px"
                 aspectRatio="4/5"
-                // loaderOptions={{
-                //   crop: 'center',
-                //   scale: 2,
-                //   width: 320,
-                //   height: 400,
-                // }}
                 data={image}
                 alt={image.altText || `Picture of ${product.title}`}
                 loading={loading}
@@ -98,7 +91,7 @@ export function ProductCard({
           </div>
           <div className="grid grid-cols-3 gap-1">
             <Text
-              className="col-span-2 w-full overflow-hidden text-ellipsis uppercase"
+              className="col-span-2 w-full overflow-hidden text-ellipsis"
               as="h3"
             >
               {product.title}
