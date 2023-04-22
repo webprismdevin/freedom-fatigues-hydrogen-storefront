@@ -16,7 +16,7 @@ function MarqueeContent({data}: {data: any}) {
     <>
       {data?.items?.map((item: string, index: number) => (
         <div
-          className="scroll flex h-12 flex-shrink-0 flex-grow-0 items-center justify-start gap-4 uppercase text-white"
+          className="scroll flex h-12 flex-shrink-0 flex-grow-0 items-center justify-start gap-4 uppercase"
           key={index}
         >
           <span className="whitespace-nowrap font-heading text-4xl">

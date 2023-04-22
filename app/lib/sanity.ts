@@ -53,6 +53,36 @@ export async function getSiteSettings() {
         }
       }
     },
+    footer {
+      ...,
+      links[]{
+        title,
+        _type,
+        _key,
+        (_type == 'collectionGroup') => {
+          collectionLinks[]{
+            _key,
+            "title": displayTitle,
+            "gid": collection->store.gid,
+            ${COLLECTION_LINK},
+            "vector": collection->vector.asset->url,
+          }
+        },
+        (_type == 'linkGroup') => {
+          links[] {
+            title,
+            (_type == 'linkExternal')=>{
+              _key,
+              "to": url,
+              newWindow
+            },
+            (_type == 'link')=>{
+              "to": "/pages/" + link->slug.current
+            }
+          }
+        }
+      },
+    },
     "announcements": announcements[],
   }`;
 

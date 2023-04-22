@@ -382,7 +382,7 @@ export function ProductForm() {
    * of add to cart if there is none returned from the loader.
    * A developer can opt out of this, too.
    */
-  const selectedVariant = product.selectedVariant ?? firstVariant;
+  const selectedVariant = product.selectedVariant ?? undefined;
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
 

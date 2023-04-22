@@ -30,6 +30,9 @@ export function Link(props: LinkProps) {
   const [root] = useMatches();
   const selectedLocale = root.data?.selectedLocale;
 
+  const decorationClasses =
+    'border-b-1 border-transparent hover:border-red-500';
+
   let toWithLocale = to;
 
   if (typeof to === 'string') {
@@ -38,9 +41,19 @@ export function Link(props: LinkProps) {
 
   if (typeof className === 'function') {
     return (
-      <RemixNavLink to={toWithLocale} className={className} {...resOfProps} />
+      <RemixNavLink
+        to={toWithLocale}
+        className={`${className} ${decorationClasses}`}
+        {...resOfProps}
+      />
     );
   }
 
-  return <RemixLink to={toWithLocale} className={className} {...resOfProps} />;
+  return (
+    <RemixLink
+      to={toWithLocale}
+      className={`${className ? className : ''} ${decorationClasses}`}
+      {...resOfProps}
+    />
+  );
 }

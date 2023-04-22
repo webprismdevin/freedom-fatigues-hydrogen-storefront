@@ -47,7 +47,7 @@ export default function ReviewCarousel({data}: {data: any}) {
 
   return (
     <div
-      className="relative px-12 py-8 text-center lg:h-[500px] lg:p-24"
+      className="relative h-[700px] px-12 pb-8 pt-12 text-center lg:h-[500px] lg:p-24 lg:px-24"
       key={data._key}
     >
       <h2 className="font-heading text-4xl">{data.title}</h2>
@@ -65,12 +65,12 @@ export default function ReviewCarousel({data}: {data: any}) {
         </motion.div>
       </AnimatePresence>
       <NavArrowLeft
-        className="absolute left-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
+        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:left-5"
         aria-label="previous"
         onClick={() => paginate(-1)}
       />
       <NavArrowRight
-        className="absolute right-5 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer"
+        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:right-5"
         aria-label="next"
         onClick={() => paginate(1)}
       />

@@ -121,14 +121,6 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Suspense fallback={<div className="h-12"></div>}>
-          <Await resolve={settings.announcements}>
-            <AnnouncementBar
-              interval={settings.announcements.interval}
-              data={settings.announcements.announcements}
-            />
-          </Await>
-        </Suspense>
         <Layout
           settings={settings}
           layout={shop as ShopData}

@@ -30,6 +30,7 @@ import type {LayoutData} from '../root';
 import {AnimatePresence, useCycle, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
+import {Image} from '@shopify/hydrogen';
 
 export function Layout({
   children,
@@ -40,6 +41,8 @@ export function Layout({
   layout: LayoutData;
   settings: any;
 }) {
+  const {announcements} = settings;
+
   return (
     <>
       <div className="flex min-h-screen flex-col">
@@ -48,13 +51,22 @@ export function Layout({
             Skip to content
           </a>
         </div>
+        <Suspense fallback={<div className="h-12"></div>}>
+          <Await resolve={settings.announcements}>
+            <AnnouncementBar data={announcements} />
+          </Await>
+        </Suspense>
         <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}
         </main>
       </div>
-      <GodFamilyCountry />
-      <Footer menu={settings?.footerMenu} text={settings?.footerText} />
+      <GodFamilyCountry preFooter={settings.footer.preFooter} />
+      <Suspense fallback={null}>
+        <Await resolve={settings.footer}>
+          <Footer footer={settings.footer} text={'test text'} />
+        </Await>
+      </Suspense>
     </>
   );
 }
@@ -164,7 +176,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                         target={link.target}
                         onClick={onClose}
                         className={({isActive}) =>
-                          isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                          isActive ? '-mb-px pb-1' : 'pb-1'
                         }
                       >
                         <Text as="span" size="copy">
@@ -464,16 +476,11 @@ function MegaMenu({
         >
           <div className="text-lg">
             {menu.megaMenuTitle?.to ? (
-              <Link
-                to={menu.megaMenuTitle.to}
-                className="font-bold text-red-500"
-              >
+              <Link to={menu.megaMenuTitle.to} className="font-bold">
                 {menu.megaMenuTitle.title}
               </Link>
             ) : (
-              <div className="font-bold text-red-500">
-                {menu.megaMenuTitle.title}
-              </div>
+              <div className="font-bold">{menu.megaMenuTitle.title}</div>
             )}
             <ul>
               {menu.collectionLinks.map((link: any) => (
@@ -495,7 +502,11 @@ function MegaMenu({
           <div className="grid grid-cols-2 gap-8 self-stretch">
             {menu.megaMenuFeatures &&
               menu.megaMenuFeatures.map((feature: any) => (
-                <Link to={feature.link.slug} key={feature._key}>
+                <Link
+                  to={feature.link.slug}
+                  key={feature._key}
+                  className={({isActive}) => (isActive ? 'text-primary' : '')}
+                >
                   <div
                     className={`relative grid place-items-center ${
                       menu.megaMenuFeatures?.length === 1 && 'col-span-2'
@@ -593,50 +604,52 @@ function Badge({
   );
 }
 
-// const FooterLink = ({item}: {item: EnhancedMenuItem}) => {
-//   if (item.to.startsWith('http')) {
-//     return (
-//       <a href={item.to} target={item.target} rel="noopener noreferrer">
-//         {item.title}
-//       </a>
-//     );
-//   }
+export function GodFamilyCountry({preFooter}: {preFooter: any}) {
+  const {title, text, image} = preFooter;
 
-//   return (
-//     <Link to={item.to} target={item.target} prefetch="intent">
-//       {item.title}
-//     </Link>
-//   );
-// };
-
-export function GodFamilyCountry() {
   return (
     <div className="flex flex-col items-center justify-center gap-1 bg-primary p-12 text-center text-contrast">
-      <p className="text-2xl font-bold">God, Family, Country.</p>
-      <p className="text-lg font-bold">In that order.</p>
+      <p className="text-2xl font-bold">{title}</p>
+      <p className="text-lg font-bold">{text}</p>
       <div
         style={{
           width: 128,
         }}
       >
-        <img src={'/branding/logo_white.png'} alt="logo" />
+        <Image src={urlFor(image).url()} alt={image?.alt} sizes="128px" />
       </div>
     </div>
   );
 }
 
-const Footer = ({menu, text}) => {
-  // const sectionCount = 1 + (menu?.items?.length || 3);
-  const sectionCount = menu.length + 1;
+const FooterLinkList = ({linkList}) => {
+  return (
+    <div>
+      <LinkListTitle title={linkList.title} />
+      <ul>
+        {linkList.links.map((link) => (
+          <li key={link.title} className={'my-2'}>
+            <Link to={link.to}>{link.title}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
+const Footer = ({text, footer}: any) => {
+  const {links, email} = footer;
+  const sectionCount = links.length + 1;
   const outlineStyle = 'outline outline-1 outline-[#ffffff66]';
 
   return (
     <div className="bg-primary text-contrast">
       <div className={`grid w-screen grid-cols-1 lg:grid-cols-${sectionCount}`}>
         <div className={`p-12 ${outlineStyle}`}>
-          <LinkListTitle title={'Email'} />
-          <div className="my-2 leading-loose">{text && <p>{text}</p>}</div>
+          <LinkListTitle title={email.title} />
+          <div className="my-2 leading-loose">
+            {email.text && <p>{email.text}</p>}
+          </div>
           <div className="flex border-b-2 border-[#ffffff66]">
             <input
               className="flex-1 bg-transparent"
@@ -657,7 +670,7 @@ const Footer = ({menu, text}) => {
             alt="Veteran Owned"
           />
         </div>
-        {menu.map((submenu) => (
+        {links.map((submenu: any) => (
           <div key={submenu._key} className={`p-12 ${outlineStyle}`}>
             {submenu._type === 'linkGroup' && (
               <FooterLinkList
@@ -678,21 +691,6 @@ const Footer = ({menu, text}) => {
       <div className="p-4 text-center">
         Freedom Fatigues © {new Date().getFullYear()}
       </div>
-    </div>
-  );
-};
-
-const FooterLinkList = ({linkList}) => {
-  return (
-    <div>
-      <LinkListTitle title={linkList.title} />
-      <ul>
-        {linkList.links.map((link) => (
-          <li key={link.title} className={'my-2'}>
-            <Link to={link.to}>{link.title}</Link>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };

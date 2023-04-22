@@ -1,3 +1,6 @@
+import {Image} from '@shopify/hydrogen';
+import {urlFor} from '~/lib/sanity';
+
 export function Columns({
   data,
 }: {
@@ -17,6 +20,16 @@ export function Columns({
       >
         {data.columns.map((item: any) => (
           <div key={item.title} className="mx-auto max-w-[400px]">
+            {item.image && (
+              <div className="card-image mb-4 aspect-square">
+                <Image
+                  src={urlFor(item.image).url()}
+                  sizes="50vw"
+                  aspectRatio="1/1"
+                  alt={item.image?.alt}
+                />
+              </div>
+            )}
             <h3 className="mb-4 text-center text-2xl font-bold md:text-3xl">
               {item.title}
             </h3>
