@@ -72,7 +72,7 @@ export function ProductGallery({
 
         const style = [
           isFullWidth ? 'md:col-span-2' : 'md:col-span-1',
-          isFirst || isFourth ? '' : 'md:aspect-[4/5]',
+          // isFirst || isFourth ? '' : 'md:aspect-[4/5]',
           'aspect-square snap-center card-image bg-white dark:bg-contrast/10 w-mobileGallery md:w-full',
         ].join(' ');
 
@@ -90,7 +90,7 @@ export function ProductGallery({
               //   className="fadeIn aspect-square h-full w-full object-cover"
               // />
               <Image
-                aspectRatio={'4/5'}
+                aspectRatio={'1/1'}
                 data={data.image!}
                 sizes="50vw"
                 loading={mediaProps.loading}

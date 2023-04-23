@@ -23,6 +23,7 @@ import {
   flattenConnection,
   type SeoHandleFunction,
   type SeoConfig,
+  Image,
 } from '@shopify/hydrogen';
 import {
   Heading,
@@ -37,6 +38,7 @@ import {
   Link,
   AddToCartButton,
   ProductCard,
+  Button,
 } from '~/components';
 import {getExcerpt} from '~/lib/utils';
 import invariant from 'tiny-invariant';
@@ -191,13 +193,8 @@ export default function Product() {
                 data-product-id={fromGID(product.id)}
               ></div>
             </ResponsiveBrowserWidget>
-            <div className="hidden lg:block">
-              {product.complete_the_look?.references && (
-                <CompleteTheLook product={product} />
-              )}
-            </div>
           </div>
-          <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
+          <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:min-h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
                 <Heading
@@ -226,6 +223,15 @@ export default function Product() {
                     <hr />
                   </>
                 )}
+                {product.fabric_fit && (
+                  <>
+                    <ProductDetail
+                      title="Fabric + Fit"
+                      content={product.fabric_fit?.value}
+                    />
+                    <hr />
+                  </>
+                )}
                 {shippingPolicy?.body && (
                   <>
                     <ProductDetail
@@ -246,20 +252,16 @@ export default function Product() {
                     <hr />
                   </>
                 )}
-                {product.fabric_fit && (
-                  <>
-                    <ProductDetail
-                      title="Fabric + Fit"
-                      content={product.fabric_fit?.value}
-                    />
-                    <hr />
-                  </>
-                )}
                 <ProductDetail
                   title="Supporting Veterans + First Responders"
                   content="We donate 10% of our profits to support veterans and first responders."
                 />
                 <hr />
+                <div className="hidden lg:block">
+                  {product.complete_the_look?.references && (
+                    <CompleteTheLook product={product} />
+                  )}
+                </div>
                 <ResponsiveBrowserWidget breakpoint={768}>
                   <div
                     className="w-full"
@@ -324,17 +326,35 @@ function CompleteTheLook({
 
   return (
     <div>
-      <h3 className="mb-4 text-center font-heading text-3xl font-bold md:text-4xl">
+      <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
         Complete The Look
       </h3>
-      <div
-        className={`mx-auto grid max-w-xl grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-${nodes.length}`}
-      >
+      <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
         {nodes.map((product: any) => (
           <div key={product.id}>
-            <ProductCard product={product} quickAdd={false} />
+            <InlineProductCard product={product} />
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+export function InlineProductCard({product}: {product: ProductType}) {
+  const variant = product.variants.nodes[0];
+
+  return (
+    <div className="grid w-full grid-cols-4 gap-2">
+      <div className="card-image col-span-1">
+        <Image sizes="128px" src={variant.image.url} alt={product.title} />
+      </div>
+      <div className="col-span-3">
+        <StarRating
+          rating={Number(product.avg_rating?.value)}
+          count={product.num_reviews.value}
+        />
+        <div className="text-lg">{product.title}</div>
+        <div className="text-sm">${variant.price.amount}</div>
       </div>
     </div>
   );
@@ -382,7 +402,7 @@ export function ProductForm() {
    * of add to cart if there is none returned from the loader.
    * A developer can opt out of this, too.
    */
-  const selectedVariant = product.selectedVariant ?? undefined;
+  const selectedVariant = product.selectedVariant;
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
 
@@ -405,7 +425,7 @@ export function ProductForm() {
           options={product.options}
           searchParamsWithDefaults={searchParamsWithDefaults}
         />
-        {selectedVariant && (
+        {selectedVariant ? (
           <div className="grid items-stretch gap-4">
             {availableForSale !== false && (
               <div
@@ -458,6 +478,25 @@ export function ProductForm() {
               <div className="text-xs">Free Shipping on orders 99+</div>
               <div className="text-xs">Easy Returns</div>
             </div>
+          </div>
+        ) : (
+          <div>
+            <Button variant="secondary" disabled className="w-full">
+              <span>Select a size</span> <span>·</span>{' '}
+              <Money
+                withoutTrailingZeros
+                data={product.variants.nodes[0]?.price!}
+                as="span"
+              />
+              {isOnSale && (
+                <Money
+                  withoutTrailingZeros
+                  data={product.variants.nodes[0]?.compareAtPrice!}
+                  as="span"
+                  className="strike opacity-50"
+                />
+              )}
+            </Button>
           </div>
         )}
       </div>
@@ -530,7 +569,7 @@ function ProductOptions({
                                   optionValue={value}
                                   className={clsx(
                                     'flex w-full cursor-pointer items-center justify-start rounded p-2 text-left text-primary transition',
-                                    active && 'bg-primary/10',
+                                    active && 'bg-contrast/10',
                                   )}
                                   searchParams={searchParamsWithDefaults}
                                   onClick={() => {
