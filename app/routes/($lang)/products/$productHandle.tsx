@@ -390,7 +390,7 @@ export function ProductForm() {
 
     for (const {name, value} of firstVariant.selectedOptions) {
       if (!searchParams.has(name)) {
-        clonedParams.set(name, value);
+        clonedParams.set(name, '');
       }
     }
 

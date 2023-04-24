@@ -1,13 +1,16 @@
+import {useScroll, useTransform, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 
 export default function HomeHero({data}: any) {
-  // console.log(data);
+  const {scrollYProgress} = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+
   const content = data.content[0];
   const image = content.image;
 
   return (
     <div
-      className="relative flex flex-col items-center justify-center w-full h-screen overflow-hidden bg-gray-100"
+      className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-gray-100"
       style={{marginTop: -96}}
     >
       <img src={urlFor(image.asset).url()} alt="" />
