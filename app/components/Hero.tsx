@@ -45,13 +45,13 @@ export function Hero({data}: {data: Hero}) {
     >
       <motion.div
         style={{y}}
-        className="absolute bottom-0 left-0 z-0 h-full w-full"
+        className="absolute left-0 top-0 z-0 h-full w-full"
       >
         <Image
           src={urlFor(image.asset).format('webp').quality(80).url()}
           sizes={'100vw'}
           aspectRatio={`${image.width} / ${image.height}`}
-          className="mx-auto mt-[-200px] min-h-full w-auto object-cover"
+          className="mx-auto mt-0 min-h-full w-auto object-cover"
           alt={image.alt}
           loading={image.loading ? image.loading : 'lazy'}
         />
