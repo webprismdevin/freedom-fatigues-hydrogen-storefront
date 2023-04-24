@@ -482,7 +482,7 @@ export function ProductForm() {
         ) : (
           <div>
             <Button variant="secondary" disabled className="w-full">
-              <span>Select a size</span> <span>·</span>{' '}
+              <span>Make a selection</span> <span>·</span>{' '}
               <Money
                 withoutTrailingZeros
                 data={product.variants.nodes[0]?.price!}
