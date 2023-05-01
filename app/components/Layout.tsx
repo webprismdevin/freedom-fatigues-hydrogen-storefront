@@ -521,7 +521,7 @@ function MegaMenu({
                         .url()}
                       alt=""
                     />
-                    <div className="text-bold absolute font-heading text-2xl text-white">
+                    <div className="text-bold text-shadow absolute font-heading text-2xl text-white">
                       {feature.title}
                     </div>
                   </div>

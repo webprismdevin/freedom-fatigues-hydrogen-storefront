@@ -27,7 +27,7 @@ export function CollectionGrid({data}: {data: any}) {
             alt=""
             loading="lazy"
           />
-          <span className="z-1 relative text-5xl text-white">
+          <span className="z-1 text-shadow relative text-5xl text-white">
             {collection.title}
           </span>
         </Link>

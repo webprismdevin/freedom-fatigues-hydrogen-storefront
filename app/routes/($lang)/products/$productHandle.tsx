@@ -58,8 +58,10 @@ import type {Storefront} from '~/lib/type';
 import type {Product} from 'schema-dts';
 import {fromGID} from '~/lib/gidUtils';
 import StarRating from '~/components/StarRating';
-import {sanity} from '~/lib/sanity';
+import {MODULE_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
 import Modules from '~/components/Modules';
+import groq from 'groq';
+import {SanityImageAssetDocument} from '@sanity/client';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -133,6 +135,8 @@ export async function loader({params, request, context}: LoaderArgs) {
     throw new Response(null, {status: 404});
   }
 
+  const defaults = await sanity.fetch(DEFAULTS_QUERY);
+
   const modules =
     await sanity.fetch(`*[_type == 'product' && store.slug.current == '${productHandle}'][0]{
       "modules" : modules[]
@@ -155,6 +159,7 @@ export async function loader({params, request, context}: LoaderArgs) {
   return defer({
     product,
     shop,
+    defaults,
     modules,
     recommended,
     analytics: {
@@ -167,7 +172,13 @@ export async function loader({params, request, context}: LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, shop, recommended, modules} = useLoaderData<typeof loader>();
+  const {product, shop, recommended, modules, defaults} =
+    useLoaderData<typeof loader>();
+  const {
+    lastAccordion,
+    belowCartCopy,
+    modules: defaultModules,
+  } = defaults.product;
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
 
@@ -212,6 +223,7 @@ export default function Product() {
                 />
               </div>
               <ProductForm />
+              <Badges />
               <div className="grid gap-4 py-4">
                 <hr />
                 {descriptionHtml && (
@@ -254,13 +266,11 @@ export default function Product() {
                 )}
                 <ProductDetail
                   title="Supporting Veterans + First Responders"
-                  content="We donate 10% of our profits to support veterans and first responders."
+                  content={lastAccordion}
                 />
                 <hr />
                 <div className="hidden lg:block">
-                  {product.complete_the_look?.references && (
-                    <CompleteTheLook product={product} />
-                  )}
+                  <CompleteTheLook />
                 </div>
                 <ResponsiveBrowserWidget breakpoint={768}>
                   <div
@@ -270,12 +280,15 @@ export default function Product() {
                     data-product-id={fromGID(product.id)}
                   ></div>
                 </ResponsiveBrowserWidget>
+                <div className="lg:hidden">
+                  <CompleteTheLook />
+                </div>
               </div>
             </section>
           </div>
         </div>
       </Section>
-      <Modules modules={modules.modules} />
+      <Modules modules={modules.modules ? modules.modules : defaultModules} />
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
@@ -289,6 +302,29 @@ export default function Product() {
     </>
   );
 }
+
+type Badge = {
+  _key: string;
+  alt: string;
+  asset: SanityImageAssetDocument;
+};
+
+const Badges = () => {
+  const {defaults} = useLoaderData<typeof loader>();
+
+  return (
+    <div className="flex flex-wrap justify-between gap-2">
+      {defaults.product.badges.map((badge: Badge) => (
+        <Image
+          width={'84'}
+          src={urlFor(badge.asset).format('webp').height(96).quality(100).url()}
+          alt={badge.alt}
+          key={badge._key}
+        />
+      ))}
+    </div>
+  );
+};
 
 let isHydrating = true;
 
@@ -317,12 +353,10 @@ function ResponsiveBrowserWidget({
   }
 }
 
-function CompleteTheLook({
-  product,
-}: {
-  product: Product & {complete_the_look: any};
-}) {
-  const {nodes} = product.complete_the_look.references;
+function CompleteTheLook() {
+  const {product} = useLoaderData<typeof loader>();
+
+  if (!product.complete_the_look) return null;
 
   return (
     <div>
@@ -330,7 +364,7 @@ function CompleteTheLook({
         Complete The Look
       </h3>
       <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
-        {nodes.map((product: any) => (
+        {product?.complete_the_look?.references.nodes.map((product: any) => (
           <div key={product.id}>
             <InlineProductCard product={product} />
           </div>
@@ -361,7 +395,8 @@ export function InlineProductCard({product}: {product: ProductType}) {
 }
 
 export function ProductForm() {
-  const {product, analytics} = useLoaderData<typeof loader>();
+  const {product, analytics, defaults} = useLoaderData<typeof loader>();
+  const {belowCartCopy} = defaults.product;
 
   const [currentSearchParams] = useSearchParams();
   const transition = useTransition();
@@ -474,10 +509,6 @@ export function ProductForm() {
                 </Text>
               )}
             </AddToCartButton>
-            <div className="flex justify-between">
-              <div className="text-xs">Free Shipping on orders 99+</div>
-              <div className="text-xs">Easy Returns</div>
-            </div>
           </div>
         ) : (
           <div>
@@ -499,6 +530,10 @@ export function ProductForm() {
             </Button>
           </div>
         )}
+        <div className="flex justify-between">
+          <div className="text-xs">{belowCartCopy.left}</div>
+          <div className="text-xs">{belowCartCopy.right}</div>
+        </div>
       </div>
     </div>
   );
@@ -515,7 +550,10 @@ function ProductOptions({
   return (
     <>
       {options
-        .filter((option) => option.values.length > 1)
+        .filter(
+          (option) =>
+            option.values.length >= 1 && option.values[0] !== 'Default Title',
+        )
         .map((option) => (
           <div
             key={option.name}
@@ -707,6 +745,14 @@ function ProductDetail({
     </Disclosure>
   );
 }
+
+const DEFAULTS_QUERY = groq`
+  *[_id == "settings"][0] {
+    product {
+      ...,
+      ${MODULE_FRAGMENT},
+    }
+  }`;
 
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariantFragment on ProductVariant {

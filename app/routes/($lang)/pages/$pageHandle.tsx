@@ -81,20 +81,16 @@ function SanityPage({page}: {page: any}) {
           </div>
         </Await>
       </Suspense>
-      {/* <div
-        dangerouslySetInnerHTML={{__html: page.body}}
-        className="prose dark:prose-invert"
-      /> */}
     </>
   );
 }
 
 function ShopPage({page}: {page: PageType}) {
   return (
-    <PageHeader heading={page.title}>
+    <PageHeader heading={""}>
       <div
         dangerouslySetInnerHTML={{__html: page.body}}
-        className="prose dark:prose-invert"
+        className="prose mx-auto dark:prose-invert"
       />
     </PageHeader>
   );

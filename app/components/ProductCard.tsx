@@ -70,12 +70,12 @@ export function ProductCard({
         prefetch="intent"
       >
         <div className={clsx('grid gap-4', className)}>
-          <div className="card-image aspect-[4/5] bg-primary/5">
+          <div className="card-image aspect-square bg-primary/5">
             {image && (
               <Image
                 className="fadeIn aspect-[4/5] w-full object-cover"
                 sizes="320px"
-                aspectRatio="4/5"
+                aspectRatio="1/1"
                 data={image}
                 alt={image.altText || `Picture of ${product.title}`}
                 loading={loading}

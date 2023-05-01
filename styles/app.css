@@ -15,7 +15,7 @@
       format('opentype');
   font-weight: normal;
   font-style: normal;
-  font-display: ;
+  font-display: optional;
 }
 @font-face {
   font-family: 'AvenirNextLTPro-Regular';
@@ -223,6 +223,10 @@ shop-pay-button {
       @apply aspect-[inherit] w-full object-cover;
     }
   }
+}
+
+.text-shadow {
+  text-shadow: 5px 3px 6px rgba(0, 0, 0, 0.40);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
