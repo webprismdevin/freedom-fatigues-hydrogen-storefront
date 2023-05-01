@@ -316,7 +316,8 @@ const Badges = () => {
     <div className="flex flex-wrap justify-between gap-2">
       {defaults.product.badges.map((badge: Badge) => (
         <Image
-          width={'84'}
+          sizes="(max-width: 639px) 64px, 80px"
+          className="max-w-[64px] flex-grow-0 md:max-w-[80px]"
           src={urlFor(badge.asset).format('webp').height(96).quality(100).url()}
           alt={badge.alt}
           key={badge._key}

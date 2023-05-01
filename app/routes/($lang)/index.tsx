@@ -93,29 +93,6 @@ export async function loader({params, context}: LoaderArgs) {
 
 export type PageModule = any;
 
-// const moduleSwitch = (module: PageModule) => {
-//   switch (module._type) {
-//     case 'component.textWithImage':
-//       return <TextWithImage data={module} key={module._key} />;
-//     case 'component.hero':
-//       return <Hero data={module} key={module._key} />;
-//     case 'component.collectionGrid':
-//       return <CollectionGrid data={module} key={module._key} />;
-//     case 'component.shippingAndReturns':
-//       return <ShippingAndReturns data={module} key={module._key} />;
-//     case 'component.marquee':
-//       return <Marquee data={module} key={module._key} />;
-//     case 'component.reviewCarousel':
-//       return <ReviewCarousel data={module} key={module._key} />;
-//     case 'component.slides':
-//       return <SlideShow data={module} key={module._key} />;
-//     // case 'component.swimlane':
-//     //   return <div>Swimlane</div>;
-//     default:
-//       return null;
-//   }
-// };
-
 export default function Homepage() {
   const {hero, modules, featuredProducts, saleProducts} =
     useLoaderData<typeof loader>();
