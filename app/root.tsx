@@ -244,11 +244,23 @@ const CART_QUERY = `#graphql
       email
       phone
     }
+    discountAllocations {
+      discountedAmount {
+        amount
+        currencyCode
+      }
+    }
     lines(first: 100) {
       edges {
         node {
           id
           quantity
+          discountAllocations {
+            discountedAmount {
+              amount
+              currencyCode
+            }
+          }
           attributes {
             key
             value
