@@ -137,9 +137,10 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const defaults = await sanity.fetch(DEFAULTS_QUERY);
 
-  const modules =
+  const pageContent =
     await sanity.fetch(`*[_type == 'product' && store.slug.current == '${productHandle}'][0]{
-      "modules" : modules[]
+      ${MODULE_FRAGMENT},
+      "badges": badges[]
     }
   `);
 
@@ -160,7 +161,9 @@ export async function loader({params, request, context}: LoaderArgs) {
     product,
     shop,
     defaults,
-    modules,
+    pageContent,
+    modules: pageContent?.modules,
+    badgeOverrides: pageContent?.badges,
     recommended,
     analytics: {
       pageType: AnalyticsPageType.product,
@@ -172,13 +175,9 @@ export async function loader({params, request, context}: LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, shop, recommended, modules, defaults} =
+  const {product, shop, recommended, modules, defaults, badgeOverrides} =
     useLoaderData<typeof loader>();
-  const {
-    lastAccordion,
-    belowCartCopy,
-    modules: defaultModules,
-  } = defaults.product;
+  const {lastAccordion, modules: defaultModules} = defaults.product;
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
 
@@ -288,7 +287,7 @@ export default function Product() {
           </div>
         </div>
       </Section>
-      <Modules modules={modules.modules ? modules.modules : defaultModules} />
+      <Modules modules={modules ? modules : defaultModules} />
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
@@ -310,11 +309,23 @@ type Badge = {
 };
 
 const Badges = () => {
-  const {defaults} = useLoaderData<typeof loader>();
+  const {defaults, badgeOverrides} = useLoaderData<typeof loader>();
+
+  const defaultBadges = defaults.product.badges;
+
+  // const badges = badgeOverrides ?? defaultBadges;
+
+  const badges = [
+    ...badgeOverrides,
+    ...defaults.product.badges.slice(
+      badgeOverrides.length,
+      defaultBadges.length,
+    ),
+  ];
 
   return (
     <div className="flex flex-wrap justify-between gap-2">
-      {defaults.product.badges.map((badge: Badge) => (
+      {badges.map((badge: Badge) => (
         <Image
           sizes="(max-width: 639px) 64px, 80px"
           className="max-w-[64px] flex-grow-0 md:max-w-[80px]"
