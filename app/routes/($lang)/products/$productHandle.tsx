@@ -187,6 +187,12 @@ export default function Product() {
       'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com';
     script.defer = true;
     document.body.appendChild(script);
+
+    // const redoScript = document.createElement('script');
+    // redoScript.src =
+    //   'http://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
+    // redoScript.async = true;
+    // document.body.appendChild(redoScript);
   }, []);
 
   return (
@@ -315,13 +321,15 @@ const Badges = () => {
 
   // const badges = badgeOverrides ?? defaultBadges;
 
-  const badges = [
-    ...badgeOverrides,
-    ...defaults.product.badges.slice(
-      badgeOverrides.length,
-      defaultBadges.length,
-    ),
-  ];
+  const badges = badgeOverrides
+    ? [
+        ...badgeOverrides,
+        ...defaults.product.badges.slice(
+          badgeOverrides.length,
+          defaultBadges.length,
+        ),
+      ]
+    : defaultBadges;
 
   return (
     <div className="flex flex-wrap justify-between gap-2">
