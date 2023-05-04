@@ -62,6 +62,7 @@ import {MODULE_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
 import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
+import useScript from '~/lib/useScript';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -181,19 +182,9 @@ export default function Product() {
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src =
-      'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com';
-    script.defer = true;
-    document.body.appendChild(script);
-
-    const redoScript = document.createElement('script');
-    redoScript.src =
-      'http://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
-    redoScript.async = true;
-    document.body.appendChild(redoScript);
-  }, []);
+  useScript(
+    'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
+  );
 
   return (
     <>
@@ -452,12 +443,17 @@ export function ProductForm() {
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
 
+  const onlyHasDefault =
+    product.options.length === 1 && product.options[0].values.length == 1;
+
   /**
    * Likewise, we're defaulting to the first variant for purposes
    * of add to cart if there is none returned from the loader.
    * A developer can opt out of this, too.
    */
-  const selectedVariant = product.selectedVariant;
+  const selectedVariant = onlyHasDefault
+    ? firstVariant
+    : product.selectedVariant;
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
 
@@ -482,7 +478,7 @@ export function ProductForm() {
         />
         {selectedVariant ? (
           <div className="grid items-stretch gap-4">
-            {availableForSale !== false && (
+            {availableForSale !== false && quantityAvailable < 20 && (
               <div
                 className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
               >
@@ -507,7 +503,7 @@ export function ProductForm() {
             >
               {isOutOfStock ? (
                 <Text>Sold out</Text>
-              ) : (
+              ) : ( 
                 <Text
                   as="span"
                   className="flex items-center justify-center gap-2"
@@ -717,7 +713,7 @@ function ProductOptionLink({
   );
 }
 
-function ProductDetail({
+export function ProductDetail({
   title,
   content,
   learnMore,

@@ -60,7 +60,7 @@ export async function loader({request, params, context}: LoaderArgs) {
 export default function Page() {
   const {sanityPage, shopPage} = useLoaderData<typeof loader>();
 
-  if (sanityPage && !shopPage) return <SanityPage page={sanityPage} />;
+  if (sanityPage) return <SanityPage page={sanityPage} />;
   if (shopPage) return <ShopPage page={shopPage} />;
 }
 
@@ -87,7 +87,7 @@ function SanityPage({page}: {page: any}) {
 
 function ShopPage({page}: {page: PageType}) {
   return (
-    <PageHeader heading={""}>
+    <PageHeader heading={''}>
       <div
         dangerouslySetInnerHTML={{__html: page.body}}
         className="prose mx-auto dark:prose-invert"

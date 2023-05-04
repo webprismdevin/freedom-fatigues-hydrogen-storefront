@@ -35,6 +35,7 @@ import {useAnalytics} from './hooks/useAnalytics';
 import AnnouncementBar from './components/AnnouncementBar';
 import {getSiteSettings, sanity} from './lib/sanity';
 import {Suspense} from 'react';
+import useScript from './lib/useScript';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
@@ -90,11 +91,9 @@ export async function loader({context}: LoaderArgs) {
     getShopData(context),
   ]);
 
-  // const announcements = await sanity.fetch(`*[ _type == "announcement" ][0]`);
   const settings = await getSiteSettings();
 
   return defer({
-    // announcements,
     settings,
     shop,
     selectedLocale: context.storefront.i18n,
@@ -110,6 +109,10 @@ export default function App() {
   const {settings, shop, selectedLocale} = useLoaderData<typeof loader>();
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
+
+  // useScript(
+  //   'https://id-shop.govx.com/app/freedom-fatigues.myshopify.com/govx.js?shop=freedom-fatigues.myshopify.com',
+  // );
 
   useAnalytics(hasUserConsent, locale);
 

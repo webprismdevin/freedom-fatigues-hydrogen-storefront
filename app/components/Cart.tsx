@@ -19,6 +19,7 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {useFetcher} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
+import GovXID from './GovXID';
 
 type Layouts = 'page' | 'drawer';
 
@@ -106,7 +107,7 @@ function CartDiscounts({
         <div
           className={clsx(
             codes ? 'hidden' : 'flex',
-            'items-center gap-4 justify-between text-copy',
+            'items-center justify-between gap-4 text-copy',
           )}
         >
           <input
@@ -115,7 +116,7 @@ function CartDiscounts({
             name="discountCode"
             placeholder="Discount code"
           />
-          <button className="flex justify-end font-medium whitespace-nowrap">
+          <button className="flex justify-end whitespace-nowrap font-medium">
             Apply Discount
           </button>
         </div>
@@ -175,7 +176,7 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div className="flex flex-col mt-2">
+    <div className="mt-2 flex flex-col">
       <a href={checkoutUrl} target="_self">
         <Button as="span" width="full">
           Continue to Checkout
@@ -201,24 +202,27 @@ function CartSummary({
   };
 
   return (
-    <section aria-labelledby="summary-heading" className={summary[layout]}>
-      <h2 id="summary-heading" className="sr-only">
-        Order summary
-      </h2>
-      <dl className="grid">
-        <div className="flex items-center justify-between font-medium">
-          <Text as="dt">Subtotal</Text>
-          <Text as="dd" data-test="subtotal">
-            {cost?.subtotalAmount?.amount ? (
-              <Money data={cost?.subtotalAmount} />
-            ) : (
-              '-'
-            )}
-          </Text>
-        </div>
-      </dl>
-      {children}
-    </section>
+    <>
+      <section aria-labelledby="summary-heading" className={summary[layout]}>
+        <h2 id="summary-heading" className="sr-only">
+          Order summary
+        </h2>
+        <dl className="grid">
+          <div className="flex items-center justify-between font-medium">
+            <Text as="dt">Subtotal</Text>
+            <Text as="dd" data-test="subtotal">
+              {cost?.subtotalAmount?.amount ? (
+                <Money data={cost?.subtotalAmount} />
+              ) : (
+                '-'
+              )}
+            </Text>
+          </div>
+        </dl>
+        {children}
+        <GovXID center />
+      </section>
+    </>
   );
 }
 
@@ -237,13 +241,13 @@ function CartLineItem({line}: {line: CartLine}) {
             width={220}
             height={220}
             data={merchandise.image}
-            className="object-cover object-center w-24 h-24 border rounded md:w-28 md:h-28"
+            className="h-24 w-24 rounded border object-cover object-center md:h-28 md:w-28"
             alt={merchandise.title}
           />
         )}
       </div>
 
-      <div className="flex justify-between flex-grow">
+      <div className="flex flex-grow justify-between">
         <div className="grid gap-2">
           <Heading as="h3" size="copy">
             {merchandise?.product?.handle ? (
@@ -290,7 +294,7 @@ function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
       />
       <input type="hidden" name="linesIds" value={JSON.stringify(lineIds)} />
       <button
-        className="flex items-center justify-center w-10 h-10 border rounded"
+        className="flex h-10 w-10 items-center justify-center rounded border"
         type="submit"
       >
         <span className="sr-only">Remove</span>
@@ -311,12 +315,12 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
       <label htmlFor={`quantity-${lineId}`} className="sr-only">
         Quantity, {quantity}
       </label>
-      <div className="flex items-center border rounded">
+      <div className="flex items-center rounded border">
         <UpdateCartButton lines={[{id: lineId, quantity: prevQuantity}]}>
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
-            className="w-10 h-10 transition text-primary/50 hover:text-primary disabled:text-primary/10"
+            className="h-10 w-10 text-primary/50 transition hover:text-primary disabled:text-primary/10"
             value={prevQuantity}
             disabled={quantity <= 1}
           >
@@ -330,7 +334,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
 
         <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
-            className="w-10 h-10 transition text-primary/50 hover:text-primary"
+            className="h-10 w-10 text-primary/50 transition hover:text-primary"
             name="increase-quantity"
             value={nextQuantity}
             aria-label="Increase quantity"
@@ -418,6 +422,9 @@ export function CartEmpty({
           <Button onClick={onClose}>Continue shopping</Button>
         </div>
       </section>
+      <div className="mt-2">
+        <GovXID />
+      </div>
       <section className="grid gap-8 pt-16">
         <FeaturedProducts
           count={4}

@@ -234,6 +234,14 @@ modules[]{
   (_type == 'component.textWithImage') => {
     ...,
     ${CTA_FRAGMENT}
-  }
+  },
+  (_type == 'component.faqSection') => {
+    ...,
+    faqs[]->{
+      _id,
+      question,
+      answer
+    }
+  },
 }
 `;
