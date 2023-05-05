@@ -1,6 +1,7 @@
 import {Image} from '@shopify/hydrogen';
 import {Link} from '~/components/Link';
 import {urlFor} from '~/lib/sanity';
+import {RichContent} from './RichContent';
 
 export function TextWithImage({data}: {data: any}) {
   return (
@@ -12,19 +13,26 @@ export function TextWithImage({data}: {data: any}) {
     >
       <div
         className={`max-w-full self-center p-8 ${
-          data.image ? 'lg:max-w-[50%]' : 'lg:max-w-4xl'
+          data.image ? 'lg:max-w-[50%]' : 'lg:max-w-screen-lg'
         } lg:p-24`}
       >
-        <div>
+        <div className={`${data.image ?? 'justify-center text-center'}`}>
           <p className="font-heading text-6xl lg:text-8xl">{data.title}</p>
           <p className="font-heading text-3xl lg:text-5xl">{data.caption}</p>
         </div>
         <div className="mt-4">
-          <div
-            dangerouslySetInnerHTML={{
-              __html: data.content,
-            }}
-          />
+          {!data.richContent && (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: data.content,
+              }}
+            />
+          )}
+          {data.richContent && (
+            <div className="max-w-prose">
+              <RichContent content={data.richContent} />
+            </div>
+          )}
           {data.cta && (
             <div className="mt-4">
               <Link to={data.cta.to} className="border-b-2 border-white">

@@ -28,6 +28,7 @@ export async function loader({request, params, context}: LoaderArgs) {
 
   const sanityPage = await sanity.fetch(
     `*[_type == 'page' && slug.current == '${params.pageHandle}'][0]{
+      _id,
       ${HERO_FRAGMENT},
       ${MODULE_FRAGMENT},
     }`,
@@ -60,7 +61,7 @@ export async function loader({request, params, context}: LoaderArgs) {
 export default function Page() {
   const {sanityPage, shopPage} = useLoaderData<typeof loader>();
 
-  if (sanityPage) return <SanityPage page={sanityPage} />;
+  if (sanityPage?._id) return <SanityPage page={sanityPage} />;
   if (shopPage) return <ShopPage page={shopPage} />;
 }
 
@@ -73,7 +74,7 @@ function SanityPage({page}: {page: any}) {
       <Suspense>
         <Await resolve={modules}>
           <div
-            className={`py-10 ${
+            className={`${
               page.theme === 'dark' ? 'bg-primary text-contrast' : ''
             }`}
           >

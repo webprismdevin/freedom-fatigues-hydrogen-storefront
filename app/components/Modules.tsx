@@ -9,6 +9,7 @@ import ReviewCarousel from './ReviewCarousel';
 import SlideShow from './Slideshow';
 import {Columns} from './Columns';
 import FAQ from './FAQ';
+import {RichContent} from './RichContent';
 
 export type PageModule = any;
 
@@ -32,6 +33,12 @@ const moduleSwitch = (module: PageModule) => {
       return <Columns data={module} key={module._key} />;
     case 'component.faqSection':
       return <FAQ data={module} key={module._key} />;
+    case 'component.richContent':
+      return (
+        <div className="mx-auto max-w-screen-lg p-8 md:p-12 lg:p-24">
+          <RichContent content={module.content} key={module._key} />
+        </div>
+      );
     // case 'component.swimlane':
     //   return <div>Swimlane</div>;
     default:

@@ -503,7 +503,7 @@ export function ProductForm() {
             >
               {isOutOfStock ? (
                 <Text>Sold out</Text>
-              ) : ( 
+              ) : (
                 <Text
                   as="span"
                   className="flex items-center justify-center gap-2"
@@ -733,7 +733,7 @@ export function ProductDetail({
               </Text>
               <IconClose
                 className={clsx(
-                  'transform-gpu transition-transform duration-200',
+                  'ml-4 flex-shrink-0 transform-gpu transition-transform duration-200',
                   !open && 'rotate-[45deg]',
                 )}
               />
