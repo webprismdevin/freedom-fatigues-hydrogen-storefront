@@ -65,7 +65,7 @@ export default function GovXID({center}: {center?: boolean}) {
                 fontFamily: 'sans-serif',
               }}
             >
-              Your custom text goes here
+              Military & First Responder Discount Available.
             </p>
           </span>
         </a>
