@@ -36,6 +36,28 @@ const components = {
     // Ex. 2: rendering custom lists
     checkmarks: ({children}) => <ol className="m-auto text-lg">{children}</ol>,
   },
+  marks: {
+    em: ({children}) => (
+      <em className="font-semibold text-gray-600">{children}</em>
+    ),
+
+    // Ex. 2: rendering a custom `link` annotation
+    link: ({value, children}) => {
+      const target = (value?.href || '').startsWith('http')
+        ? '_blank'
+        : undefined;
+      return (
+        <a
+          href={value?.href}
+          className="text-red-500"
+          target={target}
+          rel={target === '_blank' && 'noindex nofollow'}
+        >
+          {children}
+        </a>
+      );
+    },
+  },
 };
 
 export function RichContent({content}: {content: any}) {

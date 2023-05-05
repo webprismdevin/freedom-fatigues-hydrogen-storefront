@@ -35,7 +35,7 @@ const moduleSwitch = (module: PageModule) => {
       return <FAQ data={module} key={module._key} />;
     case 'component.richContent':
       return (
-        <div className="mx-auto max-w-screen-lg p-8 md:p-12 lg:p-24">
+        <div className="mx-auto max-w-prose">
           <RichContent content={module.content} key={module._key} />
         </div>
       );
