@@ -48,8 +48,8 @@ export default function SlideShow({data}: {data: any}) {
         >
           <div className="absolute z-10 grid h-full w-full place-items-center px-12">
             <div className="text-center">
-              <p className="mb-4">{slides[index].caption}</p>
-              <h2 className="mb-6 max-w-xl text-center font-heading text-6xl uppercase">
+              <p className="text-shadow mb-4">{slides[index].caption}</p>
+              <h2 className="text-shadow mb-6 max-w-xl text-center font-heading text-4xl uppercase md:text-5xl lg:text-6xl">
                 {slides[index].title}
               </h2>
               <Button variant="secondary" to={slides[index].cta.to}>
@@ -110,35 +110,6 @@ export default function SlideShow({data}: {data: any}) {
     </motion.div>
   );
 }
-
-// export const slidesData = [
-//   {
-//     id: '1',
-//     image1:
-//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Homepage_Header.png?v=1679025048',
-//     image2:
-//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_Copy_of_New_Keychain_5751c8bd-27bb-4876-adf2-6c7b72efd672.png?v=1675453521',
-//     title: 'Slide 1',
-//     description:
-//       'Pariatur aliqua nostrud pariatur consectetur laborum dolore anim laboris adipisicing et pariatur veniam magna magna.',
-//     button: {
-//       text: 'Shop Now',
-//       link: '/all',
-//     },
-//   },
-//   {
-//     id: '2',
-//     image1:
-//       'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Homepage_Header_78120f68-52e2-4634-bc3f-a68f52fd814e.png?v=1678676481',
-//     image2: undefined,
-//     title: 'Slide 2',
-//     description: 'Duis velit do magna proident qui irure ad exercitation.',
-//     button: {
-//       text: 'Shop Now',
-//       link: '/',
-//     },
-//   },
-// ];
 
 export const NavArrowLeft = ({
   color,

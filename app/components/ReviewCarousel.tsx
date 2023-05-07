@@ -47,7 +47,7 @@ export default function ReviewCarousel({data}: {data: any}) {
 
   return (
     <div
-      className="relative h-[700px] px-12 pb-8 pt-12 text-center lg:h-[500px] lg:p-24 lg:px-24"
+      className="relative h-[600px] px-12 pb-8 pt-12 text-center lg:h-[500px] lg:p-24 lg:px-24"
       key={data._key}
     >
       <h2 className="font-heading text-4xl">{data.title}</h2>

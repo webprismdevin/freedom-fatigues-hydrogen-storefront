@@ -33,9 +33,9 @@ export default function EmailSignup() {
       leave="transition-bottom duration-500"
       leaveFrom="opacity-100 translate-y-0"
       leaveTo="opacity-0 translate-y-1/2"
-      className="fixed bottom-0 left-0 right-0 z-10 flex items-center gap-4 bg-white p-2 shadow-xl md:p-4 lg:p-8"
+      className="fixed bottom-0 left-0 right-0 z-10 flex flex-col items-center gap-4 bg-white py-6 shadow-xl md:flex-row md:p-4 lg:p-8"
     >
-      <h2 className="font-heading text-lg uppercase md:text-7xl">
+      <h2 className="font-heading text-4xl uppercase md:text-7xl">
         Hey, Patriot!
       </h2>
       <div className="flex flex-col items-start justify-start">

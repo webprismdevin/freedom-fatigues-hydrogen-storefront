@@ -21,7 +21,7 @@ import {
   Link,
 } from '~/components';
 import {useParams, Form, Await, useMatches} from '@remix-run/react';
-import {useWindowScroll} from 'react-use';
+import {useLocalStorage, useLocation, useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
@@ -68,7 +68,7 @@ export function Layout({
           <Footer footer={settings.footer} text={'test text'} />
         </Await>
       </Suspense>
-      {/* <EmailSignup /> */}
+      <EmailSignup />
     </>
   );
 }
@@ -89,12 +89,18 @@ function Header({title, menu}: {title: string; menu?: any}) {
   } = useDrawer();
 
   const addToCartFetchers = useCartFetchers('ADD_TO_CART');
+  const location = useLocation();
 
   // toggle cart drawer when adding to cart
   useEffect(() => {
     if (isCartOpen || !addToCartFetchers.length) return;
     openCart();
   }, [addToCartFetchers, isCartOpen, openCart]);
+
+  useEffect(() => {
+    if (!isMenuOpen || !menu) return;
+    closeMenu();
+  }, [location]);
 
   return (
     <>
