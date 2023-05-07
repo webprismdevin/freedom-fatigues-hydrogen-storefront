@@ -433,7 +433,7 @@ function DesktopHeader({
 }
 
 function LinkTitle({text}: {text: string}) {
-  return <span className="text-lg font-bold uppercase">{text}</span>;
+  return <span className="text-lg uppercase">{text}</span>;
 }
 
 function MegaMenuLink({

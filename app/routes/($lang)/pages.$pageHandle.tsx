@@ -91,7 +91,7 @@ function ShopPage({page}: {page: PageType}) {
     <PageHeader heading={''}>
       <div
         dangerouslySetInnerHTML={{__html: page.body}}
-        className="prose mx-auto dark:prose-invert"
+        className="prose mx-auto"
       />
     </PageHeader>
   );

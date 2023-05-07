@@ -437,8 +437,6 @@ export function ProductForm() {
   useEffect(() => {
     const _learnq = window._learnq || [];
 
-    console.log(_learnq);
-
     const item = {
       ProductName: product.title,
       ProductID: product.id,
