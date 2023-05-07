@@ -32,10 +32,12 @@ import {DEFAULT_LOCALE, parseMenu, type EnhancedMenu} from './lib/utils';
 import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
-import AnnouncementBar from './components/AnnouncementBar';
 import {getSiteSettings, sanity} from './lib/sanity';
-import {Suspense} from 'react';
-import useScript from './lib/useScript';
+import {Suspense, useEffect} from 'react';
+import {isNonNullType} from 'graphql';
+// analytics
+import {logsnag} from './lib/logsnag';
+import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
@@ -76,6 +78,16 @@ export const links: LinksFunction = () => {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/png', href: favicon},
+    {
+      rel: 'preconnect dns-prefetch',
+      href: 'https://triplewhale-pixel.web.app/',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preconnect dns-prefetch',
+      href: 'https://api.config-security.com/',
+      crossOrigin: 'anonymous',
+    },
   ];
 };
 
@@ -110,10 +122,6 @@ export default function App() {
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
 
-  // useScript(
-  //   'https://id-shop.govx.com/app/freedom-fatigues.myshopify.com/govx.js?shop=freedom-fatigues.myshopify.com',
-  // );
-
   useAnalytics(hasUserConsent, locale);
 
   return (
@@ -133,6 +141,7 @@ export default function App() {
         </Layout>
         <ScrollRestoration />
         <Scripts />
+        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );
@@ -143,6 +152,17 @@ export function CatchBoundary() {
   const caught = useCatch();
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
+
+  useEffect(() => {
+    if (isNotFound)
+      logsnag.publish({
+        channel: 'navigation',
+        event: `404: Not found`,
+        description: `User navigated to ${window.location.pathname}`,
+        icon: '👀',
+        notify: true,
+      });
+  }, [isNotFound]);
 
   return (
     <html lang={locale.language}>
@@ -166,6 +186,7 @@ export function CatchBoundary() {
           )}
         </Layout>
         <Scripts />
+        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );
@@ -187,6 +208,7 @@ export function ErrorBoundary({error}: {error: Error}) {
           <GenericError error={error} />
         </Layout>
         <Scripts />
+        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );

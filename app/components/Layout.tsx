@@ -31,6 +31,7 @@ import {AnimatePresence, useCycle, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
+import EmailSignup, {SignUpForm} from './EmailSignup';
 
 export function Layout({
   children,
@@ -67,6 +68,7 @@ export function Layout({
           <Footer footer={settings.footer} text={'test text'} />
         </Await>
       </Suspense>
+      {/* <EmailSignup /> */}
     </>
   );
 }
@@ -163,12 +165,19 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
         <div key={item._key}>
           {item.collectionLinks && (
             <Disclosure>
-              <Disclosure.Button className="pb-1 font-heading">
+              <Disclosure.Button className="pb-1 font-heading text-xl">
                 {item.title}
               </Disclosure.Button>
               {/* sublevel menus */}
               <Disclosure.Panel>
                 <ul className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
+                  {item.megaMenuTitle && (
+                    <li className="font-bold">
+                      <Link to={item.megaMenuTitle.to}>
+                        {item.megaMenuTitle.title}
+                      </Link>
+                    </li>
+                  )}
                   {item.collectionLinks.map((link) => (
                     <li key={link.slug}>
                       <Link
@@ -190,7 +199,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
             </Disclosure>
           )}
           {item._type == 'linkInternal' && (
-            <span className="block font-heading">
+            <span className="block font-heading text-xl">
               <Link
                 to={item.slug}
                 target={item.target}
@@ -199,9 +208,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                   isActive ? '-mb-px border-b pb-1' : 'pb-1'
                 }
               >
-                <Text as="span" size="copy">
-                  {item.title}
-                </Text>
+                {item.title}
               </Link>
             </span>
           )}
@@ -650,12 +657,8 @@ const Footer = ({text, footer}: any) => {
           <div className="my-2 leading-loose">
             {email.text && <p>{email.text}</p>}
           </div>
-          <div className="flex border-b-2 border-[#ffffff66]">
-            <input
-              className="flex-1 bg-transparent"
-              placeholder="Enter your email"
-            />
-            <button type="submit">Submit</button>
+          <div className="flex ">
+            <SignUpForm variant="dark" source={'footer'} />
           </div>
           <div className="my-4 flex gap-2">
             <a href="https://www.instagram.com/freedomfatigues/">

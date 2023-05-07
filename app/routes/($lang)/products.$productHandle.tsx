@@ -186,6 +186,14 @@ export default function Product() {
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src =
+      'http://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <>
       <Section className="px-0">
@@ -425,6 +433,27 @@ export function ProductForm() {
 
   const firstVariant = product.variants.nodes[0];
 
+  // klaviyo 'viewed product' snippet
+  useEffect(() => {
+    const _learnq = window._learnq || [];
+
+    console.log(_learnq);
+
+    const item = {
+      ProductName: product.title,
+      ProductID: product.id,
+      // SKU: 'WINNIEPOOH',
+      // Categories: ['Fiction', 'Children'],
+      ImageURL: firstVariant.image.url,
+      URL: `https://freedomfatigues.com/products/${product.handle}`,
+      Brand: product.vendor,
+      Price: firstVariant.price.amount,
+      CompareAtPrice: firstVariant.compareAtPrice?.amount,
+    };
+
+    _learnq.push(['track', 'Viewed Product', item]);
+  }, []);
+
   /**
    * We're making an explicit choice here to display the product options
    * UI with a default variant, rather than wait for the user to select
@@ -469,6 +498,33 @@ export function ProductForm() {
 
   const quantityAvailable = selectedVariant?.quantityAvailable;
 
+  function fireAnalytics() {
+    if (process.env.NODE_ENV === 'production') {
+      //@ts-ignore
+      window.dataLayer.push({ecommerce: null});
+      // @ts-ignore
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'USD',
+          value: 7.77,
+          items: [
+            {
+              item_id: product.id,
+              item_name: product.title,
+              affiliation: 'Hydrogen',
+              item_brand: 'Freedom Fatigues',
+              item_variant: selectedVariant.id,
+              price: selectedVariant?.price!.amount,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+    }
+  }
+
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -495,11 +551,12 @@ export function ProductForm() {
                 },
               ]}
               variant={isOutOfStock ? 'secondary' : 'primary'}
-              data-test="add-to-cart"
+              // data-test="add-to-cart"
               analytics={{
                 products: [productAnalytics],
                 totalValue: parseFloat(productAnalytics.price),
               }}
+              onClick={fireAnalytics}
             >
               {isOutOfStock ? (
                 <Text>Sold out</Text>
@@ -773,6 +830,7 @@ const DEFAULTS_QUERY = groq`
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariantFragment on ProductVariant {
     id
+    sku
     availableForSale
     selectedOptions {
       name

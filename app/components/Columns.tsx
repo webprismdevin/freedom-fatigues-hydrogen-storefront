@@ -3,9 +3,9 @@ import {urlFor} from '~/lib/sanity';
 
 export function Columns({
   data,
-  key,
 }: {
   data: {
+    _key: string;
     columns: [
       {
         title: string;
@@ -13,10 +13,9 @@ export function Columns({
       },
     ];
   };
-  key: string;
 }) {
   return (
-    <section key={key} className="bg-slate-100 p-8 md:p-12 lg:p-24">
+    <section key={data._key} className="bg-slate-100 p-8 md:p-12 lg:p-24">
       <div
         className={`grid grid-cols-1 gap-12 md:grid-cols-${data.columns.length}`}
       >

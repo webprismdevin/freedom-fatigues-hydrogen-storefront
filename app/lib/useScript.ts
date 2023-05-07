@@ -6,12 +6,6 @@ export default function useScript(url: string) {
     script.src = url;
     script.defer = true;
     document.body.appendChild(script);
-
-    // const redoScript = document.createElement('script');
-    // redoScript.src =
-    //   'http://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
-    // redoScript.async = true;
-    // document.body.appendChild(redoScript);
   }, []);
 
   return true;

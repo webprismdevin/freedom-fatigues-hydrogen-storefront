@@ -1,7 +1,8 @@
 import {SanityImageAssetDocument, createClient} from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
-import {z} from 'zod';
 import groq from 'groq';
+
+console.log(process.env.NODE_ENV);
 
 export const sanity = createClient({
   projectId: 'd7y2vv8s',

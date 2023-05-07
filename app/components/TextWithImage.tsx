@@ -17,8 +17,12 @@ export function TextWithImage({data}: {data: any}) {
         } lg:p-24`}
       >
         <div className={`${data.image ?? 'justify-center text-center'}`}>
-          <p className="font-heading text-6xl lg:text-8xl">{data.title}</p>
-          <p className="font-heading text-3xl lg:text-5xl">{data.caption}</p>
+          <p className="font-heading text-3xl md:text-5xl lg:text-7xl">
+            {data.title}
+          </p>
+          <p className="font-heading text-xl md:text-3xl lg:text-5xl">
+            {data.caption}
+          </p>
         </div>
         <div className="mt-4">
           {!data.richContent && (

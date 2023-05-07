@@ -81,13 +81,11 @@ export function ProductCard({
                 loading={loading}
               />
             )}
-            <Text
-              as="label"
-              size="fine"
-              className="absolute right-0 top-0 m-4 text-right text-notice"
-            >
-              {cardLabel}
-            </Text>
+            {label && (
+              <span className="absolute right-0 top-0 m-4 rounded-full bg-red-500 px-2 py-1 text-right text-xs text-white">
+                {cardLabel}
+              </span>
+            )}
           </div>
           <div className="grid grid-cols-3 gap-1">
             <Text

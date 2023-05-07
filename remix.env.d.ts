@@ -4,6 +4,7 @@
 
 import type {Storefront} from '~/lib/type';
 import type {HydrogenSession} from '~/lib/session.server';
+import { any } from 'zod';
 
 declare global {
   /**
@@ -21,6 +22,7 @@ declare global {
     PUBLIC_STOREFRONT_API_VERSION: string;
     PUBLIC_STORE_DOMAIN: string;
     PUBLIC_STOREFRONT_ID: string;
+    KLAVIYO_API_KEY: string;
   }
 }
 

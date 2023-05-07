@@ -21,26 +21,29 @@ export type Hero = {
     to: string;
   };
   layout?: 'left' | 'right' | 'center';
+  size?: 'small' | 'medium' | 'large';
 };
 
 export function Hero({data}: {data: Hero}) {
-  const {image, title, caption, cta, layout} = data;
+  const {image, title, caption, cta, layout, size} = data;
   const {height, width} = image;
 
   const ref = useRef(null);
 
   const {scrollYProgress} = useScroll({
     target: ref,
-    offset: ['end end', 'end start'],
+    offset: ['start start', 'end start'],
   });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
   return (
     <div
       key={data._key}
-      className={`flex-column align-center relative flex h-[800px] overflow-hidden p-8 lg:p-24 ${
-        layout === 'right' && 'justify-end'
-      } ${layout === 'center' && 'justify-center text-center'}`}
+      className={`flex-column align-center relative flex ${
+        size === 'small' ? 'h-[500px]' : 'h-[800px]'
+      } overflow-hidden p-8 lg:p-24 ${layout === 'right' && 'justify-end'} ${
+        layout === 'center' && 'justify-center text-center'
+      }`}
       ref={ref}
     >
       <motion.div

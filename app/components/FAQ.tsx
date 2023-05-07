@@ -1,7 +1,5 @@
 import {Disclosure} from '@headlessui/react';
-import {PortableText} from '@portabletext/react';
 import {Fragment} from 'react';
-import {ProductDetail} from '~/routes/($lang)/products/$productHandle';
 import {RichContent} from './RichContent';
 import clsx from 'clsx';
 import {IconClose} from './Icon';
