@@ -16,6 +16,7 @@ import {ProductGrid} from '~/components/ProductGrid';
 import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {sanity} from '~/lib/sanity';
 import Modules from '~/components/Modules';
+import {useState} from 'react';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.collection?.seo?.title,
@@ -185,6 +186,7 @@ export async function loader({params, request, context}: LoaderArgs) {
 export default function Collection() {
   const {collection, collections, appliedFilters, modules} =
     useLoaderData<typeof loader>();
+  const [showDescription, setShowDescription] = useState(false);
 
   return (
     <>
@@ -210,9 +212,15 @@ export default function Collection() {
           {collection?.description && (
             <div className="flex w-full items-baseline justify-between">
               <div>
-                <Text format width="wide" as="p" className="inline-block">
+                <p className={`prose ${showDescription ? '' : 'line-clamp-3'}`}>
                   {collection.description}
-                </Text>
+                </p>
+                <button
+                  className="text-red-500"
+                  onClick={() => setShowDescription(!showDescription)}
+                >
+                  Show {showDescription ? 'less' : 'more'}
+                </button>
               </div>
             </div>
           )}
