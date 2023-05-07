@@ -331,6 +331,7 @@ function DesktopHeader({
 }) {
   const params = useParams();
   const {y} = useWindowScroll();
+  const location = useLocation();
 
   const [megaMenu, setMegaMenu] = useState<MegaMenuType>({
     open: false,
@@ -344,6 +345,12 @@ function DesktopHeader({
       setMegaMenu({open: true, menu});
     }
   };
+
+  useEffect(() => {
+    if (megaMenu.open) {
+      setMegaMenu({open: false, menu: null});
+    }
+  }, [location]);
 
   return (
     <header
