@@ -61,8 +61,8 @@ export function SignUpForm({
   const newsletter = useFetcher();
   const ref = useRef(null);
 
-  useEffect(() => {`
-    if (newsletter.state === 'idle' && newsletter.data?.ok) {`
+  useEffect(() => {
+    if (newsletter.state === 'idle' && newsletter.data?.ok) {
       ref.current.reset();
     }
   }, [newsletter]);
