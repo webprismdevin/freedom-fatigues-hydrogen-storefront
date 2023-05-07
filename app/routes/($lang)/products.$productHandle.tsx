@@ -189,7 +189,7 @@ export default function Product() {
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
-      'http://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
+      'https://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
     script.async = true;
     document.body.appendChild(script);
   }, []);
