@@ -61,8 +61,8 @@ export function SignUpForm({
   const newsletter = useFetcher();
   const ref = useRef(null);
 
-  useEffect(() => {
-    if (newsletter.state === 'idle' && newsletter.data?.ok) {
+  useEffect(() => {`
+    if (newsletter.state === 'idle' && newsletter.data?.ok) {`
       ref.current.reset();
     }
   }, [newsletter]);
@@ -90,7 +90,7 @@ export function SignUpForm({
           <p>Thanks for subscribing!</p>
         ) : (
           <p className="text-red-500">
-            Somethign went wrong. We&apos;re looking into it!
+            Something went wrong. We&apos;re looking into it!
           </p>
         )
       ) : null}
