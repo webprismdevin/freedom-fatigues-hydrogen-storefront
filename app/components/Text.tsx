@@ -73,7 +73,7 @@ export function Heading({
 } & React.HTMLAttributes<HTMLHeadingElement>) {
   const sizes = {
     display: 'font-bold text-display',
-    heading: 'font-bold text-heading uppercase',
+    heading: 'font-bold text-heading uppercase font-heading leading-relaxed',
     lead: 'font-bold text-lead',
     copy: 'font-medium text-copy',
   };
@@ -149,7 +149,7 @@ export function Section({
       {heading && (
         <Heading
           size="heading"
-          className={padding === 'y' ? paddings['x'] : ''}
+          className={`${padding === 'y' ? paddings['x'] : ''} `}
         >
           {heading}
         </Heading>

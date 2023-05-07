@@ -28,7 +28,12 @@ import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
-import {DEFAULT_LOCALE, parseMenu, type EnhancedMenu} from './lib/utils';
+import {
+  DEFAULT_LOCALE,
+  parseMenu,
+  type EnhancedMenu,
+  useIsHomePath,
+} from './lib/utils';
 import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
@@ -94,7 +99,6 @@ export const links: LinksFunction = () => {
 export const meta: MetaFunction = () => ({
   charset: 'utf-8',
   viewport: 'width=device-width,initial-scale=1',
-  themeColor: '#141414',
 });
 
 export async function loader({context}: LoaderArgs) {
@@ -121,6 +125,7 @@ export default function App() {
   const {settings, shop, selectedLocale} = useLoaderData<typeof loader>();
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
+  const isHome = useIsHomePath();
 
   useAnalytics(hasUserConsent, locale);
 
@@ -128,6 +133,10 @@ export default function App() {
     <html lang={locale.language}>
       <head>
         <Seo />
+        <meta
+          name="theme-color"
+          content={`${isHome ? '#141414' : '#FFFFFF'}`}
+        />
         <Meta />
         <Links />
       </head>

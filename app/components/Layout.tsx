@@ -352,7 +352,7 @@ function DesktopHeader({
       } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
       <div className="flex items-center gap-12 font-heading tracking-wider">
-        <Link to="/" prefetch="intent">
+        <Link to="/" prefetch="intent" className="shrink-0">
           <div>
             <img
               src={

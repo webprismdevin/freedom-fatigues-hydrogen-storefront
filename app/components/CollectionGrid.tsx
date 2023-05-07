@@ -1,5 +1,6 @@
 import {urlFor} from '~/lib/sanity';
 import {Link} from './Link';
+import {Image} from '@shopify/hydrogen';
 
 export function CollectionGrid({data}: {data: any}) {
   const {collections} = data;
@@ -21,11 +22,12 @@ export function CollectionGrid({data}: {data: any}) {
           className={collectionClass}
           key={collection._key}
         >
-          <img
+          <Image
             className={imageClass}
             src={urlFor(collection.image).url()}
             alt=""
-            loading="lazy"
+            loading={data.loading ?? 'lazy'}
+            sizes={'33vw'}
           />
           <span className="z-1 text-shadow relative text-5xl text-white">
             {collection.title}

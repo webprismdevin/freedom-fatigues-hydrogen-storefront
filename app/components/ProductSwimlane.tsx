@@ -1,6 +1,7 @@
 import type {SerializeFrom} from '@shopify/remix-oxygen';
 import type {Product} from '@shopify/hydrogen/storefront-api-types';
 import {ProductCard, Section} from '~/components';
+import {useIsHomePath} from '~/lib/utils';
 
 const mockProducts = new Array(12).fill('');
 
@@ -14,11 +15,15 @@ export function ProductSwimlane({
   products?: SerializeFrom<Product[]>;
   count?: number;
 }) {
+  const isHome = useIsHomePath();
+
   return (
     <Section
       heading={title}
       padding="y"
-      className="bg-contrast text-primary"
+      className={`${
+        isHome ? 'bg-primary text-contrast' : 'bg-contrast text-primary'
+      }`}
       {...props}
     >
       <div className="swimlane hiddenScroll md:scroll-px-8 md:px-8 md:pb-8 lg:scroll-px-12 lg:px-12">
