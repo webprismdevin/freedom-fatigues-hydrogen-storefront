@@ -161,16 +161,16 @@ export function CatchBoundary() {
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
 
-  useEffect(() => {
-    if (isNotFound)
-      logsnag.publish({
-        channel: 'navigation',
-        event: `404: Not found`,
-        description: `User navigated to ${window.location.pathname}`,
-        icon: '👀',
-        notify: true,
-      });
-  }, [isNotFound]);
+  // useEffect(() => {
+  //   if (isNotFound)
+  //     logsnag.publish({
+  //       channel: 'navigation',
+  //       event: `404: Not found`,
+  //       description: `User navigated to ${window.location.pathname}`,
+  //       icon: '👀',
+  //       notify: true,
+  //     });
+  // }, [isNotFound]);
 
   return (
     <html lang={locale.language}>
