@@ -397,19 +397,21 @@ export function InlineProductCard({product}: {product: ProductType}) {
   const variant = product.variants.nodes[0];
 
   return (
-    <div className="grid w-full grid-cols-4 gap-2">
-      <div className="card-image col-span-1">
-        <Image sizes="128px" src={variant.image.url} alt={product.title} />
+    <Link to={`/products/${product.handle}`}>
+      <div className="grid w-full grid-cols-4 gap-2">
+        <div className="card-image col-span-1">
+          <Image sizes="128px" src={variant.image.url} alt={product.title} />
+        </div>
+        <div className="col-span-3">
+          <StarRating
+            rating={Number(product.avg_rating?.value)}
+            count={product.num_reviews.value}
+          />
+          <div className="text-lg">{product.title}</div>
+          <div className="text-sm">${variant.price.amount}</div>
+        </div>
       </div>
-      <div className="col-span-3">
-        <StarRating
-          rating={Number(product.avg_rating?.value)}
-          count={product.num_reviews.value}
-        />
-        <div className="text-lg">{product.title}</div>
-        <div className="text-sm">${variant.price.amount}</div>
-      </div>
-    </div>
+    </Link>
   );
 }
 

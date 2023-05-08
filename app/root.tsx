@@ -37,7 +37,6 @@ import {useEffect} from 'react';
 // analytics
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import {createHead} from 'remix-island';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
@@ -126,17 +125,15 @@ export default function App() {
 
   return (
     <html lang={locale.language}>
-      <SupressHydrationWarning>
-        <head>
-          <Seo />
-          <meta
-            name="theme-color"
-            content={`${isHome ? '#141414' : '#FFFFFF'}`}
-          />
-          <Meta />
-          <Links />
-        </head>
-      </SupressHydrationWarning>
+      <head>
+        <Seo />
+        <meta
+          name="theme-color"
+          content={`${isHome ? '#141414' : '#FFFFFF'}`}
+        />
+        <Meta />
+        <Links />
+      </head>
       <body>
         <Layout
           settings={settings}
@@ -153,24 +150,22 @@ export default function App() {
   );
 }
 
-const SupressHydrationWarning = ({children}) => children;
-
 export function CatchBoundary() {
   const [root] = useMatches();
   const caught = useCatch();
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
 
-  // useEffect(() => {
-  //   if (isNotFound)
-  //     logsnag.publish({
-  //       channel: 'navigation',
-  //       event: `404: Not found`,
-  //       description: `User navigated to ${window.location.pathname}`,
-  //       icon: '👀',
-  //       notify: true,
-  //     });
-  // }, [isNotFound]);
+  useEffect(() => {
+    if (isNotFound)
+      logsnag.publish({
+        channel: 'navigation',
+        event: `404: Not found`,
+        description: `User navigated to ${window.location.pathname}`,
+        icon: '👀',
+        notify: true,
+      });
+  }, [isNotFound]);
 
   return (
     <html lang={locale.language}>

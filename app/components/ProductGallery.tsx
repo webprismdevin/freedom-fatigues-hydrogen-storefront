@@ -1,7 +1,7 @@
-import type {MediaEdge} from '@shopify/hydrogen/storefront-api-types';
-import {ATTR_LOADING_EAGER} from '~/lib/const';
-import type {MediaImage} from '@shopify/hydrogen/storefront-api-types';
 import {Image} from '@shopify/hydrogen';
+import type {MediaEdge} from '@shopify/hydrogen/storefront-api-types';
+import type {MediaImage} from '@shopify/hydrogen/storefront-api-types';
+import {Video} from '@shopify/hydrogen-react';
 
 /**
  * A client component that defines a media gallery for hosting images, 3D models, and videos of products
@@ -22,7 +22,6 @@ export function ProductGallery({
       className={`swimlane hiddenScroll md:grid-flow-row md:grid-cols-2 md:overflow-x-auto md:p-0 ${className}`}
     >
       {media.map((med, i) => {
-        let mediaProps: Record<string, any> = {};
         const isFirst = i === 0;
         const isFourth = i === 3;
         const isFullWidth = i % 3 === 0;
@@ -36,45 +35,32 @@ export function ProductGallery({
           },
         } as MediaImage;
 
-        switch (med.mediaContentType) {
-          case 'IMAGE':
-            mediaProps = {
-              sizes: '50vw',
-            };
-            break;
-          case 'VIDEO':
-            mediaProps = {
-              width: '100%',
-              autoPlay: true,
-              controls: false,
-              muted: true,
-              loop: true,
-              preload: 'auto',
-            };
-            break;
-          case 'EXTERNAL_VIDEO':
-            mediaProps = {width: '100%'};
-            break;
-          case 'MODEL_3D':
-            mediaProps = {
-              width: '100%',
-              interactionPromptThreshold: '0',
-              ar: true,
-              loading: ATTR_LOADING_EAGER,
-              disableZoom: true,
-            };
-            break;
-        }
-
-        if (i === 0 && med.mediaContentType === 'IMAGE') {
-          mediaProps.loading = ATTR_LOADING_EAGER;
-        }
-
         const style = [
           isFullWidth ? 'md:col-span-2' : 'md:col-span-1',
-          // isFirst || isFourth ? '' : 'md:aspect-[4/5]',
+          isFirst || isFourth ? '' : 'md:aspect-square',
           'aspect-square snap-center card-image bg-white dark:bg-contrast/10 w-mobileGallery md:w-full',
         ].join(' ');
+
+        if (med.__typename === 'Video')
+          return (
+            <div
+              key={med.id}
+              className={
+                'card-image aspect-square w-mobileGallery snap-center bg-white dark:bg-contrast/10 md:w-full'
+              }
+            >
+              <Video
+                autoPlay
+                poster={med.previewImage?.url}
+                playsInline
+                loop
+                muted
+                controls={false}
+                data={med}
+                className="fadeIn aspect-square h-full w-full object-cover"
+              />
+            </div>
+          );
 
         return (
           <div
@@ -82,36 +68,19 @@ export function ProductGallery({
             // @ts-ignore
             key={med.id || med.image.id}
           >
-            {/* TODO: Replace with MediaFile when it's available */}
             {(med as MediaImage).image && (
-              // <img
-              //   src={data.image!.url}
-              //   alt={data.image!.altText!}
-              //   className="fadeIn aspect-square h-full w-full object-cover"
-              // />
               <Image
-                aspectRatio={'1/1'}
+                loading={i === 0 ? 'eager' : 'lazy'}
                 data={data.image!}
-                sizes="50vw"
-                loading={mediaProps.loading}
+                aspectRatio={!isFirst && !isFourth ? '1/1' : undefined}
+                sizes={
+                  isFirst || isFourth
+                    ? '(min-width: 48em) 60vw, 90vw'
+                    : '(min-width: 48em) 30vw, 90vw'
+                }
+                className="fadeIn aspect-square h-full w-full object-cover"
               />
             )}
-            {/* <MediaFile
-              tabIndex="0"
-              className={`w-full h-full aspect-square fadeIn object-cover`}
-              data={data}
-              sizes={
-                isFullWidth
-                  ? '(min-width: 64em) 60vw, (min-width: 48em) 50vw, 90vw'
-                  : '(min-width: 64em) 30vw, (min-width: 48em) 25vw, 90vw'
-              }
-              // @ts-ignore
-              options={{
-                crop: 'center',
-                scale: 2,
-              }}
-              {...mediaProps}
-            /> */}
           </div>
         );
       })}

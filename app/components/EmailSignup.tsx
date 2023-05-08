@@ -40,7 +40,7 @@ export default function EmailSignup() {
       </h2>
       <div className="flex flex-col items-start justify-start">
         <p className="text-base md:text-lg">Get 20% off your first purchase.</p>
-        <SignUpForm source={'popup'} />
+        <SignUpForm source={'popup'} callback={handleHide} />
       </div>
       <button className="absolute right-2 top-2" onClick={() => handleHide()}>
         <span className="hover:border-b-2">
@@ -54,9 +54,11 @@ export default function EmailSignup() {
 export function SignUpForm({
   source,
   variant,
+  callback,
 }: {
   source: string;
   variant?: 'light' | 'dark';
+  callback?: () => void;
 }) {
   const newsletter = useFetcher();
   const ref = useRef(null);
@@ -64,6 +66,8 @@ export function SignUpForm({
   useEffect(() => {
     if (newsletter.state === 'idle' && newsletter.data?.ok) {
       ref.current.reset();
+
+      callback?.();
     }
   }, [newsletter]);
 
