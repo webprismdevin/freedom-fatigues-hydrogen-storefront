@@ -797,7 +797,7 @@ export function ProductDetail({
 
           <Disclosure.Panel className={'grid gap-2 pb-4 pt-2'}>
             <div
-              className="prose dark:prose-invert"
+              className="prose"
               dangerouslySetInnerHTML={{__html: content}}
             />
             {learnMore && (

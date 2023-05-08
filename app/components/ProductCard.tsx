@@ -81,13 +81,13 @@ export function ProductCard({
                 loading={loading}
               />
             )}
-            {label && (
+            {cardLabel && (
               <span className="absolute right-0 top-0 m-4 rounded-full bg-red-500 px-2 py-1 text-right text-xs text-white">
                 {cardLabel}
               </span>
             )}
           </div>
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-3 gap-4">
             <Text
               className="col-span-2 w-full overflow-hidden text-ellipsis"
               as="h3"
@@ -95,7 +95,7 @@ export function ProductCard({
               {product.title}
             </Text>
             <div className="flex place-items-start justify-end gap-4">
-              <Text className="flex gap-4">
+              <Text className="flex flex-col md:flex-row md:gap-2">
                 <Money withoutTrailingZeros data={price!} />
                 {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
                   <CompareAtPrice

@@ -89,9 +89,9 @@ export function CustomScriptsAndAnalytics() {
     })('', 'TriplePixel', localStorage);
   }, []);
 
-  // useScript(
-  //   'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=QuicR8',
-  // );
+  useScript(
+    'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=QuicR8',
+  );
 
   return null;
 }

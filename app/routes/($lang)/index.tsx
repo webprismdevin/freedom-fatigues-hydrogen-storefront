@@ -1,12 +1,9 @@
-import {TextWithImage} from './../../components/TextWithImage';
 import {Hero} from '../../components/Hero';
-import {CollectionGrid} from '../../components/CollectionGrid';
 import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
 import {ProductSwimlane} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {getHeroPlaceholder} from '~/lib/placeholders';
 import type {
   CollectionConnection,
   Metafield,
@@ -14,10 +11,6 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {AnalyticsPageType} from '@shopify/hydrogen';
 import {HERO_FRAGMENT, MODULE_FRAGMENT, sanity} from '~/lib/sanity';
-import ShippingAndReturns from '~/components/ShippingAndReturns';
-import SlideShow from '~/components/Slideshow';
-import Marquee from '~/components/Marquee';
-import ReviewCarousel from '~/components/ReviewCarousel';
 import Modules from '~/components/Modules';
 
 interface HomeSeoData {
@@ -97,9 +90,6 @@ export default function Homepage() {
   const {hero, modules, featuredProducts, saleProducts} =
     useLoaderData<typeof loader>();
 
-  // TODO: skeletons vs placeholders
-  const skeletons = getHeroPlaceholder([{}, {}, {}]);
-
   // TODO: analytics
   // useServerAnalytics({
   //   shopify: {
@@ -111,47 +101,41 @@ export default function Homepage() {
     <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
       <Hero data={hero.hero} />
 
-      {featuredProducts && (
-        <Suspense>
-          <Await resolve={featuredProducts}>
-            {({products}) => {
-              if (!products?.nodes) return <></>;
-              return (
-                <ProductSwimlane
-                  products={products.nodes}
-                  title="New Releases"
-                  count={4}
-                />
-              );
-            }}
-          </Await>
-        </Suspense>
-      )}
+      <Suspense>
+        <Await resolve={featuredProducts}>
+          {({products}) => {
+            if (!products?.nodes) return <></>;
+            return (
+              <ProductSwimlane
+                products={products.nodes}
+                title="Latest Releases"
+                count={4}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
 
-      {modules && (
-        <Suspense>
-          <Await resolve={modules}>
-            <Modules modules={modules.modules} />
-          </Await>
-        </Suspense>
-      )}
+      <Suspense>
+        <Await resolve={modules}>
+          <Modules modules={modules.modules} />
+        </Await>
+      </Suspense>
 
-      {saleProducts && (
-        <Suspense>
-          <Await resolve={saleProducts}>
-            {({collection}) => {
-              if (!collection?.products?.nodes) return <></>;
-              return (
-                <ProductSwimlane
-                  products={collection.products?.nodes}
-                  title="Soon to be Retired"
-                  count={4}
-                />
-              );
-            }}
-          </Await>
-        </Suspense>
-      )}
+      <Suspense>
+        <Await resolve={saleProducts}>
+          {({collection}) => {
+            if (!collection?.products?.nodes) return <></>;
+            return (
+              <ProductSwimlane
+                products={collection.products?.nodes}
+                title="Soon to be Retired"
+                count={4}
+              />
+            );
+          }}
+        </Await>
+      </Suspense>
     </div>
   );
 }

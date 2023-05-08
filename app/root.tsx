@@ -28,21 +28,16 @@ import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
-import {
-  DEFAULT_LOCALE,
-  parseMenu,
-  type EnhancedMenu,
-  useIsHomePath,
-} from './lib/utils';
+import {DEFAULT_LOCALE, useIsHomePath} from './lib/utils';
 import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
-import {getSiteSettings, sanity} from './lib/sanity';
-import {Suspense, useEffect} from 'react';
-import {isNonNullType} from 'graphql';
+import {getSiteSettings} from './lib/sanity';
+import {useEffect} from 'react';
 // analytics
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
+import {createHead} from 'remix-island';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
@@ -131,15 +126,17 @@ export default function App() {
 
   return (
     <html lang={locale.language}>
-      <head>
-        <Seo />
-        <meta
-          name="theme-color"
-          content={`${isHome ? '#141414' : '#FFFFFF'}`}
-        />
-        <Meta />
-        <Links />
-      </head>
+      <SupressHydrationWarning>
+        <head>
+          <Seo />
+          <meta
+            name="theme-color"
+            content={`${isHome ? '#141414' : '#FFFFFF'}`}
+          />
+          <Meta />
+          <Links />
+        </head>
+      </SupressHydrationWarning>
       <body>
         <Layout
           settings={settings}
@@ -150,11 +147,13 @@ export default function App() {
         </Layout>
         <ScrollRestoration />
         <Scripts />
-        <CustomScriptsAndAnalytics />
+        {process.env.NODE_ENV === 'production' && <CustomScriptsAndAnalytics />}
       </body>
     </html>
   );
 }
+
+const SupressHydrationWarning = ({children}) => children;
 
 export function CatchBoundary() {
   const [root] = useMatches();
