@@ -191,7 +191,7 @@ export default function Product() {
   );
 
   useScript(
-    'http://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
+    'https://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
   );
 
   useEffect(() => {
