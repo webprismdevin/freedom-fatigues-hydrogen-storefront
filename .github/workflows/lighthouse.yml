@@ -5,13 +5,23 @@ on:
     branches:
       - main
 
-jobs: 
-  run_speed_test
+jobs:
+  speed_test:
+    name: Run Lighthouse
+    timeout-minutes: 10
     runs-on: ubuntu-latest
-      -steps: actions/checkout@v2
-      -uses: actions/setup-node@v2
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
-      -run: npm ci
-      -run: npm install -g lighthouse-ci
-      -run: lightthouse-ci https://beta.freedomfatigues.com --performance=90 --accessibility=90 --seo=90 --pwa=90 --best-practices=90 --report=html --report=csv --report=json --report=pretty
+          check-latest: true
+      
+      - name: Install lighthouse-ci
+        run: npm install -g lighthouse-ci
+
+      - name: Run lighthouse-ci
+        run: lighthouse-ci https://beta.freedomfatigues.com/
+      
