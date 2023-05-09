@@ -2,9 +2,8 @@ module.exports = {
   ci: {
     collect: {
       startServerCommand: 'npm run preview',
-      pattern: '🚥 MiniOxygen server started at',
+      pattern: '🚥 MiniOxygen server started',
       url: ['http://localhost:3000/'],
-      staticDistDir: './dist',
       numberOfRuns: 1,
     },
     upload: {
