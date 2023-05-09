@@ -51,13 +51,14 @@ export function ProductGallery({
             >
               <Video
                 autoPlay
-                poster={med.previewImage?.url}
+                // poster={med.previewImage?.url}
                 playsInline
                 loop
                 muted
                 controls={false}
                 data={med}
-                className="fadeIn aspect-square h-full w-full object-cover"
+                data-poster={med.previewImage?.url}
+                className="lozad fadeIn aspect-square h-full w-full object-cover"
               />
             </div>
           );

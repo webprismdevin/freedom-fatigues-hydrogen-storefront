@@ -63,6 +63,7 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/lib/useScript';
+import lozad from 'lozad';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -183,6 +184,7 @@ export default function Product() {
   const {lastAccordion, modules: defaultModules} = defaults.product;
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
+  let observer = null;
 
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
@@ -193,11 +195,9 @@ export default function Product() {
   );
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src =
-      'https://shopify-extension.getredo.com/js/redo.js?widget_id=o5xzy8sv9eq3ma3';
-    script.async = true;
-    document.body.appendChild(script);
+    observer = lozad();
+
+    observer.observe();
   }, []);
 
   return (
