@@ -53,7 +53,7 @@ export function Layout({
           </a>
         </div>
         <Suspense fallback={<div className="h-12"></div>}>
-          <Await resolve={settings.announcements}>
+          <Await resolve={settings}>
             <AnnouncementBar data={announcements} />
           </Await>
         </Suspense>
@@ -62,9 +62,13 @@ export function Layout({
           {children}
         </main>
       </div>
-      <GodFamilyCountry preFooter={settings.footer.preFooter} />
       <Suspense fallback={null}>
-        <Await resolve={settings.footer}>
+        <Await resolve={settings}>
+          <GodFamilyCountry preFooter={settings.footer.preFooter} />
+        </Await>
+      </Suspense>
+      <Suspense fallback={null}>
+        <Await resolve={settings}>
           <Footer footer={settings.footer} text={'test text'} />
         </Await>
       </Suspense>
