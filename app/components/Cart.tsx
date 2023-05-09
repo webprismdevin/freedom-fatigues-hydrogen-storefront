@@ -20,6 +20,8 @@ import type {
 import {useFetcher} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
+import {cartRemove} from '~/routes/($lang)/cart';
+import {fromGID} from '~/lib/gidUtils';
 
 type Layouts = 'page' | 'drawer';
 
@@ -63,7 +65,7 @@ export function CartDetails({
       {!isZeroCost && (
         <CartSummary cost={cart.cost} layout={layout}>
           <CartDiscounts discountCodes={cart.discountCodes} />
-          <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
+          <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
         </CartSummary>
       )}
     </div>
@@ -172,16 +174,52 @@ function CartLines({
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
+function CartCheckoutActions({
+  cart,
+  checkoutUrl,
+}: {
+  cart: CartType;
+  checkoutUrl: string;
+}) {
   if (!checkoutUrl) return null;
+
+  const handleCheckout = () => {
+    if (window.dataLayer) {
+      window.dataLayer.push({ecommerce: null});
+      window.dataLayer.push({
+        event: 'begin_checkout',
+        currency: 'USD',
+        value: cart.cost.totalAmount.amount,
+        coupon: cart.discountCodes?.map(({code}) => code).join(', ') || null,
+        ecommerce: {
+          items: cart.lines.edges.map(({node}) => ({
+            item_name: node.merchandise.product.title,
+            item_id: fromGID(node.merchandise.product.id),
+            item_variant: node.merchandise.title,
+            brand: 'Freedom Fatigues',
+            price: node.merchandise.price.amount,
+          })),
+        },
+        eventCallback: () => {
+          window.location.href = checkoutUrl;
+        },
+        eventTimeout: 2000,
+      });
+    }
+  };
 
   return (
     <div className="mt-2 flex flex-col">
-      <a href={checkoutUrl} target="_self">
-        <Button as="span" width="full">
-          Continue to Checkout
-        </Button>
-      </a>
+      {/* <a href={checkoutUrl} target="_self"> */}
+      <Button
+        className="cursor-pointer hover:opacity-80"
+        onClick={handleCheckout}
+        as="span"
+        width="full"
+      >
+        Continue to Checkout
+      </Button>
+      {/* </a> */}
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );

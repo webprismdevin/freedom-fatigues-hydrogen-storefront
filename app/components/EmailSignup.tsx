@@ -9,7 +9,19 @@ export default function EmailSignup() {
   const [wasHidden, setHidden] = useState(false);
 
   useEffect(() => {
-    setHidden(window.sessionStorage.getItem('hideEmailSignup') === 'true');
+    console.log(window.localStorage.getItem('subscribed') === 'true');
+
+    if (
+      window.sessionStorage.getItem('hideEmailSignup') === 'true' ||
+      window.localStorage.getItem('subscribed') === 'true'
+    ) {
+      setHidden(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (window.sessionStorage.getItem('hideEmailSignup') === 'true')
+      setHidden(true);
   }, [setShowing]);
 
   useMotionValueEvent(scrollYProgress, 'change', (latest) => {
@@ -66,6 +78,8 @@ export function SignUpForm({
   useEffect(() => {
     if (newsletter.state === 'idle' && newsletter.data?.ok) {
       ref.current.reset();
+
+      window.localStorage.setItem('subscribed', 'true');
 
       callback?.();
     }

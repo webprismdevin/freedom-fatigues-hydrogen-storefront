@@ -144,7 +144,7 @@ export default function App() {
         </Layout>
         <ScrollRestoration />
         <Scripts />
-        {process.env.NODE_ENV === 'production' && <CustomScriptsAndAnalytics />}
+        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );

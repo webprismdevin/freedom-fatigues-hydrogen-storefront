@@ -442,8 +442,6 @@ export function ProductForm() {
     const item = {
       ProductName: product.title,
       ProductID: product.id,
-      // SKU: 'WINNIEPOOH',
-      // Categories: ['Fiction', 'Children'],
       ImageURL: firstVariant.image.url,
       URL: `https://freedomfatigues.com/products/${product.handle}`,
       Brand: product.vendor,
@@ -452,6 +450,45 @@ export function ProductForm() {
     };
 
     _learnq.push(['track', 'Viewed Product', item]);
+  }, []);
+
+  useEffect(() => {
+    // GA4 view_item event
+    if (window.dataLayer) {
+      window.dataLayer.push({ecommerce: null});
+      window.dataLayer.push({
+        event: 'view_item',
+        ecommerce: {
+          currency: 'USD',
+          value: firstVariant.price.amount,
+          items: [
+            {
+              item_id: fromGID(product.id),
+              item_name: product.title,
+              price: firstVariant.price.amount,
+              affiliation: 'Hydrogen Storefront',
+              item_brand: product.vendor,
+              category: product.productType,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    // facebook pixel
+    if (window.fbq) {
+      console.log('should fire now?');
+      window.fbq('track', 'ViewContent', {
+        content_ids: [fromGID(product.id)],
+        content_name: product.title,
+        content_type: 'product',
+        value: firstVariant.price.amount,
+        currency: 'USD',
+      });
+    }
   }, []);
 
   /**
@@ -499,7 +536,7 @@ export function ProductForm() {
   const quantityAvailable = selectedVariant?.quantityAvailable;
 
   function fireAnalytics() {
-    if (process.env.NODE_ENV === 'production') {
+    if (window.dataLayer) {
       //@ts-ignore
       window.dataLayer.push({ecommerce: null});
       // @ts-ignore
@@ -510,7 +547,7 @@ export function ProductForm() {
           value: 7.77,
           items: [
             {
-              item_id: product.id,
+              item_id: fromGID(product.id),
               item_name: product.title,
               affiliation: 'Hydrogen',
               item_brand: 'Freedom Fatigues',
@@ -521,8 +558,16 @@ export function ProductForm() {
           ],
         },
       });
-      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
     }
+    if (window.TriplePixel)
+      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+    if (window.fbq)
+      window.fbq('track', 'AddToCart', {
+        content_ids: [fromGID(product.id)],
+        content_type: 'product',
+        value: selectedVariant?.price!.amount,
+        currency: 'USD',
+      });
   }
 
   return (
@@ -883,6 +928,7 @@ const PRODUCT_QUERY = `#graphql
       descriptionHtml
       description
       availableForSale
+      productType
       options {
         name
         values

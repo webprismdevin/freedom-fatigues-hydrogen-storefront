@@ -25,7 +25,7 @@ export function Grid({
       items >= 4 && 'lg:grid-cols-4'
     }`,
     auto: 'auto-cols-auto',
-    blog: 'grid-cols-1 md:grid-cols-2',
+    blog: 'grid-cols-1 md:grid-cols-3',
   };
 
   const gaps = {

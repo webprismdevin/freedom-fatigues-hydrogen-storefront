@@ -1,26 +1,24 @@
-import {json, type MetaFunction, type LoaderArgs} from '@shopify/remix-oxygen';
+import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import {flattenConnection, Image} from '@shopify/hydrogen';
 import type {Article, Blog} from '@shopify/hydrogen/storefront-api-types';
 import {Grid, PageHeader, Section, Link} from '~/components';
 import {getImageLoadingPriority, PAGINATION_SIZE} from '~/lib/const';
+import {seoPayload} from '../../lib/seo.server';
+import {CACHE_SHORT, routeHeaders} from '../../data/cache';
 
 const BLOG_HANDLE = 'Articles';
 
-export const handle = {
-  seo: {
-    title: 'Articles',
-  },
-};
+export const headers = routeHeaders;
 
-export const loader = async ({context: {storefront}}: LoaderArgs) => {
+export const loader = async ({request, context: {storefront}}: LoaderArgs) => {
   const {language, country} = storefront.i18n;
   const {blog} = await storefront.query<{
     blog: Blog;
   }>(BLOGS_QUERY, {
     variables: {
       blogHandle: BLOG_HANDLE,
-      pageBy: PAGINATION_SIZE,
+      pageBy: 64,
       language,
     },
   });
@@ -41,20 +39,16 @@ export const loader = async ({context: {storefront}}: LoaderArgs) => {
     };
   });
 
+  const seo = seoPayload.blog({blog, url: request.url});
+
   return json(
-    {articles},
+    {articles, seo},
     {
       headers: {
-        // TODO cacheLong()
+        'Cache-Control': CACHE_SHORT,
       },
     },
   );
-};
-
-export const meta: MetaFunction = () => {
-  return {
-    title: 'All Articles',
-  };
 };
 
 export default function Journals() {
@@ -95,21 +89,16 @@ function ArticleCard({
           <div className="card-image aspect-[3/2]">
             <Image
               alt={article.image.altText || article.title}
-              className="object-cover w-full"
+              className="w-full object-cover"
               data={article.image}
-              height={400}
+              aspectRatio="3/2"
               loading={loading}
               sizes="(min-width: 768px) 50vw, 100vw"
-              width={600}
-              loaderOptions={{
-                scale: 2,
-                crop: 'center',
-              }}
             />
           </div>
         )}
         <h2 className="mt-4 font-medium">{article.title}</h2>
-        <span className="block mt-1">{article.publishedAt}</span>
+        <span className="mt-1 block">{article.publishedAt}</span>
       </Link>
     </li>
   );
@@ -123,6 +112,11 @@ query Blog(
   $cursor: String
 ) @inContext(language: $language) {
   blog(handle: $blogHandle) {
+    title
+    seo {
+      title
+      description
+    }
     articles(first: $pageBy, after: $cursor) {
       edges {
         node {
