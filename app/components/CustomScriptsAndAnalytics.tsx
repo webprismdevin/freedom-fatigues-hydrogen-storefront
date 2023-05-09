@@ -17,7 +17,7 @@ export function CustomScriptsAndAnalytics() {
       n.version = '2.0';
       n.queue = [];
       t = b.createElement(e);
-      t.async = !0;
+      t.defer = true;
       t.src = v;
       s = b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t, s);
@@ -39,7 +39,7 @@ export function CustomScriptsAndAnalytics() {
       var f = d.getElementsByTagName(s)[0],
         j = d.createElement(s),
         dl = l != 'dataLayer' ? '&l=' + l : '';
-      j.async = true;
+      j.defer = true;
       j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
       f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', 'GTM-NX97D93');
