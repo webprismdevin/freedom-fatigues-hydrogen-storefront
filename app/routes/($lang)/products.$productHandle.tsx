@@ -188,6 +188,10 @@ export default function Product() {
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
 
+  useScript(
+    'http://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
+  );
+
   useEffect(() => {
     const script = document.createElement('script');
     script.src =
