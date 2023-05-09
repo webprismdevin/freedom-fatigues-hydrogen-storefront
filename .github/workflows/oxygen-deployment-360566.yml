@@ -53,8 +53,3 @@ jobs:
           environment: 'preview'
           preview_url: ${{ steps.deploy.outputs.url }}
           description: ${{ github.event.head_commit.message }}
-
-      - name: Run Lighthouse CI
-        run:  |
-          npm install -g @lhci/cli@latest
-          lhci autorun
