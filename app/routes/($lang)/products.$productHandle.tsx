@@ -102,6 +102,8 @@ type CustomQueryParams = {
   complete_the_look?: Metafield & {
     references: ProductType;
   };
+  avg_rating?: Metafield | undefined;
+  num_reviews?: Metafield | undefined;
 };
 
 type ProductQueryType = {
@@ -393,7 +395,11 @@ function CompleteTheLook() {
   );
 }
 
-export function InlineProductCard({product}: {product: ProductType}) {
+export function InlineProductCard({
+  product,
+}: {
+  product: ProductType & CustomQueryParams;
+}) {
   const variant = product.variants.nodes[0];
 
   return (
@@ -405,7 +411,7 @@ export function InlineProductCard({product}: {product: ProductType}) {
         <div className="col-span-3">
           <StarRating
             rating={Number(product.avg_rating?.value)}
-            count={product.num_reviews.value}
+            count={product.num_reviews?.value}
           />
           <div className="text-lg">{product.title}</div>
           <div className="text-sm">${variant.price.amount}</div>

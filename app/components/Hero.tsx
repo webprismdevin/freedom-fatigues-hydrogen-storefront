@@ -26,7 +26,6 @@ export type Hero = {
 
 export function Hero({data}: {data: Hero}) {
   const {image, title, caption, cta, layout, size} = data;
-  const {height, width} = image;
 
   const ref = useRef(null);
 
@@ -53,7 +52,6 @@ export function Hero({data}: {data: Hero}) {
         <Image
           src={urlFor(image.asset).format('webp').quality(80).url()}
           sizes={'100vw'}
-          aspectRatio={`${image.width} / ${image.height}`}
           className="mx-auto mt-0 min-h-full w-auto object-cover"
           alt={image.alt}
           loading={image.loading ? image.loading : 'lazy'}
@@ -64,8 +62,8 @@ export function Hero({data}: {data: Hero}) {
           layout === 'right' && 'text-right'
         } z-1 relative self-center text-contrast`}
       >
-        <p className="text-xl font-bold lg:text-2xl">{caption}</p>
-        <h2 className="mb-4 font-heading text-4xl uppercase lg:text-6xl">
+        <p className="text-shadow text-xl font-bold lg:text-2xl">{caption}</p>
+        <h2 className="text-shadow mb-4 font-heading text-4xl uppercase lg:text-6xl">
           {title}
         </h2>
         {cta?.to && (

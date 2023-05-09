@@ -27,7 +27,7 @@ import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import type {LayoutData} from '../root';
-import {AnimatePresence, useCycle, motion} from 'framer-motion';
+import {AnimatePresence, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';

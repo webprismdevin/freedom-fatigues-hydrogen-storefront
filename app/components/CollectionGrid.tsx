@@ -11,9 +11,15 @@ export function CollectionGrid({data}: {data: any}) {
   const collectionClass =
     'relative grid place-items-center font-heading text-2xl uppercase min-h-[100px] md:min-h-[200px]';
 
+  function isEven(n: number) {
+    return n % 2 == 0;
+  }
+
   return (
     <div
-      className={`grid min-h-[300px] grid-cols-2 gap-4 p-4 md:min-h-[400px] md:grid-cols-${collections.length}`}
+      className={`grid min-h-[300px] ${
+        isEven(collections.length) ? 'grid-cols-2' : 'grid-cols-1'
+      } gap-4 p-4 md:min-h-[400px] md:grid-cols-${collections.length}`}
       key={data._key}
     >
       {collections.map((collection: any) => (
@@ -29,7 +35,7 @@ export function CollectionGrid({data}: {data: any}) {
             loading={data.loading ?? 'lazy'}
             sizes={'33vw'}
           />
-          <span className="z-1 text-shadow relative text-2xl text-white md:text-3xl lg:text-5xl">
+          <span className="z-1 text-shadow relative text-center text-2xl text-white md:text-3xl lg:text-5xl">
             {collection.title}
           </span>
         </Link>

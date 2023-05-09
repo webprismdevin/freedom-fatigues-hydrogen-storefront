@@ -55,7 +55,7 @@ export default function () {
               </Text>
             </Section>
           )}
-          <Suspense>
+          <Suspense fallback={null}>
             <Await
               errorElement="There was a problem loading related products"
               resolve={noResultRecommendations}

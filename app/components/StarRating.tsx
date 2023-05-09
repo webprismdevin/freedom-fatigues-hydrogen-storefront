@@ -3,16 +3,17 @@ export default function StarRating({
   count,
 }: {
   rating: number;
-  count?: number;
+  count?: number | null;
 }) {
-  if (!rating) return null;
+  if (!rating)
+    return <div className="ml-2 text-xs text-slate-500">No rating yet</div>;
 
   return (
     <div className="flex flex-row items-center">
       {[...Array(Math.ceil(rating))].map((_, i) => (
         <IconStar key={i} />
       ))}{' '}
-      <span className=" ml-2 text-xs text-slate-500">
+      <span className="ml-2 text-xs text-slate-500">
         {rating} {count && `[${count}]`}
       </span>
     </div>

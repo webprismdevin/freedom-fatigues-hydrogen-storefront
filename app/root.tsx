@@ -37,6 +37,7 @@ import {useEffect} from 'react';
 // analytics
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
+import useScript from './lib/useScript';
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
@@ -122,6 +123,7 @@ export default function App() {
   const isHome = useIsHomePath();
 
   useAnalytics(hasUserConsent, locale);
+  useScript('https://unpkg.com/@botpoison/browser');
 
   return (
     <html lang={locale.language}>
