@@ -24,7 +24,7 @@ export function Columns({
             {item.image && (
               <div className="card-image mb-4 aspect-square">
                 <Image
-                  src={urlFor(item.image).url()}
+                  src={urlFor(item.image).height(800).format('webp').url()}
                   sizes="50vw"
                   aspectRatio="1/1"
                   alt={item.image?.alt}
