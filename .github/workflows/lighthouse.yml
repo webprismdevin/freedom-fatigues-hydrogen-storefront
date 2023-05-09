@@ -1,0 +1,17 @@
+name: Lighthouse
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs: 
+  run_speed_test
+    runs-on: ubuntu-latest
+      -steps: actions/checkout@v2
+      -uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      -run: npm ci
+      -run: npm install -g lighthouse-ci
+      -run: lightthouse-ci https://beta.freedomfatigues.com --performance=90 --accessibility=90 --seo=90 --pwa=90 --best-practices=90 --report=html --report=csv --report=json --report=pretty
