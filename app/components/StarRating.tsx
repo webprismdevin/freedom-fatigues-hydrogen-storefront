@@ -3,10 +3,9 @@ export default function StarRating({
   count,
 }: {
   rating: number;
-  count?: number | null;
+  count?: number | string | null | undefined;
 }) {
-  if (!rating)
-    return <div className="ml-2 text-xs text-slate-500">No rating yet</div>;
+  if (!rating) return null;
 
   return (
     <div className="flex flex-row items-center">

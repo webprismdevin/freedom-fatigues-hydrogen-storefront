@@ -30,6 +30,8 @@
     "clsx": "^1.2.1",
     "concurrently": "^7.5.0",
     "cross-env": "^7.0.3",
+    "cy-spok": "^1.6.1",
+    "cypress-map": "^1.19.1",
     "framer-motion": "^10.3.1",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",

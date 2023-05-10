@@ -97,6 +97,7 @@ export const handle = {
 };
 
 type CustomQueryParams = {
+  selectedVariant: ProductVariant;
   variants: ProductVariant[];
   caption?: Metafield | undefined;
   fabric_fit?: Metafield | undefined;
@@ -410,7 +411,7 @@ export function InlineProductCard({
     <Link to={`/products/${product.handle}`}>
       <div className="grid w-full grid-cols-4 gap-2">
         <div className="card-image col-span-1">
-          <Image sizes="128px" src={variant.image.url} alt={product.title} />
+          <Image sizes="128px" src={variant?.image?.url} alt={product.title} />
         </div>
         <div className="col-span-3">
           <StarRating
