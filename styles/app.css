@@ -83,7 +83,7 @@
 }
 
 .scroll {
-  animation: scroll 5s linear infinite;
+  animation: scroll 30s linear infinite;
 }
 
 .reverse {
