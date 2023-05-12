@@ -86,23 +86,15 @@ export default function Article() {
   return (
     <>
       <PageHeader heading={title} variant="blogPost">
-        <span>
-          {formattedDate} &middot; {author.name}
-        </span>
+        <span>{formattedDate}</span>
       </PageHeader>
       <Section as="article" padding="x">
         {image && (
           <Image
             data={image}
-            className="w-full mx-auto mt-8 md:mt-16 max-w-7xl"
+            className="mx-auto mt-8 w-full max-w-7xl md:mt-16"
             sizes="90vw"
-            widths={[400, 800, 1200]}
-            width="100px"
             loading={ATTR_LOADING_EAGER}
-            loaderOptions={{
-              scale: 2,
-              crop: 'center',
-            }}
           />
         )}
         <div

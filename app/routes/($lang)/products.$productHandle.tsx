@@ -555,7 +555,7 @@ export function ProductForm() {
         event: 'add_to_cart',
         ecommerce: {
           currency: 'USD',
-          value: 7.77,
+          value: selectedVariant?.price!.amount,
           items: [
             {
               item_id: fromGID(product.id),
