@@ -688,7 +688,7 @@ function BackInStock({variant}: {variant: any}) {
   return (
     <div>
       <backinstock.Form ref={ref} method="post" action="/backinstock/notify">
-        <p className="grow py-2 text-center text-red-500">
+        <p className="grow py-2 text-center font-bold">
           Get notified when this item is back in stock
         </p>
         <div className="flex">

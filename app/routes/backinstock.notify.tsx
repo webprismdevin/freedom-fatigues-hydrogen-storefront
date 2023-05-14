@@ -1,32 +1,37 @@
 import {ActionArgs, LoaderArgs, json} from '@remix-run/server-runtime';
 import {logsnag} from '~/lib/logsnag';
 
-const klaviyo_endpoint = 'https://a.klaviyo.com/api/v1/catalog/subscribe';
+const klaviyo_endpoint =
+  'https://a.klaviyo.com/onsite/components/back-in-stock/subscribe';
 
 export async function action({request, context}: ActionArgs) {
   const form = await request.formData();
   const email = form.get('email');
   const variant = form.get('variant');
 
-  if (!email) {
-    return json({error: 'Missing email or source', ok: false});
+  if (!email || !variant) {
+    return json({error: 'Missing email or variant', ok: false});
   }
+
+  const urlencoded = new URLSearchParams();
+  urlencoded.append('a', 'QuicR8');
+  urlencoded.append('email', email as string);
+  urlencoded.append('variant', variant as string);
+  urlencoded.append('platform', 'shopify');
+
+  // data = {
+  //   a: 'QuicR8',
+  //   email,
+  //   variant,
+  //   platform: 'shopify',
+  // };
 
   const response = await fetch(klaviyo_endpoint, {
     method: 'POST',
-    // headers: {
-    //   Authorization: `Klaviyo-API-Key ${context.env.KLAVIYO_API_KEY}`,
-    //   revision: '2023-02-22',
-    //   Accept: 'application/json',
-    //   'Content-Type': 'application/json',
-    // },
-    body: JSON.stringify({
-      a: 'QuicR8',
-      email,
-      variant,
-      platform: 'shopify',
-    }),
-  });
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: urlencoded,
+    redirect: 'follow',
+  })
 
   // if (response.status !== 202) {
   //   await logsnag.publish({
