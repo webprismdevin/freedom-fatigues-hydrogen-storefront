@@ -14,6 +14,7 @@ import {
   useSearchParams,
   useLocation,
   useTransition,
+  useFetcher,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -544,6 +545,11 @@ export function ProductForm() {
     quantity: 1,
   };
 
+  useEffect(() => {
+    console.log('fired');
+    console.log(isOutOfStock);
+  }, [product]);
+
   const quantityAvailable = selectedVariant?.quantityAvailable;
 
   function fireAnalytics() {
@@ -638,6 +644,9 @@ export function ProductForm() {
                 </Text>
               )}
             </AddToCartButton>
+            {isOutOfStock && (
+              <BackInStock variant={fromGID(selectedVariant.id)} />
+            )}
           </div>
         ) : (
           <div>
@@ -664,6 +673,44 @@ export function ProductForm() {
           <div className="text-xs">{belowCartCopy.right}</div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function BackInStock({variant}: {variant: any}) {
+  const backinstock = useFetcher();
+  const ref = useRef(null);
+
+  useEffect(() => {
+    console.log(backinstock.data);
+  }, [backinstock]);
+
+  return (
+    <div>
+      <backinstock.Form ref={ref} method="post" action="/backinstock/notify">
+        <p className="grow py-2 text-center text-red-500">
+          Get notified when this item is back in stock
+        </p>
+        <div className="flex">
+          <input type="hidden" value={variant} name="variant" />
+          <input
+            type="email"
+            placeholder="Enter email address"
+            name="email"
+            className="grow border-b-2 border-b-black bg-transparent px-4 py-2"
+          />
+          <Button variant="primary">Notify Me</Button>
+        </div>
+        {backinstock.state === 'idle' && backinstock.data ? (
+          backinstock.data.ok ? (
+            <p>We&apos;ll let you know once we restock!</p>
+          ) : (
+            <p className="text-red-500">
+              Something went wrong. We&apos;re looking into it!
+            </p>
+          )
+        ) : null}
+      </backinstock.Form>
     </div>
   );
 }

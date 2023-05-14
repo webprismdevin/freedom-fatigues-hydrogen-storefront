@@ -4,8 +4,8 @@ import {flattenConnection, Image} from '@shopify/hydrogen';
 import type {Article, Blog} from '@shopify/hydrogen/storefront-api-types';
 import {Grid, PageHeader, Section, Link} from '~/components';
 import {getImageLoadingPriority, PAGINATION_SIZE} from '~/lib/const';
-import {seoPayload} from '../../lib/seo.server';
-import {CACHE_SHORT, routeHeaders} from '../../data/cache';
+import {seoPayload} from '../lib/seo.server';
+import {CACHE_SHORT, routeHeaders} from '../data/cache';
 
 const BLOG_HANDLE = 'Articles';
 
@@ -18,7 +18,7 @@ export const loader = async ({request, context: {storefront}}: LoaderArgs) => {
   }>(BLOGS_QUERY, {
     variables: {
       blogHandle: BLOG_HANDLE,
-      pageBy: 64,
+      pageBy: 249,
       language,
     },
   });
@@ -51,7 +51,7 @@ export const loader = async ({request, context: {storefront}}: LoaderArgs) => {
   );
 };
 
-export default function Journals() {
+export default function Articles() {
   const {articles} = useLoaderData<typeof loader>();
 
   return (
@@ -117,7 +117,7 @@ query Blog(
       title
       description
     }
-    articles(first: $pageBy, after: $cursor) {
+    articles(first: $pageBy, after: $cursor, sortKey: PUBLISHED_AT, reverse: true) {
       edges {
         node {
           author: authorV2 {

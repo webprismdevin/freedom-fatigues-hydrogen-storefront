@@ -39,6 +39,15 @@ import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import useScript from './lib/useScript';
 
+declare global {
+  interface Window {
+    fbq: any;
+    dataLayer: any;
+    TriplePixel: any;
+    _learnq: any;
+  }
+}
+
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
   titleTemplate: '%s',

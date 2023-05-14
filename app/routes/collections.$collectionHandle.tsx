@@ -11,7 +11,7 @@ import {
   type SeoHandleFunction,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
-import {PageHeader, Section, Text, SortFilter} from '~/components';
+import {PageHeader, Section, Text, SortFilter, Heading} from '~/components';
 import {ProductGrid} from '~/components/ProductGrid';
 import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import {sanity} from '~/lib/sanity';
@@ -31,14 +31,20 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   },
   jsonLd: {
     '@context': 'https://schema.org',
+    // @ts-expect-error Shopify schema
     '@type': 'CollectionPage',
+    // @ts-expect-error Shopify schema
     description: data?.collection?.seo?.description,
     image: {
+      // @ts-expect-error Shopify schema
       '@type': 'ImageObject',
       url: data?.collection?.image?.url,
+      // @ts-expect-error Shopify schema
       height: data?.collection?.image?.height,
+      // @ts-expect-error Shopify schema
       width: data?.collection?.image?.width,
     },
+    // @ts-expect-error Shopify schema
     name: data?.collection?.seo?.title,
   },
 });
@@ -188,12 +194,21 @@ export default function Collection() {
     useLoaderData<typeof loader>();
   const [showDescription, setShowDescription] = useState(false);
 
+  const titleTransform = (title: string) => {
+    const index = title.search(' -');
+
+    if (index > 0) {
+      return title.substring(0, index);
+    }
+  };
+
+  const displayTitle = titleTransform(collection.title);
+
   return (
     <>
-      <div className="p-2 md:p-4 lg:p-8">
-        <Modules modules={modules.modules} />
-      </div>
       <Section>
+        <Heading size="heading">{displayTitle}</Heading>
+        <Modules modules={modules.modules} />
         <SortFilter
           filters={collection.products.filters as Filter[]}
           appliedFilters={appliedFilters}
@@ -208,23 +223,21 @@ export default function Collection() {
             />
           </div>
         </SortFilter>
-        <PageHeader heading={collection.title}>
-          {collection?.description && (
-            <div className="flex w-full items-baseline justify-between">
-              <div>
-                <p className={`prose ${showDescription ? '' : 'line-clamp-3'}`}>
-                  {collection.description}
-                </p>
-                <button
-                  className="text-red-500"
-                  onClick={() => setShowDescription(!showDescription)}
-                >
-                  Show {showDescription ? 'less' : 'more'}
-                </button>
-              </div>
+        {collection?.description && (
+          <div className="flex w-full items-baseline justify-between">
+            <div>
+              <p className={`prose ${showDescription ? '' : 'line-clamp-3'}`}>
+                {collection.description}
+              </p>
+              <button
+                className="text-red-500"
+                onClick={() => setShowDescription(!showDescription)}
+              >
+                Show {showDescription ? 'less' : 'more'}
+              </button>
             </div>
-          )}
-        </PageHeader>
+          </div>
+        )}
       </Section>
     </>
   );
