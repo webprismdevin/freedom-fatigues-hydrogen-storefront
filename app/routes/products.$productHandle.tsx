@@ -487,7 +487,6 @@ export function ProductForm() {
     if (window.fbq) {
       console.log('should fire now?');
       window.fbq('track', 'ViewContent', {
-        test_event_code: 'TEST56584',
         content_ids: [fromGID(product.id)],
         content_name: product.title,
         content_type: 'product',
@@ -574,7 +573,6 @@ export function ProductForm() {
       window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
     if (window.fbq)
       window.fbq('track', 'AddToCart', {
-        test_event_code: ''TEST56584'',
         content_ids: [fromGID(product.id)],
         content_type: 'product',
         value: selectedVariant?.price!.amount,
