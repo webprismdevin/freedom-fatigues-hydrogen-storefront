@@ -64,7 +64,6 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/lib/useScript';
-import lozad from 'lozad';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -195,12 +194,6 @@ export default function Product() {
   useScript(
     'https://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
   );
-
-  useEffect(() => {
-    observer = lozad();
-
-    observer.observe();
-  }, []);
 
   return (
     <>
@@ -494,6 +487,7 @@ export function ProductForm() {
     if (window.fbq) {
       console.log('should fire now?');
       window.fbq('track', 'ViewContent', {
+        test_event_code: 'TEST56584',
         content_ids: [fromGID(product.id)],
         content_name: product.title,
         content_type: 'product',
@@ -580,6 +574,7 @@ export function ProductForm() {
       window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
     if (window.fbq)
       window.fbq('track', 'AddToCart', {
+        test_event_code: ''TEST56584'',
         content_ids: [fromGID(product.id)],
         content_type: 'product',
         value: selectedVariant?.price!.amount,
@@ -677,10 +672,6 @@ export function ProductForm() {
 function BackInStock({variant}: {variant: any}) {
   const backinstock = useFetcher();
   const ref = useRef(null);
-
-  useEffect(() => {
-    console.log(backinstock.data);
-  }, [backinstock]);
 
   return (
     <div>

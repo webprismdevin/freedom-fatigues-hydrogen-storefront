@@ -28,7 +28,7 @@ export function CustomScriptsAndAnalytics() {
       'https://connect.facebook.net/en_US/fbevents.js',
     );
     window.fbq('init', '280447639311369');
-    window.fbq('track', 'PageView');
+    window.fbq('track', 'PageView', {test_event_code: 'TEST56584'});
   }, []);
 
   // tag manager
