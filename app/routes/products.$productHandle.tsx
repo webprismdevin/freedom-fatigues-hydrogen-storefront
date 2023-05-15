@@ -605,24 +605,22 @@ export function ProductForm() {
                 in this size
               </div>
             )}
-            <AddToCartButton
-              lines={[
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                },
-              ]}
-              variant={isOutOfStock ? 'secondary' : 'primary'}
-              // data-test="add-to-cart"
-              analytics={{
-                products: [productAnalytics],
-                totalValue: parseFloat(productAnalytics.price),
-              }}
-              onClick={fireAnalytics}
-            >
-              {isOutOfStock ? (
-                <Text>Sold out</Text>
-              ) : (
+            {!isOutOfStock ? (
+              <AddToCartButton
+                lines={[
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                  },
+                ]}
+                variant={isOutOfStock ? 'secondary' : 'primary'}
+                // data-test="add-to-cart"
+                analytics={{
+                  products: [productAnalytics],
+                  totalValue: parseFloat(productAnalytics.price),
+                }}
+                onClick={fireAnalytics}
+              >
                 <Text
                   as="span"
                   className="flex items-center justify-center gap-2"
@@ -642,9 +640,8 @@ export function ProductForm() {
                     />
                   )}
                 </Text>
-              )}
-            </AddToCartButton>
-            {isOutOfStock && (
+              </AddToCartButton>
+            ) : (
               <BackInStock variant={fromGID(selectedVariant.id)} />
             )}
           </div>
@@ -688,7 +685,7 @@ function BackInStock({variant}: {variant: any}) {
   return (
     <div>
       <backinstock.Form ref={ref} method="post" action="/backinstock/notify">
-        <p className="grow py-2 text-center font-bold">
+        <p className="grow py-2 font-bold">
           Get notified when this item is back in stock
         </p>
         <div className="flex">
