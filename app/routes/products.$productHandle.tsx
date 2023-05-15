@@ -15,6 +15,7 @@ import {
   useLocation,
   useTransition,
   useFetcher,
+  useMatches,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -424,6 +425,8 @@ export function ProductForm() {
   const {product, analytics, defaults} = useLoaderData<typeof loader>();
   const {belowCartCopy} = defaults.product;
 
+  const [root] = useMatches();
+
   const [currentSearchParams] = useSearchParams();
   const transition = useTransition();
 
@@ -579,6 +582,27 @@ export function ProductForm() {
         currency: 'USD',
       });
   }
+
+  useEffect(() => {
+    const _learnq = window._learnq || [];
+
+    const echoCart = async () => {
+      // console.log(await root.data?.cart);
+      const cartObj = await root.data?.cart;
+
+      const cart = {
+        total_price: cartObj.cost.totalAmount.amount,
+        $value: cartObj.cost.totalAmount.amount,
+        original_total_price: cartObj.cost.subtotalAmount.amount,
+        items: cartObj.lines,
+      };
+
+      console.log(cart);
+
+      if (_learnq) _learnq.push(['track', 'Added to Cart', cart]);
+    };
+    if (root.data?.cart) echoCart();
+  }, [root.data?.cart]);
 
   return (
     <div className="grid gap-10">

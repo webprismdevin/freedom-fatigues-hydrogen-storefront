@@ -6,7 +6,7 @@ export default function Marquee({data}: {data: any}) {
     <div className="flex select-none gap-[1rem] overflow-hidden py-4">
       <div className="scroll flex min-w-full flex-shrink-0 items-center justify-around gap-[1rem]">
         {data.items.map((item: any) => (
-          <Fragment key={item._key + '_1'}>
+          <Fragment key={crypto.randomUUID()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -22,7 +22,7 @@ export default function Marquee({data}: {data: any}) {
           </Fragment>
         ))}
         {data.items.map((item: any) => (
-          <Fragment key={item._key + '_2'}>
+          <Fragment key={crypto.randomUUID()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -40,7 +40,7 @@ export default function Marquee({data}: {data: any}) {
       </div>
       <div className="scroll flex min-w-full flex-shrink-0 items-center justify-around gap-[1rem]">
         {data.items.map((item: any) => (
-          <Fragment key={item._key + '_3'}>
+          <Fragment key={crypto.randomUUID()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -56,7 +56,7 @@ export default function Marquee({data}: {data: any}) {
           </Fragment>
         ))}
         {data.items.map((item: any) => (
-          <Fragment key={item._key + '_4'}>
+          <Fragment key={crypto.randomUUID()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
