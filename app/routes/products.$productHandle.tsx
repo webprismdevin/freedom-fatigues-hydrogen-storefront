@@ -194,9 +194,9 @@ export default function Product() {
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
 
-  useScript(
-    'https://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
-  );
+  // useScript(
+  //   'https://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
+  // );
 
   return (
     <>
