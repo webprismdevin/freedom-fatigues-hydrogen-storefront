@@ -188,7 +188,6 @@ export default function Product() {
   const {lastAccordion, modules: defaultModules} = defaults.product;
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
-  let observer = null;
 
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
@@ -641,10 +640,11 @@ export function ProductForm() {
                 <div className="flex flex-wrap items-center gap-1">
                   <span className="text-[11px]">
                     Get free returns for store credit or exchanges for $1 via
+                    re:do
                   </span>
-                  <div className="max-h-[18px] md:max-h-[20px]">
+                  {/* <div className="max-h-[18px] md:max-h-[20px]">
                     <IconRedo />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
