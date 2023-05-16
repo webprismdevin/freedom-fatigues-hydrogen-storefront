@@ -72,7 +72,7 @@ export function Layout({
           <Footer footer={settings.footer} text={'test text'} />
         </Await>
       </Suspense>
-      <EmailSignup />
+      {/* <EmailSignup /> */}
     </>
   );
 }
