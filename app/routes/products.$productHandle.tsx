@@ -616,15 +616,17 @@ export function ProductForm() {
         />
         {selectedVariant ? (
           <div className="grid items-stretch gap-4">
-            {availableForSale !== false && quantityAvailable < 20 && (
-              <div
-                className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
-              >
-                {quantityAvailable < 10 && <span>Only&nbsp;</span>}
-                <span className="font-bold">{quantityAvailable}&nbsp;</span>left
-                in this size
-              </div>
-            )}
+            {availableForSale !== false &&
+              quantityAvailable < 20 &&
+              quantityAvailable > 0 && (
+                <div
+                  className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
+                >
+                  {quantityAvailable < 10 && <span>Only&nbsp;</span>}
+                  <span className="font-bold">{quantityAvailable}&nbsp;</span>
+                  left in this size
+                </div>
+              )}
             {selectedVariant && !isRedoInCart && (
               <div className="flex items-center gap-2">
                 <input
