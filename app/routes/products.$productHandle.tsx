@@ -68,6 +68,8 @@ import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/lib/useScript';
 import useRedo from '~/lib/useRedo';
+import {has} from 'cypress/types/lodash';
+import useTags from '~/lib/useTags';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -607,6 +609,10 @@ export function ProductForm() {
 
   const addRedo = redo && !isRedoInCart;
 
+  const isClearance = useTags(product.tags, 'Clearance');
+
+  console.log(isClearance);
+
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -627,7 +633,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant && !isRedoInCart && (
+            {selectedVariant && !isRedoInCart && !isClearance && (
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -649,7 +655,7 @@ export function ProductForm() {
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
-                  !addRedo
+                  !addRedo || isClearance
                     ? [
                         {
                           merchandiseId: selectedVariant.id,
@@ -1036,6 +1042,7 @@ const PRODUCT_QUERY = `#graphql
       description
       availableForSale
       productType
+      tags
       options {
         name
         values

@@ -9,8 +9,6 @@ export default function useRedo() {
   const findRedo = async () => {
     const cart = await root.data?.cart;
 
-    console.log(cart);
-
     return cart.lines.edges.some(
       (line: any) => line.node.merchandise.sku === 'x-redo',
     );
