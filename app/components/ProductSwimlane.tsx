@@ -27,14 +27,17 @@ export function ProductSwimlane({
       {...props}
     >
       <div className="swimlane hiddenScroll md:scroll-px-8 md:px-8 md:pb-8 lg:scroll-px-12 lg:px-12">
-        {products.map((product) => (
-          <ProductCard
-            product={product}
-            key={product.id}
-            className="w-80 snap-start"
-            quickAdd={false}
-          />
-        ))}
+        {products.map((product) => {
+          if (product.id === 'gid://shopify/Product/6859749195894') return null;
+          return (
+            <ProductCard
+              product={product}
+              key={product.id}
+              className="w-80 snap-start"
+              quickAdd={false}
+            />
+          );
+        })}
       </div>
     </Section>
   );
