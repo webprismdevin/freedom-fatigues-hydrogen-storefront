@@ -204,14 +204,16 @@ export default function Product() {
         <div className="grid grid-cols-1 items-start md:grid-cols-2 md:gap-6 lg:grid-cols-5 lg:gap-10">
           <div className="col-span-1 lg:col-span-3">
             <ProductGallery media={media.nodes} />
-            <ResponsiveBrowserWidget breakpoint={1024} greaterThan={true}>
-              <div
-                className="w-full"
-                key={product.id}
-                id="looxReviews"
-                data-product-id={fromGID(product.id)}
-              ></div>
-            </ResponsiveBrowserWidget>
+            {product.num_reviews?.value && (
+              <ResponsiveBrowserWidget breakpoint={1024} greaterThan={true}>
+                <div
+                  className="w-full"
+                  key={product.id}
+                  id="looxReviews"
+                  data-product-id={fromGID(product.id)}
+                ></div>
+              </ResponsiveBrowserWidget>
+            )}
           </div>
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:min-h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
@@ -280,14 +282,16 @@ export default function Product() {
                 <div className="hidden lg:block">
                   <CompleteTheLook />
                 </div>
-                <ResponsiveBrowserWidget breakpoint={768}>
-                  <div
-                    className="w-full"
-                    key={product.id}
-                    id="looxReviews"
-                    data-product-id={fromGID(product.id)}
-                  ></div>
-                </ResponsiveBrowserWidget>
+                {product.num_reviews?.value && (
+                  <ResponsiveBrowserWidget breakpoint={768}>
+                    <div
+                      className="w-full"
+                      key={product.id}
+                      id="looxReviews"
+                      data-product-id={fromGID(product.id)}
+                    ></div>
+                  </ResponsiveBrowserWidget>
+                )}
                 <div className="lg:hidden">
                   <CompleteTheLook />
                 </div>

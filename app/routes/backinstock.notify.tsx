@@ -19,19 +19,12 @@ export async function action({request, context}: ActionArgs) {
   urlencoded.append('variant', variant as string);
   urlencoded.append('platform', 'shopify');
 
-  // data = {
-  //   a: 'QuicR8',
-  //   email,
-  //   variant,
-  //   platform: 'shopify',
-  // };
-
   const response = await fetch(klaviyo_endpoint, {
     method: 'POST',
     headers: {'Content-Type': 'application/x-www-form-urlencoded'},
     body: urlencoded,
     redirect: 'follow',
-  })
+  });
 
   // if (response.status !== 202) {
   //   await logsnag.publish({
