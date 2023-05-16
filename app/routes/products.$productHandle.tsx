@@ -638,11 +638,11 @@ export function ProductForm() {
                   onChange={(e) => setRedo(e.target.checked)}
                   checked={redo}
                 />
-                <div className="flex items-center gap-1">
-                  <p className="text-xs">
-                    Get free returns for store credit or exchanges for $1 via{' '}
-                  </p>
-                  <div>
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="text-[11px]">
+                    Get free returns for store credit or exchanges for $1 via
+                  </span>
+                  <div className="max-h-[18px] md:max-h-[20px]">
                     <IconRedo />
                   </div>
                 </div>

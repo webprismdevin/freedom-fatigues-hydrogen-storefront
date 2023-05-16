@@ -40,6 +40,7 @@ export default function SlideShow({data}: {data: any}) {
           initial={{x: -1000 * direction, opacity: 0}}
           animate={{x: 0, opacity: 1}}
           exit={{x: 1000 * direction, opacity: 0}}
+          transition={{ease: [0.17, 0.67, 0.83, 0.67]}}
           custom={direction}
           key={page}
           className={`relative grid h-full w-full grid-cols-1 bg-white ${
