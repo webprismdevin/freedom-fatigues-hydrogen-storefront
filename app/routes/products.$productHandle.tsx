@@ -16,6 +16,7 @@ import {
   useTransition,
   useFetcher,
   useMatches,
+  useNavigation,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -192,10 +193,6 @@ export default function Product() {
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
-
-  // useScript(
-  //   'https://shopify-extension.getredo.com/js/redo.js?widget_id=sshis2brqgi1wgx',
-  // );
 
   return (
     <>
@@ -433,7 +430,7 @@ export function ProductForm() {
   const [root] = useMatches();
 
   const [currentSearchParams] = useSearchParams();
-  const transition = useTransition();
+  const {location} = useNavigation();
 
   const redoBox = useRef(null);
   const [redo, setRedo] = useState(true);
@@ -450,10 +447,10 @@ export function ProductForm() {
    * request has completed.
    */
   const searchParams = useMemo(() => {
-    return transition.location
-      ? new URLSearchParams(transition.location.search)
+    return location
+      ? new URLSearchParams(location.search)
       : currentSearchParams;
-  }, [currentSearchParams, transition]);
+  }, [currentSearchParams, location]);
 
   const firstVariant = product.variants.nodes[0];
 
@@ -523,7 +520,7 @@ export function ProductForm() {
 
     for (const {name, value} of firstVariant.selectedOptions) {
       if (!searchParams.has(name)) {
-        clonedParams.set(name, '');
+        clonedParams.set(name, value);
       }
     }
 
@@ -538,9 +535,8 @@ export function ProductForm() {
    * of add to cart if there is none returned from the loader.
    * A developer can opt out of this, too.
    */
-  const selectedVariant = onlyHasDefault
-    ? firstVariant
-    : product.selectedVariant;
+  const selectedVariant = product.selectedVariant ?? firstVariant;
+
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
 
