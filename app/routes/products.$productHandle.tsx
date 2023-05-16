@@ -298,7 +298,7 @@ export default function Product() {
           </div>
         </div>
       </Section>
-      <Modules modules={modules ? modules : defaultModules} />
+      <Modules modules={modules?.length > 0 ? modules : defaultModules} />
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
@@ -438,10 +438,6 @@ export function ProductForm() {
   const [redo, setRedo] = useState(true);
 
   const [isRedoInCart] = useRedo();
-
-  useEffect(() => {
-    console.log(isRedoInCart);
-  }, [isRedoInCart]);
 
   /**
    * We update `searchParams` with in-flight request data from `transition` (if available)
@@ -610,8 +606,6 @@ export function ProductForm() {
   const addRedo = redo && !isRedoInCart;
 
   const isClearance = useTags(product.tags, 'Clearance');
-
-  console.log(isClearance);
 
   return (
     <div className="grid gap-10">

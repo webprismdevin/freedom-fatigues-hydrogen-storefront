@@ -9,8 +9,6 @@ export default function EmailSignup() {
   const [wasHidden, setHidden] = useState(false);
 
   useEffect(() => {
-    console.log(window.localStorage.getItem('subscribed') === 'true');
-
     if (
       window.sessionStorage.getItem('hideEmailSignup') === 'true' ||
       window.localStorage.getItem('subscribed') === 'true'
