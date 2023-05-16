@@ -41,6 +41,7 @@ import {
   AddToCartButton,
   ProductCard,
   Button,
+  IconRedo,
 } from '~/components';
 import {getExcerpt} from '~/lib/utils';
 import invariant from 'tiny-invariant';
@@ -65,6 +66,7 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/lib/useScript';
+import useRedo from '~/lib/useRedo';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -430,6 +432,15 @@ export function ProductForm() {
   const [currentSearchParams] = useSearchParams();
   const transition = useTransition();
 
+  const redoBox = useRef(null);
+  const [redo, setRedo] = useState(true);
+
+  const [isRedoInCart] = useRedo();
+
+  useEffect(() => {
+    console.log(isRedoInCart);
+  }, [isRedoInCart]);
+
   /**
    * We update `searchParams` with in-flight request data from `transition` (if available)
    * to create an optimistic UI, e.g. check the product option before the
@@ -488,7 +499,6 @@ export function ProductForm() {
   useEffect(() => {
     // facebook pixel
     if (window.fbq) {
-      console.log('should fire now?');
       window.fbq('track', 'ViewContent', {
         content_ids: [fromGID(product.id)],
         content_name: product.title,
@@ -541,11 +551,6 @@ export function ProductForm() {
     quantity: 1,
   };
 
-  useEffect(() => {
-    console.log('fired');
-    console.log(isOutOfStock);
-  }, [product]);
-
   const quantityAvailable = selectedVariant?.quantityAvailable;
 
   function fireAnalytics() {
@@ -587,22 +592,21 @@ export function ProductForm() {
     const _learnq = window._learnq || [];
 
     const echoCart = async () => {
-      // console.log(await root.data?.cart);
       const cartObj = await root.data?.cart;
 
       const cart = {
         total_price: cartObj.cost.totalAmount.amount,
         $value: cartObj.cost.totalAmount.amount,
         original_total_price: cartObj.cost.subtotalAmount.amount,
-        items: cartObj.lines,
+        items: cartObj.lines.edges,
       };
-
-      console.log(cart);
 
       if (_learnq) _learnq.push(['track', 'Added to Cart', cart]);
     };
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
+
+  const addRedo = redo && !isRedoInCart;
 
   return (
     <div className="grid gap-10">
@@ -622,14 +626,47 @@ export function ProductForm() {
                 in this size
               </div>
             )}
+            {selectedVariant && !isRedoInCart && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  ref={redoBox}
+                  onChange={(e) => setRedo(e.target.checked)}
+                  checked={redo}
+                />
+                <div className="flex items-center gap-1">
+                  <p className="text-xs">
+                    Get free returns for store credit or exchanges for $1 via{' '}
+                  </p>
+                  <div>
+                    <IconRedo />
+                  </div>
+                </div>
+              </div>
+            )}
             {!isOutOfStock ? (
               <AddToCartButton
-                lines={[
-                  {
-                    merchandiseId: selectedVariant.id,
-                    quantity: 1,
-                  },
-                ]}
+                lines={
+                  !addRedo
+                    ? [
+                        {
+                          merchandiseId: selectedVariant.id,
+                          quantity: 1,
+                        },
+                      ]
+                    : [
+                        {
+                          merchandiseId: selectedVariant.id,
+                          quantity: 1,
+                        },
+                        //redo hack
+                        {
+                          merchandiseId:
+                            'gid://shopify/ProductVariant/40053085339766',
+                          quantity: 1,
+                        },
+                      ]
+                }
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 // data-test="add-to-cart"
                 analytics={{

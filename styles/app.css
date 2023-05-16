@@ -221,7 +221,7 @@ shop-pay-button {
 }
 
 .text-shadow {
-  text-shadow: 5px 3px 6px rgba(0, 0, 0, 0.40);
+  text-shadow: 5px 3px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -233,4 +233,18 @@ shop-pay-button {
 * {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+
+/*! Inherited styles */
+.mf-class-1,
+.mf-class-2 {
+  box-sizing: border-box;
+}
+
+.mf-class-1 {
+  overflow: hidden;
+  display: block;
+  height: auto;
+  opacity: 0.75;
+  width: 100%;
 }

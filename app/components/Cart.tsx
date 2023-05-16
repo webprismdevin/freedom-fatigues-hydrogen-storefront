@@ -273,7 +273,7 @@ function CartLineItem({line}: {line: CartLine}) {
 
   return (
     <li key={id} className="flex gap-4">
-      <div className="flex-shrink">
+      <div className="shrink-0">
         {merchandise.image && (
           <Image
             width={220}

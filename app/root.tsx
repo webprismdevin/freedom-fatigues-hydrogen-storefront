@@ -321,6 +321,7 @@ const CART_QUERY = `#graphql
           merchandise {
             ... on ProductVariant {
               id
+              sku
               availableForSale
               compareAtPrice {
                 ...MoneyFragment
