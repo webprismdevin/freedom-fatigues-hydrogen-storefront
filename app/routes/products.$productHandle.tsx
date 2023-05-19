@@ -66,10 +66,9 @@ import {MODULE_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
 import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
-import useScript from '~/lib/useScript';
-import useRedo from '~/lib/useRedo';
-import {has} from 'cypress/types/lodash';
-import useTags from '~/lib/useTags';
+import useScript from '~/hooks/useScript';
+import useRedo from '~/hooks/useRedo';
+import useTags from '~/hooks/useTags';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -670,7 +669,7 @@ export function ProductForm() {
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}
-                // data-test="add-to-cart"
+                data-test="add-to-cart"
                 analytics={{
                   products: [productAnalytics],
                   totalValue: parseFloat(productAnalytics.price),
