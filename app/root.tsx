@@ -37,7 +37,7 @@ import {useEffect} from 'react';
 // analytics
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import useScript from './lib/useScript';
+import useScript from './hooks/useScript';
 
 declare global {
   interface Window {

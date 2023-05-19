@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import useScript from '../lib/useScript';
+import useScript from '../hooks/useScript';
 
 export function CustomScriptsAndAnalytics() {
   // Facebook Pixel
