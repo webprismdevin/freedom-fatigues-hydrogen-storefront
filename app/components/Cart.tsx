@@ -118,7 +118,7 @@ function CartDiscounts({
             name="discountCode"
             placeholder="Discount code"
           />
-          <button className="flex justify-end whitespace-nowrap font-medium">
+          <button className="flex justify-end whitespace-nowrap font-medium bg-slate-200 text-black rounded py-1 px-3">
             Apply Discount
           </button>
         </div>
