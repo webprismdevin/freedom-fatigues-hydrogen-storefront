@@ -53,12 +53,12 @@ const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   titleTemplate: '%s',
   description: data?.shop?.shop?.description?.substring(0, 154),
   handle: '@shopify',
-  url: `https://freedomfatigues.com${pathname}`,
+  url: `https://www.freedomfatigues.com${pathname}`,
   jsonLd: {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: data?.shop?.shop?.name,
-    url: `https://freedomfatigues.com/`,
+    url: `https://www.freedomfatigues.com/`,
     logo: '/branding/logo_black.png',
     sameAs: [
       'https://www.facebook.com/freedomfatigues',
