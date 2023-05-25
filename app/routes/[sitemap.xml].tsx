@@ -1,6 +1,7 @@
-import {flattenConnection} from '@shopify/hydrogen';
-import type {LoaderArgs} from '@shopify/remix-oxygen';
+import { flattenConnection } from '@shopify/hydrogen';
+import type { LoaderArgs } from '@shopify/remix-oxygen';
 import {
+  ArticleConnection,
   CollectionConnection,
   PageConnection,
   ProductConnection,
@@ -13,6 +14,7 @@ interface SitemapQueryData {
   products: ProductConnection;
   collections: CollectionConnection;
   pages: PageConnection;
+  articles: ArticleConnection
 }
 
 interface ProductEntry {
@@ -26,7 +28,7 @@ interface ProductEntry {
   };
 }
 
-export async function loader({request, context: {storefront}}: LoaderArgs) {
+export async function loader({ request, context: { storefront } }: LoaderArgs) {
   const data = await storefront.query<SitemapQueryData>(SITEMAP_QUERY, {
     variables: {
       urlLimits: MAX_URLS,
@@ -37,7 +39,7 @@ export async function loader({request, context: {storefront}}: LoaderArgs) {
   invariant(data, 'Sitemap data is missing');
 
   return new Response(
-    shopSitemap({data, baseUrl: new URL(request.url).origin}),
+    shopSitemap({ data, baseUrl: new URL(request.url).origin }),
     {
       headers: {
         'content-type': 'application/xml',
@@ -111,7 +113,19 @@ function shopSitemap({
       };
     });
 
-  const urlsDatas = [...productsData, ...collectionsData, ...pagesData];
+  const articlesData = flattenConnection(data.articles)
+    .filter((article) => article.onlineStoreUrl)
+    .map((article) => {
+      const url = `${baseUrl}/articles/${article.handle}`;
+
+      return {
+        url,
+        lastMod: article.publishedAt,
+        changeFreq: 'weekly',
+      };
+    });
+
+  const urlsDatas = [...productsData, ...collectionsData, ...pagesData, ...articlesData];
 
   return `
     <urlset
@@ -142,16 +156,15 @@ function renderUrlTag({
       <loc>${url}</loc>
       <lastmod>${lastMod}</lastmod>
       <changefreq>${changeFreq}</changefreq>
-      ${
-        image
-          ? `
+      ${image
+      ? `
         <image:image>
           <image:loc>${image.url}</image:loc>
           <image:title>${image.title ?? ''}</image:title>
           <image:caption>${image.caption ?? ''}</image:caption>
         </image:image>`
-          : ''
-      }
+      : ''
+    }
 
     </url>
   `;
@@ -188,6 +201,13 @@ const SITEMAP_QUERY = `#graphql
     pages(first: $urlLimits, query: "published_status:'published'") {
       nodes {
         updatedAt
+        handle
+        onlineStoreUrl
+      }
+    }
+    articles(first: $urlLimits, query: "published_status:'published'") {
+      nodes {
+        publishedAt
         handle
         onlineStoreUrl
       }
