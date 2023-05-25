@@ -50,8 +50,8 @@ declare global {
 
 const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
   title: data?.shop?.shop?.name,
-  titleTemplate: '%s',
-  description: data?.shop?.shop?.description?.substring(0, 154),
+  titleTemplate: '%s | American Made | Veteran Owned & Operated',
+  description: data?.shop?.shop?.description,
   handle: '@shopify',
   url: `https://www.freedomfatigues.com${pathname}`,
   jsonLd: {
