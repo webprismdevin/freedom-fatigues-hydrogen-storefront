@@ -4,17 +4,18 @@ import {
   type SerializeFrom,
   type LoaderArgs,
 } from '@shopify/remix-oxygen';
-import type {Page as PageType} from '@shopify/hydrogen/storefront-api-types';
-import {Await, useLoaderData} from '@remix-run/react';
+import type { Page as PageType } from '@shopify/hydrogen/storefront-api-types';
+import { Await, useLoaderData } from '@remix-run/react';
 import invariant from 'tiny-invariant';
-import {PageHeader} from '~/components';
-import {Hero} from '~/components/Hero';
-import type {SeoHandleFunction} from '@shopify/hydrogen';
-import {HERO_FRAGMENT, MODULE_FRAGMENT, sanity} from '~/lib/sanity';
-import {Suspense} from 'react';
+import { PageHeader } from '~/components';
+import { Hero } from '~/components/Hero';
+import type { SeoHandleFunction } from '@shopify/hydrogen';
+import { HERO_FRAGMENT, MODULE_FRAGMENT, sanity } from '~/lib/sanity';
+import { Suspense } from 'react';
 import Modules from '~/components/Modules';
+import useScript from '~/hooks/useScript';
 
-const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
+const seo: SeoHandleFunction<typeof loader> = ({ data }) => ({
   title: data?.page?.seo?.title,
   description: data?.page?.seo?.description,
 });
@@ -23,7 +24,7 @@ export const handle = {
   seo,
 };
 
-export async function loader({request, params, context}: LoaderArgs) {
+export async function loader({ request, params, context }: LoaderArgs) {
   invariant(params.pageHandle, 'Missing page handle');
 
   const sanityPage = await sanity.fetch(
@@ -34,7 +35,7 @@ export async function loader({request, params, context}: LoaderArgs) {
     }`,
   );
 
-  const {page: shopPage} = await context.storefront.query<{page: PageType}>(
+  const { page: shopPage } = await context.storefront.query<{ page: PageType }>(
     PAGE_QUERY,
     {
       variables: {
@@ -45,11 +46,11 @@ export async function loader({request, params, context}: LoaderArgs) {
   );
 
   if (!shopPage && !sanityPage) {
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
   return json(
-    {sanityPage, shopPage},
+    { sanityPage, shopPage },
     {
       headers: {
         // TODO cacheLong()
@@ -59,14 +60,17 @@ export async function loader({request, params, context}: LoaderArgs) {
 }
 
 export default function Page() {
-  const {sanityPage, shopPage} = useLoaderData<typeof loader>();
+  const { sanityPage, shopPage } = useLoaderData<typeof loader>();
+
+  useScript('https://unpkg.com/@botpoison/browser');
+  useScript('https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js');
 
   if (sanityPage?._id) return <SanityPage page={sanityPage} />;
   if (shopPage) return <ShopPage page={shopPage} />;
 }
 
-function SanityPage({page}: {page: any}) {
-  const {hero, modules} = page;
+function SanityPage({ page }: { page: any }) {
+  const { hero, modules } = page;
 
   return (
     <>
@@ -74,9 +78,8 @@ function SanityPage({page}: {page: any}) {
       <Suspense>
         <Await resolve={modules}>
           <div
-            className={`${
-              page.theme === 'dark' ? 'bg-primary text-contrast' : ''
-            }`}
+            className={`${page.theme === 'dark' ? 'bg-primary text-contrast' : ''
+              }`}
           >
             <Modules modules={modules} />
           </div>
@@ -86,11 +89,11 @@ function SanityPage({page}: {page: any}) {
   );
 }
 
-function ShopPage({page}: {page: PageType}) {
+function ShopPage({ page }: { page: PageType }) {
   return (
     <PageHeader heading={''}>
       <div
-        dangerouslySetInnerHTML={{__html: page.body}}
+        dangerouslySetInnerHTML={{ __html: page.body }}
         className="prose mx-auto"
       />
     </PageHeader>

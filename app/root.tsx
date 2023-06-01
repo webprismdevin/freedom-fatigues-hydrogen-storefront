@@ -132,7 +132,6 @@ export default function App() {
   const isHome = useIsHomePath();
 
   useAnalytics(hasUserConsent, locale);
-  useScript('https://unpkg.com/@botpoison/browser');
 
   return (
     <html lang={locale.language}>
