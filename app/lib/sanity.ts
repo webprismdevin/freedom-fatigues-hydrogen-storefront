@@ -1,6 +1,7 @@
 import {SanityImageAssetDocument, createClient} from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import groq from 'groq';
+import { SanityImageProps } from 'sanity-image/dist/types';
 
 export const sanity = createClient({
   projectId: 'd7y2vv8s',
@@ -10,7 +11,7 @@ export const sanity = createClient({
 
 const builder = imageUrlBuilder(sanity);
 
-export const urlFor = (source: SanityImageAssetDocument) => {
+export const urlFor = (source: any) => {
   return builder.image(source);
 };
 
