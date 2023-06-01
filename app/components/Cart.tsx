@@ -109,7 +109,7 @@ function CartDiscounts({
         <div
           className={clsx(
             codes ? 'hidden' : 'flex',
-            'items-center justify-between gap-4 text-copy',
+            'items-stretch justify-between gap-4 text-copy',
           )}
         >
           <input
@@ -118,8 +118,8 @@ function CartDiscounts({
             name="discountCode"
             placeholder="Discount code"
           />
-          <button className="flex justify-end whitespace-nowrap font-medium bg-slate-200 text-black rounded py-1 px-3">
-            Apply Discount
+          <button className="flex justify-end items-center whitespace-nowrap font-medium bg-slate-200 text-black rounded py-1 px-3">
+            <span>Apply Discount</span>
           </button>
         </div>
       </UpdateDiscountForm>
@@ -205,6 +205,8 @@ function CartCheckoutActions({
         },
         eventTimeout: 2000,
       });
+    } else {
+      window.location.href = checkoutUrl;
     }
   };
 
