@@ -27,6 +27,7 @@
     "@shopify/cli-hydrogen": "^4.0.8",
     "@shopify/hydrogen": "^2023.1.6",
     "@shopify/remix-oxygen": "^1.0.3",
+    "canvas-confetti": "^1.6.0",
     "clsx": "^1.2.1",
     "concurrently": "^7.5.0",
     "cross-env": "^7.0.3",
