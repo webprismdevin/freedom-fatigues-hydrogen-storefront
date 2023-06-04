@@ -6,11 +6,11 @@ import {
   ShopifyAnalyticsProduct,
   useMoney,
 } from '@shopify/hydrogen';
-import type {SerializeFrom} from '@shopify/remix-oxygen';
-import {Text, Link, AddToCartButton, Button} from '~/components';
-import {isDiscounted, isNewArrival} from '~/lib/utils';
-import {getProductPlaceholder} from '~/lib/placeholders';
-import type {MoneyV2, Product} from '@shopify/hydrogen/storefront-api-types';
+import type { SerializeFrom } from '@shopify/remix-oxygen';
+import { Text, Link, AddToCartButton, Button } from '~/components';
+import { isDiscounted, isNewArrival } from '~/lib/utils';
+import { getProductPlaceholder } from '~/lib/placeholders';
+import type { MoneyV2, Product } from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
 
 export function ProductCard({
@@ -22,9 +22,9 @@ export function ProductCard({
   quickAdd,
 }: {
   product: SerializeFrom<Product> & {
-    caption?: {value: string};
-    avg_rating?: {value: string};
-    num_reviews?: {value: string};
+    caption?: { value: string };
+    avg_rating?: { value: string };
+    num_reviews?: { value: string };
   };
   label?: string;
   className?: string;
@@ -42,7 +42,7 @@ export function ProductCard({
   const firstVariant = flattenConnection(cardProduct.variants)[0];
 
   if (!firstVariant) return null;
-  const {image, price, compareAtPrice} = firstVariant;
+  const { image, price, compareAtPrice } = firstVariant;
 
   if (label) {
     cardLabel = label;
@@ -144,8 +144,67 @@ export function ProductCard({
   );
 }
 
-export function QuickAdd({product}: {product: Product}) {
-  return <Button>Add To Bag</Button>;
+export function MiniProductCard({
+  product,
+  label,
+  className,
+  loading,
+  onClick,
+}: {
+  product: SerializeFrom<Product> & {
+    caption?: { value: string };
+    avg_rating?: { value: string };
+    num_reviews?: { value: string };
+  };
+  label?: string;
+  className?: string;
+  loading?: HTMLImageElement['loading'];
+  onClick?: () => void;
+}) {
+
+
+  const cardProduct: Product = product?.variants
+    ? (product as Product)
+    : getProductPlaceholder();
+  if (!cardProduct?.variants?.nodes?.length) return null;
+
+  const firstVariant = flattenConnection(cardProduct.variants)[0];
+
+  if (!firstVariant) return null;
+  const { image, price, compareAtPrice } = firstVariant;
+
+  return (
+    <div className="flex">
+      <div className="aspect-square bg-primary/5">
+        {image && (
+          <Image
+            className="fadeIn aspect-[4/5] w-full object-cover"
+            sizes="320px"
+            aspectRatio="1/1"
+            data={image}
+            alt={image.altText || `Picture of ${product.title}`}
+            loading={loading}
+          />
+        )}
+      </div>
+      <div>
+        <StarRating
+          rating={Number(product.avg_rating?.value)}
+          count={Number(product.num_reviews?.value)}
+        />
+        <p>{product.title}</p>
+        <Text className="flex flex-col md:flex-row md:gap-2">
+          <Money withoutTrailingZeros data={price!} />
+          {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
+            <CompareAtPrice
+              className={'opacity-50'}
+              data={compareAtPrice as MoneyV2}
+            />
+          )}
+        </Text>
+      </div>
+    </div>
+  )
 }
 
 export type ProductRating = {
@@ -160,7 +219,7 @@ function CompareAtPrice({
   data: MoneyV2;
   className?: string;
 }) {
-  const {currencyNarrowSymbol, withoutTrailingZerosAndCurrency} =
+  const { currencyNarrowSymbol, withoutTrailingZerosAndCurrency } =
     useMoney(data);
 
   const styles = clsx('strike', className);

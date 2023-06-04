@@ -20,8 +20,9 @@ import type {
 import {useFetcher} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
-import {cartRemove} from '~/routes/($lang)/cart';
+import {cartRemove} from '~/routes/cart';
 import {fromGID} from '~/lib/gidUtils';
+import confetti from 'canvas-confetti';
 
 type Layouts = 'page' | 'drawer';
 
@@ -44,6 +45,47 @@ export function Cart({
   );
 }
 
+import {useState, useEffect} from 'react';
+
+function ProgressBar({value}: {value: number}) {
+  const [width, setWidth] = useState(0);
+  const [confettiFired, setConfettiFired] = useState(() => {
+    if (window.sessionStorage.getItem('confettiFired') === 'true') {
+      return true;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (value >= 1) {
+      setWidth(100);
+      if (!confettiFired) {
+        confetti({
+          colors: ['#B31942', '#0A3161', '#FFFFFF'],
+          particleCount: 100,
+          spread: 70,
+          origin: {y: 0.6, x: 0.8},
+        });
+        setConfettiFired(true);
+        window.sessionStorage.setItem('confettiFired', 'true');
+      }
+      return;
+    }
+    setWidth(value * 100);
+  }, [value]);
+
+  return (
+    <div className="relative h-2 w-full bg-gray-300">
+      <div
+        className={`absolute left-0 top-0 h-full ${
+          width < 100 ? 'bg-slate-400' : 'bg-green-500'
+        } transition-all duration-500`}
+        style={{width: `${width}%`}}
+      />
+    </div>
+  );
+}
+
 export function CartDetails({
   layout,
   cart,
@@ -61,6 +103,19 @@ export function CartDetails({
 
   return (
     <div className={container[layout]}>
+      {cart && (
+        <div className="mb-6 bg-slate-200 px-6 py-4 md:px-12">
+          <div className="mb-2 text-center text-xs font-bold">
+            {Number(cart.cost.subtotalAmount.amount) < 70
+              ? `Add $${Math.floor(
+                  70 - Number(cart.cost.subtotalAmount.amount),
+                )} for free U.S.
+            shipping`
+              : "You've unlocked free U.S. shipping!"}
+          </div>
+          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+        </div>
+      )}
       <CartLines lines={cart?.lines} layout={layout} />
       {!isZeroCost && (
         <CartSummary cost={cart.cost} layout={layout}>
@@ -118,7 +173,7 @@ function CartDiscounts({
             name="discountCode"
             placeholder="Discount code"
           />
-          <button className="flex justify-end items-center whitespace-nowrap font-medium bg-slate-200 text-black rounded py-1 px-3">
+          <button className="flex items-center justify-end whitespace-nowrap rounded bg-slate-200 px-3 py-1 font-medium text-black">
             <span>Apply Discount</span>
           </button>
         </div>

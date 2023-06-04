@@ -6,8 +6,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {Disclosure, Listbox} from '@headlessui/react';
-import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
+import { Disclosure, Listbox } from '@headlessui/react';
+import { defer, type LoaderArgs } from '@shopify/remix-oxygen';
 import {
   useLoaderData,
   Await,
@@ -44,7 +44,7 @@ import {
   Button,
   IconRedo,
 } from '~/components';
-import {getExcerpt} from '~/lib/utils';
+import { getExcerpt } from '~/lib/utils';
 import invariant from 'tiny-invariant';
 import clsx from 'clsx';
 import type {
@@ -57,20 +57,21 @@ import type {
   MediaImage,
   Metafield,
 } from '@shopify/hydrogen/storefront-api-types';
-import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import type {Storefront} from '~/lib/type';
-import type {Product} from 'schema-dts';
-import {fromGID} from '~/lib/gidUtils';
+import { MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT } from '~/data/fragments';
+import type { Storefront } from '~/lib/type';
+import type { Product } from 'schema-dts';
+import { fromGID } from '~/lib/gidUtils';
 import StarRating from '~/components/StarRating';
-import {MODULE_FRAGMENT, sanity, urlFor} from '~/lib/sanity';
+import { MODULE_FRAGMENT, sanity, urlFor } from '~/lib/sanity';
 import Modules from '~/components/Modules';
 import groq from 'groq';
-import {SanityImageAssetDocument} from '@sanity/client';
+import { SanityImageAssetDocument } from '@sanity/client';
 import useScript from '~/hooks/useScript';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
+import { MiniProductCard } from '~/components/ProductCard';
 
-const seo: SeoHandleFunction<typeof loader> = ({data}) => {
+const seo: SeoHandleFunction<typeof loader> = ({ data }) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
     (media) => media.mediaContentType === 'IMAGE',
   ) as MediaImage | undefined;
@@ -118,18 +119,18 @@ type ProductQueryType = {
   shop: Shop;
 };
 
-export async function loader({params, request, context}: LoaderArgs) {
-  const {productHandle} = params;
+export async function loader({ params, request, context }: LoaderArgs) {
+  const { productHandle } = params;
   invariant(productHandle, 'Missing productHandle param, check route filename');
 
   const searchParams = new URL(request.url).searchParams;
 
   const selectedOptions: SelectedOptionInput[] = [];
   searchParams.forEach((value, name) => {
-    selectedOptions.push({name, value});
+    selectedOptions.push({ name, value });
   });
 
-  const {shop, product} = await context.storefront.query<ProductQueryType>(
+  const { shop, product } = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
     {
       variables: {
@@ -142,7 +143,7 @@ export async function loader({params, request, context}: LoaderArgs) {
   );
 
   if (!product?.id) {
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
   const defaults = await sanity.fetch(DEFAULTS_QUERY);
@@ -185,11 +186,11 @@ export async function loader({params, request, context}: LoaderArgs) {
 }
 
 export default function Product() {
-  const {product, shop, recommended, modules, defaults, badgeOverrides} =
+  const { product, shop, recommended, modules, defaults, badgeOverrides } =
     useLoaderData<typeof loader>();
-  const {lastAccordion, modules: defaultModules} = defaults.product;
-  const {media, title, vendor, descriptionHtml} = product;
-  const {shippingPolicy, refundPolicy} = shop;
+  const { lastAccordion, modules: defaultModules } = defaults.product;
+  const { media, title, vendor, descriptionHtml } = product;
+  const { shippingPolicy, refundPolicy } = shop;
 
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
@@ -319,7 +320,7 @@ type Badge = {
 };
 
 const Badges = () => {
-  const {defaults, badgeOverrides} = useLoaderData<typeof loader>();
+  const { defaults, badgeOverrides } = useLoaderData<typeof loader>();
 
   const defaultBadges = defaults.product.badges;
 
@@ -327,12 +328,12 @@ const Badges = () => {
 
   const badges = badgeOverrides
     ? [
-        ...badgeOverrides,
-        ...defaults.product.badges.slice(
-          badgeOverrides.length,
-          defaultBadges.length,
-        ),
-      ]
+      ...badgeOverrides,
+      ...defaults.product.badges.slice(
+        badgeOverrides.length,
+        defaultBadges.length,
+      ),
+    ]
     : defaultBadges;
 
   return (
@@ -378,7 +379,7 @@ function ResponsiveBrowserWidget({
 }
 
 function CompleteTheLook() {
-  const {product} = useLoaderData<typeof loader>();
+  const { product } = useLoaderData<typeof loader>();
 
   if (!product.complete_the_look) return null;
 
@@ -390,7 +391,8 @@ function CompleteTheLook() {
       <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
         {product?.complete_the_look?.references.nodes.map((product: any) => (
           <div key={product.id}>
-            <InlineProductCard product={product} />
+            {/* <InlineProductCard product={product} /> */}
+            <MiniProductCard product={product} />
           </div>
         ))}
       </div>
@@ -425,13 +427,13 @@ export function InlineProductCard({
 }
 
 export function ProductForm() {
-  const {product, analytics, defaults} = useLoaderData<typeof loader>();
-  const {belowCartCopy} = defaults.product;
+  const { product, analytics, defaults } = useLoaderData<typeof loader>();
+  const { belowCartCopy } = defaults.product;
 
   const [root] = useMatches();
 
   const [currentSearchParams] = useSearchParams();
-  const {location} = useNavigation();
+  const { location } = useNavigation();
 
   const redoBox = useRef(null);
   const [redo, setRedo] = useState(true);
@@ -471,7 +473,7 @@ export function ProductForm() {
   useEffect(() => {
     // GA4 view_item event
     if (window.dataLayer) {
-      window.dataLayer.push({ecommerce: null});
+      window.dataLayer.push({ ecommerce: null });
       window.dataLayer.push({
         event: 'view_item',
         ecommerce: {
@@ -515,7 +517,7 @@ export function ProductForm() {
   const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
     const clonedParams = new URLSearchParams(searchParams);
 
-    for (const {name, value} of firstVariant.selectedOptions) {
+    for (const { name, value } of firstVariant.selectedOptions) {
       if (!searchParams.has(name)) {
         clonedParams.set(name, value);
       }
@@ -552,7 +554,7 @@ export function ProductForm() {
   function fireAnalytics() {
     if (window.dataLayer) {
       //@ts-ignore
-      window.dataLayer.push({ecommerce: null});
+      window.dataLayer.push({ ecommerce: null });
       // @ts-ignore
       window.dataLayer.push({
         event: 'add_to_cart',
@@ -574,7 +576,7 @@ export function ProductForm() {
       });
     }
     if (window.TriplePixel)
-      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+      window.TriplePixel('AddToCart', { item: fromGID(product.id), q: 1 });
     if (window.fbq)
       window.fbq('track', 'AddToCart', {
         content_ids: [fromGID(product.id)],
@@ -650,23 +652,23 @@ export function ProductForm() {
                 lines={
                   !addRedo || isClearance
                     ? [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                      ]
+                      {
+                        merchandiseId: selectedVariant.id,
+                        quantity: 1,
+                      },
+                    ]
                     : [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                        //redo hack
-                        {
-                          merchandiseId:
-                            'gid://shopify/ProductVariant/40053085339766',
-                          quantity: 1,
-                        },
-                      ]
+                      {
+                        merchandiseId: selectedVariant.id,
+                        quantity: 1,
+                      },
+                      //redo hack
+                      {
+                        merchandiseId:
+                          'gid://shopify/ProductVariant/40053085339766',
+                        quantity: 1,
+                      },
+                    ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 data-test="add-to-cart"
@@ -729,7 +731,7 @@ export function ProductForm() {
   );
 }
 
-function BackInStock({variant}: {variant: any}) {
+function BackInStock({ variant }: { variant: any }) {
   const backinstock = useFetcher();
   const ref = useRef(null);
 
@@ -798,7 +800,7 @@ function ProductOptions({
               {option.values.length > 7 ? (
                 <div className="relative w-full">
                   <Listbox>
-                    {({open}) => (
+                    {({ open }) => (
                       <>
                         <Listbox.Button
                           ref={closeRef}
@@ -825,7 +827,7 @@ function ProductOptions({
                               key={`option-${option.name}-${value}`}
                               value={value}
                             >
-                              {({active}) => (
+                              {({ active }) => (
                                 <ProductOptionLink
                                   optionName={option.name}
                                   optionValue={value}
@@ -842,10 +844,10 @@ function ProductOptions({
                                   {value}
                                   {searchParamsWithDefaults.get(option.name) ===
                                     value && (
-                                    <span className="ml-2">
-                                      <IconCheck />
-                                    </span>
-                                  )}
+                                      <span className="ml-2">
+                                        <IconCheck />
+                                      </span>
+                                    )}
                                 </ProductOptionLink>
                               )}
                             </Listbox.Option>
@@ -898,7 +900,7 @@ function ProductOptionLink({
   children?: ReactNode;
   [key: string]: any;
 }) {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   const isLangPathname = /\/[a-zA-Z]{2}-[a-zA-Z]{2}\//g.test(pathname);
   // fixes internalized pathname
   const path = isLangPathname
@@ -932,7 +934,7 @@ export function ProductDetail({
 }) {
   return (
     <Disclosure key={title} as="div" className="grid w-full gap-2">
-      {({open}) => (
+      {({ open }) => (
         <>
           <Disclosure.Button className="text-left">
             <div className="flex justify-between">
@@ -951,7 +953,7 @@ export function ProductDetail({
           <Disclosure.Panel className={'grid gap-2 pb-4 pt-2'}>
             <div
               className="prose"
-              dangerouslySetInnerHTML={{__html: content}}
+              dangerouslySetInnerHTML={{ __html: content }}
             />
             {learnMore && (
               <div className="">
@@ -1119,7 +1121,7 @@ async function getRecommendedProducts(
     recommended: ProductType[];
     additional: ProductConnection;
   }>(RECOMMENDED_PRODUCTS_QUERY, {
-    variables: {productId, count: 12},
+    variables: { productId, count: 12 },
   });
 
   invariant(products, 'No data returned from Shopify API');
