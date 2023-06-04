@@ -39,19 +39,6 @@ export function Cart({
 
   return (
     <>
-      {cart && linesCount && (
-        <div className="mb-6 bg-slate-200 px-6 py-4 md:px-12">
-          <div className="mb-2 text-center text-xs font-bold">
-            {Number(cart.cost.subtotalAmount.amount) < 70
-              ? `Add $${
-                  Math.floor(70 - Number(cart.cost.subtotalAmount.amount))
-                } for free U.S.
-            shipping`
-              : "You've unlocked free U.S. shipping!"}
-          </div>
-          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
-        </div>
-      )}
       <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
       <CartDetails cart={cart} layout={layout} />
     </>
@@ -116,6 +103,19 @@ export function CartDetails({
 
   return (
     <div className={container[layout]}>
+      {cart && (
+        <div className="mb-6 bg-slate-200 px-6 py-4 md:px-12">
+          <div className="mb-2 text-center text-xs font-bold">
+            {Number(cart.cost.subtotalAmount.amount) < 70
+              ? `Add $${Math.floor(
+                  70 - Number(cart.cost.subtotalAmount.amount),
+                )} for free U.S.
+            shipping`
+              : "You've unlocked free U.S. shipping!"}
+          </div>
+          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+        </div>
+      )}
       <CartLines lines={cart?.lines} layout={layout} />
       {!isZeroCost && (
         <CartSummary cost={cart.cost} layout={layout}>
