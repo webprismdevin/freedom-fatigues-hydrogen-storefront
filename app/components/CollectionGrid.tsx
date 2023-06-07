@@ -31,7 +31,7 @@ export function CollectionGrid({data}: {data: any}) {
           <Image
             className={imageClass}
             src={urlFor(collection.image).height(800).format('webp').url()}
-            alt=""
+            alt={collection.image.alt ? collection.image.alt : collection.title}
             loading={data.loading ?? 'lazy'}
             sizes={'33vw'}
           />

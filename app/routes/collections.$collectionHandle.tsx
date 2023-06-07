@@ -207,7 +207,7 @@ export default function Collection() {
   return (
     <>
       <Section>
-        <Heading size="heading">{displayTitle}</Heading>
+        <h1 className="font-heading text-2xl">{displayTitle}</h1>
         <Modules modules={modules.modules} />
         <SortFilter
           filters={collection.products.filters as Filter[]}
@@ -226,9 +226,12 @@ export default function Collection() {
         {collection?.description && (
           <div className="flex w-full items-baseline justify-between">
             <div>
-              <p className={`prose ${showDescription ? '' : 'line-clamp-3'}`}>
-                {collection.description}
-              </p>
+              <div
+                className={`prose ${showDescription ? '' : 'line-clamp-3'}`}
+                dangerouslySetInnerHTML={{
+                  __html: collection.descriptionHtml,
+                }}
+              />
               <button
                 className="text-red-500"
                 onClick={() => setShowDescription(!showDescription)}
@@ -260,6 +263,7 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      descriptionHtml
       seo {
         description
         title
