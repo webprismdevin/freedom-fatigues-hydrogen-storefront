@@ -267,16 +267,16 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex flex-col">
-      {/* <a href={checkoutUrl} target="_self"> */}
-      <Button
+      <a href={checkoutUrl} target="_self">
+      {/* <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
         as="span"
         width="full"
-      >
+      > */}
         Continue to Checkout
-      </Button>
-      {/* </a> */}
+      {/* </Button> */}
+      </a>
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );
