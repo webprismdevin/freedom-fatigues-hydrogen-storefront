@@ -20,6 +20,7 @@ module.exports = {
         contrast: withOpacityValue('--color-contrast'),
         notice: withOpacityValue('--color-accent'),
         shopPay: 'var(--color-shop-pay)',
+        'FF-red': '#e9382b'
       },
       fontFamily: {
         heading: ['Norwester-Regular', 'ui-sans-serif', 'system-ui'],
