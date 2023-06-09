@@ -104,7 +104,7 @@ export function CartDetails({
   return (
     <div className={container[layout]}>
       {cart && (
-        <div className="mb-6 bg-slate-200 px-6 py-4 md:px-12">
+        <div className="mb-6 self-start bg-slate-200 px-6 py-4 md:px-12">
           <div className="mb-2 text-center text-xs font-bold">
             {Number(cart.cost.subtotalAmount.amount) < 70
               ? `Add $${Math.floor(
