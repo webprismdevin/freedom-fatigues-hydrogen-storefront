@@ -267,7 +267,7 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex flex-col">
-      <a href={checkoutUrl} target="_self" className="cursor-pointer hover:opacity-80 w-full text-center bg-black hover:bg-FF-red px-2 py-4 text-white transition-colors duration-200">
+      <a href={checkoutUrl} target="_self" className="cursor-pointer hover:opacity-80 w-full text-center bg-black hover:bg-FF-red px-4 py-3 text-white transition-colors duration-200">
       {/* <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
