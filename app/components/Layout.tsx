@@ -402,7 +402,7 @@ function DesktopHeader({
                   target="_parent"
                   prefetch="intent"
                   className={({isActive}) =>
-                    isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                    isActive ? '-mb-px border-b-2 border-red-500 pb-1' : 'pb-1'
                   }
                 >
                   <LinkTitle text={item.title} />
@@ -514,7 +514,7 @@ function MegaMenu({
                     target="_parent"
                     prefetch="intent"
                     className={({isActive}) =>
-                      isActive ? '-mb-px border-b pb-1' : 'pb-1'
+                      isActive ? '-mb-px border-b-2 border-FF-red pb-1' : 'pb-1'
                     }
                   >
                     {link.title}

@@ -227,7 +227,7 @@ export default function Collection() {
           <div className="flex w-full items-baseline justify-between">
             <div>
               <div
-                className={`prose ${showDescription ? '' : 'line-clamp-3'}`}
+                className={`prose ${showDescription ? 'max-h-fit' : 'line-clamp-5 max-h-48 md:max-h-44 overflow-hidden'}`}
                 dangerouslySetInnerHTML={{
                   __html: collection.descriptionHtml,
                 }}

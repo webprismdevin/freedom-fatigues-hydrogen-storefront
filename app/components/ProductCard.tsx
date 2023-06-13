@@ -82,7 +82,7 @@ export function ProductCard({
               />
             )}
             {cardLabel && (
-              <span className="absolute right-0 top-0 m-4 rounded-full bg-red-500 px-2 py-1 text-right text-xs text-white">
+              <span className="absolute right-0 top-0 m-4 rounded-full bg-FF-red px-2 py-1 text-right text-xs text-white">
                 {cardLabel}
               </span>
             )}

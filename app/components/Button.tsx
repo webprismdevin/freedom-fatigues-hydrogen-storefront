@@ -23,7 +23,8 @@ export const Button = forwardRef(
   ) => {
     const Component = props?.to ? Link : as;
 
-    const baseButtonClasses = 'inline-block font-medium text-center py-3 px-6';
+    const baseButtonClasses =
+      'inline-block font-medium text-center py-3 px-6 hover:bg-FF-red hover:text-white transition-colors duration-200';
 
     const variants = {
       primary: `${baseButtonClasses} bg-primary text-contrast`,
