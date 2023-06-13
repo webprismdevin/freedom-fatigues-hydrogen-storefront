@@ -1067,7 +1067,7 @@ const PRODUCT_QUERY = `#graphql
           }
         }
       }
-      media(first: 7) {
+      media(first: 14) {
         nodes {
           ...Media
         }
