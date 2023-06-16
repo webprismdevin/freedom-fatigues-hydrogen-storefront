@@ -45,6 +45,7 @@ declare global {
     dataLayer: any;
     TriplePixel: any;
     _learnq: any;
+    plausible: any;
   }
 }
 
