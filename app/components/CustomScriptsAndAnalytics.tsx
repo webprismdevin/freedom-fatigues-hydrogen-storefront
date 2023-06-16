@@ -110,5 +110,13 @@ export function CustomScriptsAndAnalytics() {
     'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=QuicR8',
   );
 
-  return null;
+  return (
+    <>
+      <script
+        defer
+        data-domain="freedomfatigues.com"
+        src="https://plausible.io/js/script.js"
+      ></script>
+    </>
+  );
 }

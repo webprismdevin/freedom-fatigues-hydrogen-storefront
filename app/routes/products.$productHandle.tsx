@@ -554,6 +554,14 @@ export function ProductForm() {
   const quantityAvailable = selectedVariant?.quantityAvailable;
 
   function fireAnalytics() {
+    if (window.plausible) {
+      window.plausible('AddToCart', {
+        props: {
+          product: product.title,
+          value: selectedVariant?.price!.amount,
+        },
+      });
+    }
     if (window.dataLayer) {
       //@ts-ignore
       window.dataLayer.push({ecommerce: null});
