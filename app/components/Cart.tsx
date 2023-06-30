@@ -75,10 +75,10 @@ function ProgressBar({value}: {value: number}) {
   }, [value]);
 
   return (
-    <div className="relative h-2 w-full bg-gray-300">
+    <div className="relative h-2 w-full bg-slate-200">
       <div
         className={`absolute left-0 top-0 h-full ${
-          width < 100 ? 'bg-slate-400' : 'bg-green-500'
+          width < 100 ? 'bg-blue-600' : 'bg-green-500'
         } transition-all duration-500`}
         style={{width: `${width}%`}}
       />
@@ -97,15 +97,16 @@ export function CartDetails({
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
   const container = {
-    drawer: 'grid grid-cols-1 h-screen-no-nav grid-rows-[1fr_auto]',
+    drawer: 'grid grid-cols-1 h-screen-no-nav grid-rows-[min-content_auto]',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
   };
 
   return (
     <div className={container[layout]}>
       {cart && (
-        <div className="mb-6 self-start bg-slate-200 px-6 py-4 md:px-12">
-          <div className="mb-2 text-center text-xs font-bold">
+        <div className="mb-6 self-start bg-black text-white px-6 pt-3 pb-2 md:px-12">
+          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+          <div className="mt-2 text-center text-xs font-bold">
             {Number(cart.cost.subtotalAmount.amount) < 70
               ? `Add $${Math.floor(
                   70 - Number(cart.cost.subtotalAmount.amount),
@@ -113,7 +114,6 @@ export function CartDetails({
             shipping`
               : "You've unlocked free U.S. shipping!"}
           </div>
-          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
         </div>
       )}
       <CartLines lines={cart?.lines} layout={layout} />
@@ -267,15 +267,19 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex flex-col">
-      <a href={checkoutUrl} target="_self" className="cursor-pointer hover:opacity-80 w-full text-center bg-black hover:bg-FF-red px-4 py-3 text-white transition-colors duration-200">
-      {/* <Button
+      <a
+        href={checkoutUrl}
+        target="_self"
+        className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+      >
+        {/* <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
         as="span"
         width="full"
       > */}
         Continue to Checkout
-      {/* </Button> */}
+        {/* </Button> */}
       </a>
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>

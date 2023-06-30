@@ -62,7 +62,7 @@ export async function loader({params, context}: LoaderArgs) {
   const {shop} = await context.storefront.query<{
     shop: HomeSeoData;
   }>(HOMEPAGE_SEO_QUERY, {
-    variables: {handle: 'new-releases'},
+    variables: {handle: 'best-sellers'},
   });
 
   return defer({
@@ -75,7 +75,7 @@ export async function loader({params, context}: LoaderArgs) {
     saleProducts: context.storefront.query<{collection: CollectionConnection}>(
       HOMEPAGE_SALE_PRODUCTS_QUERY,
       {
-        variables: {handle: 'sale'},
+        variables: {handle: 'newly-released'},
       },
     ),
     analytics: {
@@ -129,7 +129,7 @@ export default function Homepage() {
             return (
               <ProductSwimlane
                 products={collection.products?.nodes}
-                title="Soon to be Retired"
+                title="Latest Releases"
                 count={4}
               />
             );
