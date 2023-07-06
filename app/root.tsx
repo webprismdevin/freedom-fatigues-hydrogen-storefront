@@ -200,8 +200,8 @@ export function CatchBoundary() {
             />
           )}
         </Layout>
-        <Scripts />
-        <CustomScriptsAndAnalytics />
+        {/* <Scripts /> */}
+        {/* <CustomScriptsAndAnalytics /> */}
       </body>
     </html>
   );

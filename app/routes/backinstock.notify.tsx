@@ -1,4 +1,4 @@
-import {ActionArgs, LoaderArgs, json} from '@remix-run/server-runtime';
+import {ActionArgs, LoaderArgs, json} from '@shopify/remix-oxygen';
 import {logsnag} from '~/lib/logsnag';
 
 const klaviyo_endpoint =
