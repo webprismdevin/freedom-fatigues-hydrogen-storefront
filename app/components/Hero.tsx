@@ -41,8 +41,6 @@ export function Hero({ data }: { data: Hero }) {
   });
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
 
-  console.log(image.hotspot?.x)
-
   return (
     <div
       key={data._key}

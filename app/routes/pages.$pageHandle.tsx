@@ -15,8 +15,8 @@ import {Suspense} from 'react';
 import Modules from '~/components/Modules';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
-  title: data?.page?.seo?.title,
-  description: data?.page?.seo?.description,
+  title: data?.page?.seo?.title ?? data?.page?.title,
+  description: data?.page?.seo?.description ?? '',
 });
 
 export const handle = {

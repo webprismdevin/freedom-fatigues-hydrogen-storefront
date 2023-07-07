@@ -19,9 +19,9 @@ import Modules from '~/components/Modules';
 import {useState} from 'react';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
-  title: data?.collection?.seo?.title,
-  description: data?.collection?.seo?.description,
-  titleTemplate: '%s | Collection',
+  title: data?.collection?.seo?.title ?? data?.collection?.title,
+  description: data?.collection?.seo?.description ?? data?.collection?.description,
+  titleTemplate: '%s',
   media: {
     type: 'image',
     url: data?.collection?.image?.url,
@@ -31,20 +31,14 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   },
   jsonLd: {
     '@context': 'https://schema.org',
-    // @ts-expect-error Shopify schema
     '@type': 'CollectionPage',
-    // @ts-expect-error Shopify schema
     description: data?.collection?.seo?.description,
     image: {
-      // @ts-expect-error Shopify schema
       '@type': 'ImageObject',
       url: data?.collection?.image?.url,
-      // @ts-expect-error Shopify schema
       height: data?.collection?.image?.height,
-      // @ts-expect-error Shopify schema
       width: data?.collection?.image?.width,
     },
-    // @ts-expect-error Shopify schema
     name: data?.collection?.seo?.title,
   },
 });
