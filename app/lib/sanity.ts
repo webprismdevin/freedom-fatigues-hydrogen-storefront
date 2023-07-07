@@ -6,6 +6,7 @@ import { SanityImageProps } from 'sanity-image/dist/types';
 export const sanity = createClient({
   projectId: 'd7y2vv8s',
   dataset: 'production',
+  apiVersion: '2023-03-25',
   useCdn: process.env.NODE_ENV === 'production' ? true : false,
 });
 
@@ -83,7 +84,7 @@ export async function getSiteSettings() {
         }
       },
     },
-    "announcements": announcements[],
+    announcements
   }`;
 
   return sanity.fetch(query);

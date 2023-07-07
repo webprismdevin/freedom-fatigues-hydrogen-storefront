@@ -15,9 +15,9 @@ import { Suspense } from 'react';
 import Modules from '~/components/Modules';
 import useScript from '~/hooks/useScript';
 
-const seo: SeoHandleFunction<typeof loader> = ({ data }) => ({
-  title: data?.page?.seo?.title,
-  description: data?.page?.seo?.description,
+const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
+  title: data?.page?.seo?.title ?? data?.page?.title,
+  description: data?.page?.seo?.description ?? '',
 });
 
 export const handle = {

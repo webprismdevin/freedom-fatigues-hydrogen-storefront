@@ -17,9 +17,9 @@ import type {SeoHandleFunction} from '@shopify/hydrogen';
 const BLOG_HANDLE = 'articles';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
-  title: data?.article?.seo?.title,
-  description: data?.article?.seo?.description,
-  titleTemplate: '%s | Articles',
+  title: data?.article?.seo?.title ?? data?.article?.title,
+  description: data?.article?.seo?.description ?? data?.article?.excerpt,
+  titleTemplate: '%s',
 });
 
 export const handle = {
@@ -68,9 +68,10 @@ export const meta: MetaFunction = ({
 }: {
   data: SerializeFrom<typeof loader> | undefined;
 }) => {
+
   return {
-    title: data?.article?.seo?.title ?? 'Article',
-    description: data?.article?.seo?.description,
+    title: data?.article?.seo?.title ?? data?.article?.title,
+    description: data?.article?.seo?.description ?? data?.article?.excerpt,
   };
 };
 
@@ -117,6 +118,7 @@ const ARTICLE_QUERY = `#graphql
         title
         contentHtml
         publishedAt
+        excerpt
         author: authorV2 {
           name
         }
