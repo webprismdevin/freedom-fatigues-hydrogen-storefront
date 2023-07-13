@@ -51,9 +51,11 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
     caption: metafield(namespace: "page", key: "caption") {
       value
     }
-    variants(first: 1) {
+    variants(first: 20) {
       nodes {
         id
+        title
+        availableForSale
         image {
           url
           altText

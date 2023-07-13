@@ -6,11 +6,15 @@ import {
   ShopifyAnalyticsProduct,
   useMoney,
 } from '@shopify/hydrogen';
-import type { SerializeFrom } from '@shopify/remix-oxygen';
-import { Text, Link, AddToCartButton, Button } from '~/components';
-import { isDiscounted, isNewArrival } from '~/lib/utils';
-import { getProductPlaceholder } from '~/lib/placeholders';
-import type { MoneyV2, Product } from '@shopify/hydrogen/storefront-api-types';
+import type {SerializeFrom} from '@shopify/remix-oxygen';
+import {Text, Link, AddToCartButton, Button} from '~/components';
+import {isDiscounted, isNewArrival} from '~/lib/utils';
+import {getProductPlaceholder} from '~/lib/placeholders';
+import type {
+  MoneyV2,
+  Product,
+  ProductVariant,
+} from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
 
 export function ProductCard({
@@ -22,9 +26,9 @@ export function ProductCard({
   quickAdd,
 }: {
   product: SerializeFrom<Product> & {
-    caption?: { value: string };
-    avg_rating?: { value: string };
-    num_reviews?: { value: string };
+    caption?: {value: string};
+    avg_rating?: {value: string};
+    num_reviews?: {value: string};
   };
   label?: string;
   className?: string;
@@ -42,7 +46,7 @@ export function ProductCard({
   const firstVariant = flattenConnection(cardProduct.variants)[0];
 
   if (!firstVariant) return null;
-  const { image, price, compareAtPrice } = firstVariant;
+  const {image, price, compareAtPrice} = firstVariant;
 
   if (label) {
     cardLabel = label;
@@ -89,7 +93,7 @@ export function ProductCard({
           </div>
           <div className="grid grid-cols-3 gap-4">
             <Text
-              className="col-span-2 w-full overflow-hidden text-ellipsis"
+              className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
               as="h3"
             >
               {product.title}
@@ -113,34 +117,82 @@ export function ProductCard({
           </div>
         </div>
         {/* star rating placeholder */}
-        <div>
+        <div className="h-4">
           <StarRating
             rating={Number(product.avg_rating?.value)}
             count={Number(product.num_reviews?.value)}
           />
         </div>
       </Link>
-      {quickAdd && (
-        <AddToCartButton
-          lines={[
-            {
-              quantity: 1,
-              merchandiseId: firstVariant.id,
-            },
-          ]}
-          variant="secondary"
-          className="mt-2"
-          analytics={{
-            products: [productAnalytics],
-            totalValue: parseFloat(productAnalytics.price),
-          }}
-        >
-          <Text as="span" className="flex items-center justify-center gap-2">
-            Add to Bag
-          </Text>
-        </AddToCartButton>
-      )}
+      {quickAdd
+        ? QuickAddOptions(product, firstVariant, productAnalytics)
+        : null}
     </div>
+  );
+}
+
+import {useState} from 'react';
+
+function QuickAddOptions(
+  product: Product,
+  firstVariant: ProductVariant,
+  productAnalytics: ShopifyAnalyticsProduct,
+) {
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
+    null,
+  );
+
+  return (
+    <>
+      <div className="h-11">
+        {product.variants.nodes.length > 1 ? (
+          <select
+            className="w-full bg-transparent"
+            value={selectedVariant?.title ?? ''}
+            onChange={(event) => {
+              const variant = product.variants?.nodes?.find(
+                (variant) => variant.title === event.target.value,
+              );
+              setSelectedVariant(variant ?? null);
+              if (variant) {
+                productAnalytics.variantName = variant.title;
+                productAnalytics.variantId = variant.id;
+              }
+            }}
+          >
+            <option value="">Select a size</option>
+            {product.variants?.nodes?.map((variant) => (
+              <option
+                key={variant.id}
+                value={variant.title}
+                disabled={!variant.availableForSale}
+              >
+                {variant.title} {variant.availableForSale ? '' : ' - Sold Out'}
+              </option>
+            ))}
+          </select>
+        ) : null}
+      </div>
+      <AddToCartButton
+        lines={[
+          {
+            quantity: 1,
+            merchandiseId: selectedVariant?.id ?? firstVariant.id,
+          },
+        ]}
+        variant="secondary"
+        className="mt-2"
+        analytics={{
+          products: [productAnalytics],
+          totalValue: parseFloat(productAnalytics.price),
+        }}
+        disabled={!selectedVariant && !firstVariant.availableForSale}
+      >
+        <Text as="span" className="flex items-center justify-center gap-2">
+          Add to Bag
+        </Text>
+      </AddToCartButton>
+    </>
   );
 }
 
@@ -152,17 +204,15 @@ export function MiniProductCard({
   onClick,
 }: {
   product: SerializeFrom<Product> & {
-    caption?: { value: string };
-    avg_rating?: { value: string };
-    num_reviews?: { value: string };
+    caption?: {value: string};
+    avg_rating?: {value: string};
+    num_reviews?: {value: string};
   };
   label?: string;
   className?: string;
   loading?: HTMLImageElement['loading'];
   onClick?: () => void;
 }) {
-
-
   const cardProduct: Product = product?.variants
     ? (product as Product)
     : getProductPlaceholder();
@@ -171,7 +221,7 @@ export function MiniProductCard({
   const firstVariant = flattenConnection(cardProduct.variants)[0];
 
   if (!firstVariant) return null;
-  const { image, price, compareAtPrice } = firstVariant;
+  const {image, price, compareAtPrice} = firstVariant;
 
   return (
     <div className="flex">
@@ -204,7 +254,7 @@ export function MiniProductCard({
         </Text>
       </div>
     </div>
-  )
+  );
 }
 
 export type ProductRating = {
@@ -219,7 +269,7 @@ function CompareAtPrice({
   data: MoneyV2;
   className?: string;
 }) {
-  const { currencyNarrowSymbol, withoutTrailingZerosAndCurrency } =
+  const {currencyNarrowSymbol, withoutTrailingZerosAndCurrency} =
     useMoney(data);
 
   const styles = clsx('strike', className);
