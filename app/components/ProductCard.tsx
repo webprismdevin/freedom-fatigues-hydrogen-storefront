@@ -16,6 +16,8 @@ import type {
   ProductVariant,
 } from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
+import {AnimatePresence, motion, useCycle} from 'framer-motion';
+import {useState} from 'react';
 
 export function ProductCard({
   product,
@@ -37,6 +39,9 @@ export function ProductCard({
   quickAdd?: boolean;
 }) {
   let cardLabel;
+  const [hovered, setHovered] = useState(false);
+  const [shown, cycleShown] = useCycle(false, true);
+  const [showOptions, cycleOptions] = useCycle(false, true);
 
   const cardProduct: Product = product?.variants
     ? (product as Product)
@@ -68,131 +73,122 @@ export function ProductCard({
 
   return (
     <div className="flex flex-col gap-2">
-      <Link
-        onClick={onClick}
-        to={`/products/${product.handle}`}
-        prefetch="intent"
-      >
-        <div className={clsx('grid gap-4', className)}>
-          <div className="card-image aspect-square bg-primary/5">
-            {image && (
-              <Image
-                className="fadeIn aspect-[4/5] w-full object-cover"
-                sizes="320px"
-                aspectRatio="1/1"
-                data={image}
-                alt={image.altText || `Picture of ${product.title}`}
-                loading={loading}
-              />
-            )}
-            {cardLabel && (
-              <span className="absolute right-0 top-0 m-4 rounded-full bg-FF-red px-2 py-1 text-right text-xs text-white">
-                {cardLabel}
-              </span>
-            )}
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <Text
-              className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
-              as="h3"
-            >
-              {product.title}
-            </Text>
-            <div className="flex place-items-start justify-end gap-4">
-              <Text className="flex flex-col md:flex-row md:gap-2">
-                <Money withoutTrailingZeros data={price!} />
-                {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
-                  <CompareAtPrice
-                    className={'opacity-50'}
-                    data={compareAtPrice as MoneyV2}
-                  />
-                )}
-              </Text>
-            </div>
-          </div>
-          {/* for metafield captions later */}
-          <div>
-            <p className="text-sm text-slate-400">{product.caption?.value}</p>
-            {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
-          </div>
-        </div>
-        {/* star rating placeholder */}
-        <div className="h-4">
-          <StarRating
-            rating={Number(product.avg_rating?.value)}
-            count={Number(product.num_reviews?.value)}
-          />
-        </div>
-      </Link>
-      {quickAdd
-        ? QuickAddOptions(product, firstVariant, productAnalytics)
-        : null}
-    </div>
-  );
-}
-
-import {useState} from 'react';
-
-function QuickAddOptions(
-  product: Product,
-  firstVariant: ProductVariant,
-  productAnalytics: ShopifyAnalyticsProduct,
-) {
-  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
-    null,
-  );
-
-  return (
-    <>
-      <div className="h-11">
-        {product.variants.nodes.length > 1 ? (
-          <select
-            className="w-full bg-transparent"
-            value={selectedVariant?.title ?? ''}
-            onChange={(event) => {
-              const variant = product.variants?.nodes?.find(
-                (variant) => variant.title === event.target.value,
-              );
-              setSelectedVariant(variant ?? null);
-              if (variant) {
-                productAnalytics.variantName = variant.title;
-                productAnalytics.variantId = variant.id;
-              }
-            }}
+      <div className={clsx('grid gap-4', className)}>
+        <div
+          className="relative overflow-hidden"
+          onMouseEnter={() => cycleShown(1)}
+          onMouseLeave={() => cycleShown(0)}
+        >
+          <Link
+            onClick={onClick}
+            to={`/products/${product.handle}`}
+            prefetch="intent"
           >
-            <option value="">Select a size</option>
-            {product.variants?.nodes?.map((variant) => (
-              <option
-                key={variant.id}
-                value={variant.title}
-                disabled={!variant.availableForSale}
-              >
-                {variant.title} {variant.availableForSale ? '' : ' - Sold Out'}
-              </option>
-            ))}
-          </select>
-        ) : null}
+            <div className="card-image relative aspect-square bg-primary/5">
+              {image && (
+                <Image
+                  className="fadeIn aspect-[4/5] w-full object-cover"
+                  sizes="320px"
+                  aspectRatio="1/1"
+                  data={image}
+                  alt={image.altText || `Picture of ${product.title}`}
+                  loading={loading}
+                />
+              )}
+              {cardLabel && (
+                <span className="absolute right-0 top-0 m-4 rounded-full bg-FF-red px-2 py-1 text-right text-xs text-white">
+                  {cardLabel}
+                </span>
+              )}
+            </div>
+          </Link>
+          {quickAdd && (
+            <AnimatePresence>
+              {shown && (
+                <motion.div
+                  initial={{y: '110%'}}
+                  animate={{y: 0}}
+                  exit={{y: '110%'}}
+                  onMouseEnter={() => cycleOptions(1)}
+                  onMouseLeave={() => cycleOptions(0)}
+                  className="absolute bottom-2 left-2 right-2 z-10 rounded-sm border border-primary bg-white p-4 text-primary shadow"
+                >
+                  {!showOptions ? (
+                    <motion.p className="text-center font-bold">
+                      Quick Add
+                    </motion.p>
+                  ) : null}
+                  {showOptions ? (
+                    <motion.div className="flex justify-center gap-2">
+                      {product.variants.nodes.map((variant) => (
+                        <AddToCartButton
+                          className="bg-transparent px-1 py-0 hover:bg-red-500 hover:text-white"
+                          analytics={{
+                            products: [
+                              {
+                                productGid: product.id,
+                                variantGid: variant.id,
+                                name: product.title,
+                                variantName: variant.title,
+                                brand: product.vendor,
+                                price: variant.price.amount,
+                                quantity: 1,
+                              },
+                            ],
+                            totalValue: parseFloat(productAnalytics.price),
+                          }}
+                          key={variant.id}
+                          lines={[
+                            {
+                              quantity: 1,
+                              merchandiseId: variant.id,
+                            },
+                          ]}
+                        >
+                          <p>{variant.title}</p>
+                        </AddToCartButton>
+                      ))}
+                    </motion.div>
+                  ) : null}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <Text
+            className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
+            as="h3"
+          >
+            {product.title}
+          </Text>
+          <div className="flex place-items-start justify-end gap-4">
+            <Text className="flex flex-col md:flex-row md:gap-2">
+              <Money withoutTrailingZeros data={price!} />
+              {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
+                <CompareAtPrice
+                  className={'opacity-50'}
+                  data={compareAtPrice as MoneyV2}
+                />
+              )}
+            </Text>
+          </div>
+        </div>
+        {/* for metafield captions later */}
+        <div>
+          <p className="text-sm text-slate-400">{product.caption?.value}</p>
+          {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
+        </div>
       </div>
-      <AddToCartButton
-        lines={[
-          {
-            quantity: 1,
-            merchandiseId: selectedVariant?.id ?? firstVariant.id,
-          },
-        ]}
-        variant="secondary"
-        className="mt-2"
-        analytics={{
-          products: [productAnalytics],
-          totalValue: parseFloat(productAnalytics.price),
-        }}
-        disabled={!selectedVariant && !firstVariant.availableForSale}
-      >
-        <Text as="span" className="flex items-center justify-center gap-2">
-          Add to Bag
-        </Text>
-      </AddToCartButton>
-    </>
+      {/* star rating placeholder */}
+      <div className="h-4">
+        <StarRating
+          rating={Number(product.avg_rating?.value)}
+          count={Number(product.num_reviews?.value)}
+        />
+      </div>
+      {/* </Link> */}
+    </div>
   );
 }
 
