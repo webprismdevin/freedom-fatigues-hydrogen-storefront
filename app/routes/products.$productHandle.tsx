@@ -96,7 +96,12 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => {
           : 'OutOfStock',
         url: data?.product?.url,
       },
-    },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue:  data?.product?.avg_rating?.value,
+        reviewCount: data?.product.num_reviews?.value,
+      }
+    }
   } satisfies SeoConfig<Product>;
 };
 
