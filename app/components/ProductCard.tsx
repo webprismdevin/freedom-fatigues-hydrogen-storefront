@@ -18,6 +18,7 @@ import type {
 import StarRating from './StarRating';
 import {AnimatePresence, motion, useCycle} from 'framer-motion';
 import {useState} from 'react';
+import {Listbox} from '@headlessui/react';
 
 export function ProductCard({
   product,
@@ -31,6 +32,7 @@ export function ProductCard({
     caption?: {value: string};
     avg_rating?: {value: string};
     num_reviews?: {value: string};
+    options: {name: string; values: string[]}[];
   };
   label?: string;
   className?: string;
@@ -42,6 +44,11 @@ export function ProductCard({
   const [hovered, setHovered] = useState(false);
   const [shown, cycleShown] = useCycle(false, true);
   const [showOptions, cycleOptions] = useCycle(false, true);
+  const [selectedVariant, setSelectedVariant] = useState<
+    ProductVariant | (() => void)
+  >(() => {
+    return product.variants.nodes.find((variant) => variant.availableForSale);
+  });
 
   const cardProduct: Product = product?.variants
     ? (product as Product)
@@ -75,7 +82,7 @@ export function ProductCard({
     <div className="flex flex-col gap-2">
       <div className={clsx('grid gap-4', className)}>
         <div
-          className="relative overflow-hidden"
+          className="relative"
           onMouseEnter={() => cycleShown(1)}
           onMouseLeave={() => cycleShown(0)}
         >
@@ -119,36 +126,104 @@ export function ProductCard({
                     </motion.p>
                   ) : null}
                   {showOptions ? (
-                    <motion.div className="flex justify-center gap-2">
-                      {product.variants.nodes.map((variant) => (
-                        <AddToCartButton
-                          className="bg-transparent px-1 py-0 hover:bg-red-500 hover:text-white"
-                          analytics={{
-                            products: [
+                    <>
+                      {product.options.length === 1 ? (
+                        <motion.div className="flex justify-center gap-2">
+                          {product.variants.nodes.map((variant) => (
+                            <AddToCartButton
+                              className="bg-transparent px-1 py-0 hover:bg-red-500 hover:text-white"
+                              analytics={{
+                                products: [
+                                  {
+                                    productGid: product.id,
+                                    variantGid: variant.id,
+                                    name: product.title,
+                                    variantName: variant.title,
+                                    brand: product.vendor,
+                                    price: variant.price.amount,
+                                    quantity: 1,
+                                  },
+                                ],
+                                totalValue: parseFloat(productAnalytics.price),
+                              }}
+                              key={variant.id}
+                              lines={[
+                                {
+                                  quantity: 1,
+                                  merchandiseId: variant.id,
+                                },
+                              ]}
+                            >
+                              <p>{variant.title}</p>
+                            </AddToCartButton>
+                          ))}
+                        </motion.div>
+                      ) : (
+                        <div className="flex gap-2">
+                          <Listbox
+                            value={selectedVariant}
+                            onChange={setSelectedVariant}
+                          >
+                            {({open}) => (
+                              <>
+                                <Listbox.Button
+                                  className={clsx(
+                                    'flex w-full items-center justify-between border border-primary px-4 py-3',
+                                    open
+                                      ? 'rounded-b md:rounded-b-none md:rounded-t'
+                                      : 'rounded',
+                                  )}
+                                >
+                                  {selectedVariant.title}
+                                </Listbox.Button>
+                                <Listbox.Options
+                                  className={clsx(
+                                    'absolute bottom-12 z-30 grid h-48 w-full overflow-y-scroll rounded-t border border-primary bg-contrast px-2 py-2 transition-[max-height] duration-150 sm:bottom-auto md:rounded-b md:rounded-t-none md:border-b md:border-t-0',
+                                    open ? 'max-h-48' : 'max-h-0',
+                                  )}
+                                >
+                                  {product.variants.nodes.map((variant) => (
+                                    <Listbox.Option
+                                      key={variant.id}
+                                      value={variant}
+                                      disabled={!variant.availableForSale}
+                                    >
+                                      {variant.title}
+                                    </Listbox.Option>
+                                  ))}
+                                </Listbox.Options>
+                              </>
+                            )}
+                          </Listbox>
+                          <AddToCartButton
+                            className="bg-transparent px-1 py-0 hover:bg-red-500 hover:text-white"
+                            analytics={{
+                              products: [
+                                {
+                                  productGid: product.id,
+                                  variantGid: selectedVariant.id,
+                                  name: product.title,
+                                  variantName: selectedVariant.title,
+                                  brand: product.vendor,
+                                  price: selectedVariant.price.amount,
+                                  quantity: 1,
+                                },
+                              ],
+                              totalValue: parseFloat(productAnalytics.price),
+                            }}
+                            key={selectedVariant.id}
+                            lines={[
                               {
-                                productGid: product.id,
-                                variantGid: variant.id,
-                                name: product.title,
-                                variantName: variant.title,
-                                brand: product.vendor,
-                                price: variant.price.amount,
                                 quantity: 1,
+                                merchandiseId: selectedVariant.id,
                               },
-                            ],
-                            totalValue: parseFloat(productAnalytics.price),
-                          }}
-                          key={variant.id}
-                          lines={[
-                            {
-                              quantity: 1,
-                              merchandiseId: variant.id,
-                            },
-                          ]}
-                        >
-                          <p>{variant.title}</p>
-                        </AddToCartButton>
-                      ))}
-                    </motion.div>
+                            ]}
+                          >
+                            <p>Add</p>
+                          </AddToCartButton>
+                        </div>
+                      )}
+                    </>
                   ) : null}
                 </motion.div>
               )}
