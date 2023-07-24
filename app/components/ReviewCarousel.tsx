@@ -47,51 +47,41 @@ export default function ReviewCarousel({data}: {data: any}) {
 
   return (
     <div
-      className="relative h-[600px] px-12 pb-8 pt-12 text-center lg:h-[500px] lg:p-24 lg:px-24"
+      className="flex h-[600px] flex-col pb-8 pt-12 lg:h-[500px] "
       key={data._key}
     >
-      <h2 className="font-heading text-4xl">{data.title}</h2>
-      <Link to="/reviews">See all reviews</Link>
+      <div className="px-6 text-center lg:p-24 lg:px-24">
+        <h2 className="font-heading text-4xl">{data.title}</h2>
+        <Link to="/reviews">See all reviews</Link>
+      </div>
       <AnimatePresence mode="wait">
-        <motion.div
-          className="pt-8"
-          initial={{x: -1000 * direction, opacity: 0}}
-          animate={{x: 0, opacity: 1}}
-          exit={{x: 1000 * direction, opacity: 0}}
-          custom={direction}
-          key={page}
-        >
-          <ReviewCard {...reviews[index]} />
-        </motion.div>
+        <div className="relative flex flex-1 items-center">
+          <NavArrowLeft
+            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:left-5"
+            aria-label="previous"
+            onClick={() => paginate(-1)}
+          />
+          <motion.div
+            className="px-12 text-center lg:px-24"
+            initial={{x: -1000 * direction, opacity: 0}}
+            animate={{x: 0, opacity: 1}}
+            exit={{x: 1000 * direction, opacity: 0}}
+            custom={direction}
+            transition={{
+              ease: 'linear',
+              duration: 0.2,
+            }}
+            key={page}
+          >
+            <ReviewCard {...reviews[index]} />
+          </motion.div>
+          <NavArrowRight
+            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:right-5"
+            aria-label="next"
+            onClick={() => paginate(1)}
+          />
+        </div>
       </AnimatePresence>
-      <NavArrowLeft
-        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:left-5"
-        aria-label="previous"
-        onClick={() => paginate(-1)}
-      />
-      <NavArrowRight
-        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:right-5"
-        aria-label="next"
-        onClick={() => paginate(1)}
-      />
     </div>
   );
 }
-
-// const reviews = [
-//   {
-//     text: 'The look is perfect and the cotton material is so comfortable. It washes without shrinking and I love the look!',
-//     name: 'Gail Leslie Q.',
-//     rating: 5,
-//   },
-//   {
-//     text: "This is a quality hat, fit, finish and feels as good as it looks. You can really see and feel the quality of this hat. I'm looking forward to wearing it when weather warms up a bit.",
-//     name: 'Brian H.',
-//     rating: 5,
-//   },
-//   {
-//     text: 'Great quality shirts and wonder customer service! I ordered the wrong size for my husband. Sent an email requesting an exchange and received an immediate response from Ryann with a return shipping label. Will definitely order from Freedom Fatigues again!',
-//     name: 'Melody N.',
-//     rating: 5,
-//   },
-// ];
