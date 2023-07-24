@@ -50,12 +50,12 @@ export default function ReviewCarousel({data}: {data: any}) {
       className="flex h-[600px] flex-col pb-8 pt-12 lg:h-[500px] "
       key={data._key}
     >
-      <div className="px-6 text-center lg:p-24 lg:px-24">
+      <div className="px-6 text-center lg:px-24">
         <h2 className="font-heading text-4xl">{data.title}</h2>
         <Link to="/reviews">See all reviews</Link>
       </div>
       <AnimatePresence mode="wait">
-        <div className="relative flex flex-1 items-center">
+        <div className="relative flex flex-1 items-center justify-center">
           <NavArrowLeft
             className="absolute left-3 top-1/2 z-10 -translate-y-1/2 transform cursor-pointer lg:left-5"
             aria-label="previous"

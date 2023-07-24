@@ -174,8 +174,8 @@ export function MiniProductCard({
   const { image, price, compareAtPrice } = firstVariant;
 
   return (
-    <div className="flex">
-      <div className="aspect-square bg-primary/5">
+    <div className="flex gap-4">
+      <div className="aspect-square bg-primary/5 min-w-[128px] max-w-[128px]">
         {image && (
           <Image
             className="fadeIn aspect-[4/5] w-full object-cover"
@@ -187,13 +187,13 @@ export function MiniProductCard({
           />
         )}
       </div>
-      <div>
+      <div className="flex flex-col gap-2">
         <StarRating
           rating={Number(product.avg_rating?.value)}
           count={Number(product.num_reviews?.value)}
         />
         <p>{product.title}</p>
-        <Text className="flex flex-col md:flex-row md:gap-2">
+        <Text className="flex flex-col md:flex-row md:gap-2 text-sm">
           <Money withoutTrailingZeros data={price!} />
           {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
             <CompareAtPrice
