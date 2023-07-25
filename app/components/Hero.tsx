@@ -53,7 +53,7 @@ export function Hero({data}: {data: Hero}) {
       ref={ref}
     >
       <div
-        style={{background: 'black', opacity: image.overlay / 100 ??  0}}
+        style={{background: 'black', opacity: image?.overlay ? image.overlay/100 : 0}}
         className="absolute bottom-0 left-0 right-0 top-0 z-10"
       />
       <motion.div
