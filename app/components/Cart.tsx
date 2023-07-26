@@ -97,14 +97,14 @@ export function CartDetails({
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
   const container = {
-    drawer: 'grid grid-cols-1 h-screen-no-nav grid-rows-[min-content_auto]',
+    drawer: 'h-screen-no-nav flex flex-col',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
   };
 
   return (
     <div className={container[layout]}>
       {cart && (
-        <div className="mb-6 self-start bg-black text-white px-6 pt-3 pb-2 md:px-12">
+        <div className="mb-6 bg-black px-6 pb-2 pt-3 text-white md:px-12">
           <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
           <div className="mt-2 text-center text-xs font-bold">
             {Number(cart.cost.subtotalAmount.amount) < 70
@@ -121,6 +121,7 @@ export function CartDetails({
         <CartSummary cost={cart.cost} layout={layout}>
           <CartDiscounts discountCodes={cart.discountCodes} />
           <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
+          <GovXID center />
         </CartSummary>
       )}
     </div>
@@ -211,7 +212,7 @@ function CartLines({
     y > 0 ? 'border-t' : '',
     layout === 'page'
       ? 'flex-grow md:translate-y-4'
-      : 'px-6 pb-6 sm-max:pt-2 overflow-auto transition md:px-12',
+      : 'px-6 pb-6 sm-max:pt-2 overflow-auto flex-grow transition md:px-12',
   ]);
 
   return (
@@ -220,7 +221,7 @@ function CartLines({
       aria-labelledby="cart-contents"
       className={className}
     >
-      <ul className="grid gap-6 md:gap-10">
+      <ul className="grid flex-1 gap-6 md:gap-10">
         {currentLines.map((line) => (
           <CartLineItem key={line.id} line={line as CartLine} />
         ))}
@@ -296,7 +297,7 @@ function CartSummary({
   layout: Layouts;
 }) {
   const summary = {
-    drawer: 'grid gap-4 p-6 border-t md:px-12',
+    drawer: 'grid gap-3 px-6 pt-6 pb-3 border-t md:px-12 align-end',
     page: 'sticky top-nav grid gap-6 p-4 md:px-6 md:translate-y-4 bg-primary/5 rounded w-full',
   };
 
@@ -319,7 +320,6 @@ function CartSummary({
           </div>
         </dl>
         {children}
-        <GovXID center />
       </section>
     </>
   );
@@ -359,11 +359,14 @@ function CartLineItem({line}: {line: CartLine}) {
           </Heading>
 
           <div className="grid pb-2">
-            {(merchandise?.selectedOptions || []).map((option) => (
-              <Text color="subtle" key={option.name}>
-                {option.name}: {option.value}
-              </Text>
-            ))}
+            {(merchandise?.selectedOptions || []).map((option) => {
+              if (option.value !== 'Default Title')
+                return (
+                  <Text color="subtle" key={option.name}>
+                    {option.name}: {option.value}
+                  </Text>
+                );
+            })}
           </div>
 
           <div className="flex items-center gap-2">
