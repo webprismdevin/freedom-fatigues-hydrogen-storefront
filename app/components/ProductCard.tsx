@@ -1,3 +1,4 @@
+import {QuickAdd} from './QuickAdd';
 import clsx from 'clsx';
 import {
   flattenConnection,
@@ -115,75 +116,162 @@ export function ProductCard({
             </div>
           </Link>
           {quickAdd && (
-            <AnimatePresence>
-              {shown && (
-                <motion.div
-                  initial={{y: '110%'}}
-                  animate={{y: 0}}
-                  exit={{y: '110%'}}
-                  onMouseEnter={() => cycleOptions(1)}
-                  onMouseLeave={() => cycleOptions(0)}
-                  className="absolute bottom-2 left-2 right-2 z-10 rounded-sm border border-primary bg-white p-4 text-primary shadow"
-                >
-                  {!showOptions ? (
-                    <motion.p className="text-center font-bold">
-                      Quick Add
-                    </motion.p>
-                  ) : null}
-                  {showOptions ? (
-                    <>
-                      {product.options.length === 1 && (
-                        <motion.div className="flex justify-center gap-2">
-                          {product.variants.nodes.map((variant) => (
-                            <AddToCartButton
-                              className="bg-transparent px-1 py-0 hover:bg-red-500 hover:text-white"
-                              analytics={{
-                                products: [
-                                  {
-                                    productGid: product.id,
-                                    variantGid: variant.id,
-                                    name: product.title,
-                                    variantName: variant.title,
-                                    brand: product.vendor,
-                                    price: variant.price.amount,
-                                    quantity: 1,
-                                  },
-                                ],
-                                totalValue: parseFloat(productAnalytics.price),
-                              }}
-                              key={variant.id}
-                              data-test="add-to-cart"
-                              lines={
-                                isRedoInCart || isClearance
-                                  ? [
+            <div className="hidden md:block">
+              <AnimatePresence>
+                {product.variants.nodes.length > 1 &&
+                  shown &&
+                  product.availableForSale && (
+                    <motion.div
+                      initial={{y: '110%'}}
+                      animate={{y: 0}}
+                      exit={{y: '110%'}}
+                      onMouseEnter={() => cycleOptions(1)}
+                      onMouseLeave={() => cycleOptions(0)}
+                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white p-4 text-primary shadow"
+                    >
+                      {!showOptions && product.variants.nodes.length > 1 ? (
+                        <motion.p className="text-center font-bold">
+                          Quick Add
+                        </motion.p>
+                      ) : null}
+                      {product.variants.nodes.length > 1 && showOptions ? (
+                        <>
+                          {product.options.length === 1 && (
+                            <motion.div className="flex justify-center gap-2">
+                              {product.variants.nodes.map((variant) => (
+                                <AddToCartButton
+                                  disabled={!variant.availableForSale}
+                                  className={`bg-transparent ${
+                                    variant.availableForSale
+                                      ? 'hover:bg-red-500 hover:text-white'
+                                      : 'text-gray-300 line-through '
+                                  } rounded-sm px-1 py-0`}
+                                  analytics={{
+                                    products: [
                                       {
-                                        quantity: 1,
-                                        merchandiseId: variant.id,
-                                      },
-                                    ]
-                                  : [
-                                      {
-                                        quantity: 1,
-                                        merchandiseId: variant.id,
-                                      },
-                                      {
-                                        merchandiseId:
-                                          'gid://shopify/ProductVariant/40053085339766',
+                                        productGid: product.id,
+                                        variantGid: variant.id,
+                                        name: product.title,
+                                        variantName: variant.title,
+                                        brand: product.vendor,
+                                        price: variant.price.amount,
                                         quantity: 1,
                                       },
-                                    ]
-                              }
-                            >
-                              <p>{variant.title}</p>
-                            </AddToCartButton>
-                          ))}
-                        </motion.div>
-                      )}
-                    </>
-                  ) : null}
-                </motion.div>
-              )}
-            </AnimatePresence>
+                                    ],
+                                    totalValue: parseFloat(
+                                      productAnalytics.price,
+                                    ),
+                                  }}
+                                  key={variant.id}
+                                  data-test="add-to-cart"
+                                  lines={
+                                    isRedoInCart || isClearance
+                                      ? [
+                                          {
+                                            quantity: 1,
+                                            merchandiseId: variant.id,
+                                          },
+                                        ]
+                                      : [
+                                          {
+                                            quantity: 1,
+                                            merchandiseId: variant.id,
+                                          },
+                                          {
+                                            merchandiseId:
+                                              'gid://shopify/ProductVariant/40053085339766',
+                                            quantity: 1,
+                                          },
+                                        ]
+                                  }
+                                >
+                                  <p>{variant.title}</p>
+                                </AddToCartButton>
+                              ))}
+                            </motion.div>
+                          )}
+                        </>
+                      ) : null}
+                    </motion.div>
+                  )}
+                {product.variants.nodes.length === 1 &&
+                  shown &&
+                  product.availableForSale && (
+                    <motion.div
+                      initial={{y: '110%'}}
+                      animate={{y: 0}}
+                      exit={{y: '110%'}}
+                      onMouseEnter={() => cycleOptions(1)}
+                      onMouseLeave={() => cycleOptions(0)}
+                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white p-4 text-primary shadow hover:bg-red-500 hover:text-white"
+                    >
+                      <AddToCartButton
+                        className="bg-transparent px-1 py-0"
+                        analytics={{
+                          products: [
+                            {
+                              productGid: product.id,
+                              variantGid: product.variants.nodes[0].id,
+                              name: product.title,
+                              variantName: product.variants.nodes[0].title,
+                              brand: product.vendor,
+                              price: product.variants.nodes[0].price.amount,
+                              quantity: 1,
+                            },
+                          ],
+                          totalValue: parseFloat(productAnalytics.price),
+                        }}
+                        key={product.variants.nodes[0].id}
+                        data-test="add-to-cart"
+                        lines={
+                          isRedoInCart || isClearance
+                            ? [
+                                {
+                                  quantity: 1,
+                                  merchandiseId: product.variants.nodes[0].id,
+                                },
+                              ]
+                            : [
+                                {
+                                  quantity: 1,
+                                  merchandiseId: product.variants.nodes[0].id,
+                                },
+                                {
+                                  merchandiseId:
+                                    'gid://shopify/ProductVariant/40053085339766',
+                                  quantity: 1,
+                                },
+                              ]
+                        }
+                      >
+                        <p className="font-bold">Quick Add</p>
+                      </AddToCartButton>
+                    </motion.div>
+                  )}
+                {product.variants.nodes.length === 1 &&
+                  shown &&
+                  !product.availableForSale && (
+                    <motion.div
+                      initial={{y: '110%'}}
+                      animate={{y: 0}}
+                      exit={{y: '110%'}}
+                      onMouseEnter={() => cycleOptions(1)}
+                      onMouseLeave={() => cycleOptions(0)}
+                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white text-primary shadow hover:bg-black hover:text-white"
+                    >
+                      <Link
+                        onClick={onClick}
+                        to={`/products/${product.handle}`}
+                        prefetch="intent"
+                      >
+                        <p className="p-4 text-center font-bold">
+                          Out of stock. Get notified.
+                        </p>
+                      </Link>
+                    </motion.div>
+                  )}
+              </AnimatePresence>
+            </div>
           )}
         </div>
         <div className="grid grid-cols-3 gap-4">

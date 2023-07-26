@@ -101,14 +101,16 @@ export function CartDetails({
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
   };
 
+  const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < 70;
+
   return (
     <div className={container[layout]}>
-      {cart && (
-        <div className="mb-6 bg-black px-6 pb-2 pt-3 text-white md:px-12">
+      {cart && layout == 'drawer' && (
+        <div className="bg-black px-6 py-2 text-white md:px-12">
           <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
           <div className="mt-2 text-center text-xs font-bold">
-            {Number(cart.cost.subtotalAmount.amount) < 70
-              ? `Add $${Math.floor(
+            {
+              isFreeShipping ? `Add $${Math.floor(
                   70 - Number(cart.cost.subtotalAmount.amount),
                 )} for free U.S.
             shipping`
@@ -117,13 +119,28 @@ export function CartDetails({
         </div>
       )}
       <CartLines lines={cart?.lines} layout={layout} />
-      {!isZeroCost && (
-        <CartSummary cost={cart.cost} layout={layout}>
-          <CartDiscounts discountCodes={cart.discountCodes} />
-          <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
-          <GovXID center />
-        </CartSummary>
-      )}
+      <div>
+        {cart && layout == 'page' && (
+          <div className="bg-primary/5 px-6 pb-4 pt-6 md:px-12 rounded">
+            <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+            <div className="mt-2 text-center text-xs font-bold">
+              {Number(cart.cost.subtotalAmount.amount) < 70
+                ? `Add $${Math.floor(
+                    70 - Number(cart.cost.subtotalAmount.amount),
+                  )} for free U.S.
+            shipping`
+                : "You've unlocked free U.S. shipping!"}
+            </div>
+          </div>
+        )}
+        {!isZeroCost && (
+          <CartSummary cost={cart.cost} layout={layout}>
+            <CartDiscounts discountCodes={cart.discountCodes} />
+            <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
+            <GovXID center />
+          </CartSummary>
+        )}
+      </div>
     </div>
   );
 }
@@ -221,7 +238,7 @@ function CartLines({
       aria-labelledby="cart-contents"
       className={className}
     >
-      <ul className="grid flex-1 gap-6 md:gap-10">
+      <ul className="grid flex-1 gap-6 md:gap-10 mt-6">
         {currentLines.map((line) => (
           <CartLineItem key={line.id} line={line as CartLine} />
         ))}

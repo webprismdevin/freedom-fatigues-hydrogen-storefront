@@ -41,6 +41,7 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
     id
     title
     publishedAt
+    availableForSale
     handle
     tags
     options {
