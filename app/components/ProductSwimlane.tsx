@@ -34,7 +34,7 @@ export function ProductSwimlane({
               product={product}
               key={product.id}
               className="w-80 snap-start"
-              quickAdd={false}
+              quickAdd={true}
             />
           );
         })}
