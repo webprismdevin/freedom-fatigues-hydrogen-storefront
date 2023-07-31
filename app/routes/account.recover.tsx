@@ -3,12 +3,12 @@ import {
   redirect,
   type ActionFunction,
   type LoaderArgs,
-  MetaFunction,
+  type V2_MetaFunction,
 } from '@shopify/remix-oxygen';
-import {Form, useActionData, type V2_MetaFunction} from '@remix-run/react';
+import {Form, useActionData} from '@remix-run/react';
 import {useState} from 'react';
 import {Link} from '~/components';
-import {getInputStyleClasses} from '~/lib/utils';
+import {getInputStyleClasses} from '~/utils';
 import type {CustomerRecoverPayload} from '@shopify/hydrogen/storefront-api-types';
 
 export async function loader({context, params}: LoaderArgs) {
@@ -53,8 +53,8 @@ export const action: ActionFunction = async ({request, context}) => {
   }
 };
 
-export const meta: MetaFunction = () => {
-  return {title: 'Recover Password'};
+export const meta: V2_MetaFunction = () => {
+  return [{title: 'Recover Password'}];
 };
 
 export default function Recover() {

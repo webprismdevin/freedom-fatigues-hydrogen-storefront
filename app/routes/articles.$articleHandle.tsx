@@ -1,6 +1,6 @@
 import {
   json,
-  type MetaFunction,
+  type V2_MetaFunction,
   type SerializeFrom,
   type LinksFunction,
   type LoaderArgs,
@@ -63,16 +63,15 @@ export async function loader({params, context}: LoaderArgs) {
   );
 }
 
-export const meta: MetaFunction = ({
+export const meta: V2_MetaFunction = ({
   data,
 }: {
   data: SerializeFrom<typeof loader> | undefined;
 }) => {
-
-  return {
-    title: data?.article?.seo?.title ?? data?.article?.title,
-    description: data?.article?.seo?.description ?? data?.article?.excerpt,
-  };
+  return [
+    {title: data?.article?.seo?.title ?? data?.article?.title},
+    {description: data?.article?.seo?.description ?? data?.article?.excerpt},
+  ];
 };
 
 // export const links: LinksFunction = () => {

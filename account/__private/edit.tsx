@@ -13,7 +13,7 @@ import type {
 import clsx from 'clsx';
 import invariant from 'tiny-invariant';
 import {Button, Text} from '~/components';
-import {getInputStyleClasses, assertApiErrors} from '~/lib/utils';
+import {getInputStyleClasses, assertApiErrors} from '~/utils';
 import {getCustomer} from '../../account.bak';
 
 export interface AccountOutletContext {

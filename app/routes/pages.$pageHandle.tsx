@@ -1,6 +1,6 @@
 import {
   json,
-  type MetaFunction,
+  type V2_MetaFunction,
   type SerializeFrom,
   type LoaderArgs,
 } from '@shopify/remix-oxygen';

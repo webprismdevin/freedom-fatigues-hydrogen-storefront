@@ -1,7 +1,7 @@
 import {motion, AnimatePresence} from 'framer-motion';
 import {wrap} from '@popmotion/popcorn';
 import {useEffect, useState} from 'react';
-import {useIsHomePath} from '~/lib/utils';
+import {useIsHomePath} from '~/utils';
 
 export default function AnnouncementBar({data}: any) {
   const [[page, direction], setPage] = useState([0, 0]);

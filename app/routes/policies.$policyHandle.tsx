@@ -1,4 +1,8 @@
-import {json, type MetaFunction, type LoaderArgs} from '@shopify/remix-oxygen';
+import {
+  json,
+  type V2_MetaFunction,
+  type LoaderArgs,
+} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 
 import {PageHeader, Section, Button} from '~/components';
@@ -43,10 +47,12 @@ export async function loader({request, params, context}: LoaderArgs) {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return {
-    title: data?.policy?.title ?? 'Policies',
-  };
+export const meta: V2_MetaFunction<typeof loader> = ({data}) => {
+  return [
+    {
+      title: data?.policy?.title ?? 'Policies',
+    },
+  ];
 };
 
 export default function Policies() {
@@ -57,11 +63,11 @@ export default function Policies() {
       <Section
         padding="all"
         display="flex"
-        className="flex-col items-baseline w-full gap-8 md:flex-row"
+        className="w-full flex-col items-baseline gap-8 md:flex-row"
       >
         <PageHeader
           heading={policy.title}
-          className="grid items-start flex-grow gap-4 md:sticky top-36 md:w-5/12"
+          className="top-36 grid flex-grow items-start gap-4 md:sticky md:w-5/12"
         >
           <Button
             className="justify-self-start"
@@ -71,7 +77,7 @@ export default function Policies() {
             &larr; Back to Policies
           </Button>
         </PageHeader>
-        <div className="flex-grow w-full md:w-7/12">
+        <div className="w-full flex-grow md:w-7/12">
           <div
             dangerouslySetInnerHTML={{__html: policy.body}}
             className="prose"

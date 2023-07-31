@@ -34,7 +34,7 @@ import {
 import {flattenConnection} from '@shopify/hydrogen';
 import {getFeaturedData} from './featured-products';
 import {doLogout} from './account.logout';
-import {usePrefixPathWithLocale} from '~/lib/utils';
+import {usePrefixPathWithLocale} from '~/utils';
 import {CACHE_NONE, routeHeaders} from '~/data/cache';
 
 // Combining json + Response + defer in a loader breaks the

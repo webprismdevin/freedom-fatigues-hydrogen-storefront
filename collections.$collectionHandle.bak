@@ -20,7 +20,8 @@ import {useState} from 'react';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
   title: data?.collection?.seo?.title ?? data?.collection?.title,
-  description: data?.collection?.seo?.description ?? data?.collection?.description,
+  description:
+    data?.collection?.seo?.description ?? data?.collection?.description,
   titleTemplate: '%s',
   media: {
     type: 'image',
@@ -221,7 +222,11 @@ export default function Collection() {
           <div className="flex w-full items-baseline justify-between">
             <div>
               <div
-                className={`prose ${showDescription ? 'max-h-fit' : 'line-clamp-5 max-h-48 md:max-h-44 overflow-hidden'}`}
+                className={`prose ${
+                  showDescription
+                    ? 'max-h-fit'
+                    : 'line-clamp-5 max-h-48 overflow-hidden md:max-h-44'
+                }`}
                 dangerouslySetInnerHTML={{
                   __html: collection.descriptionHtml,
                 }}

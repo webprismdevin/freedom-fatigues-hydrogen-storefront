@@ -1,5 +1,5 @@
 import {
-  type MetaFunction,
+  type V2_MetaFunction,
   redirect,
   json,
   type ActionFunction,
@@ -7,7 +7,7 @@ import {
 } from '@shopify/remix-oxygen';
 import {Form, useActionData} from '@remix-run/react';
 import {useState} from 'react';
-import {getInputStyleClasses} from '~/lib/utils';
+import {getInputStyleClasses} from '~/utils';
 import {Link} from '~/components';
 import {doLogin} from './login';
 import type {CustomerCreatePayload} from '@shopify/hydrogen/storefront-api-types';
@@ -88,10 +88,12 @@ export const action: ActionFunction = async ({request, context, params}) => {
   }
 };
 
-export const meta: MetaFunction = () => {
-  return {
-    title: 'Register',
-  };
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: 'Register',
+    },
+  ];
 };
 
 export default function Register() {
@@ -102,18 +104,18 @@ export default function Register() {
   );
 
   return (
-    <div className="flex justify-center my-24 px-4">
-      <div className="max-w-md w-full">
+    <div className="my-24 flex justify-center px-4">
+      <div className="w-full max-w-md">
         <h1 className="text-4xl">Create an Account.</h1>
         {/* TODO: Add onSubmit to validate _before_ submission with native? */}
         <Form
           method="post"
           noValidate
-          className="pt-6 pb-8 mt-4 mb-4 space-y-3"
+          className="mb-4 mt-4 space-y-3 pb-8 pt-6"
         >
           {actionData?.formError && (
-            <div className="flex items-center justify-center mb-6 bg-zinc-500">
-              <p className="m-4 text-s text-contrast">{actionData.formError}</p>
+            <div className="mb-6 flex items-center justify-center bg-zinc-500">
+              <p className="text-s m-4 text-contrast">{actionData.formError}</p>
             </div>
           )}
           <div>
@@ -138,7 +140,7 @@ export default function Register() {
               }}
             />
             {nativeEmailError && (
-              <p className="text-red-500 text-xs">{nativeEmailError} &nbsp;</p>
+              <p className="text-xs text-red-500">{nativeEmailError} &nbsp;</p>
             )}
           </div>
           <div>
@@ -170,7 +172,7 @@ export default function Register() {
               }}
             />
             {nativePasswordError && (
-              <p className="text-red-500 text-xs">
+              <p className="text-xs text-red-500">
                 {' '}
                 {nativePasswordError} &nbsp;
               </p>
@@ -178,14 +180,14 @@ export default function Register() {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-primary text-contrast rounded py-2 px-4 focus:shadow-outline block w-full"
+              className="focus:shadow-outline block w-full rounded bg-primary px-4 py-2 text-contrast"
               type="submit"
             >
               Create Account
             </button>
           </div>
-          <div className="flex items-center mt-8 border-t border-gray-300">
-            <p className="align-baseline text-sm mt-6">
+          <div className="mt-8 flex items-center border-t border-gray-300">
+            <p className="mt-6 align-baseline text-sm">
               Already have an account? &nbsp;
               <Link className="inline underline" to="/account/login">
                 Sign in

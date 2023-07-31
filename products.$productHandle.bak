@@ -1,3 +1,6 @@
+//@ts-nocheck
+// eslint-disable
+
 import {
   type ReactNode,
   useRef,
@@ -98,10 +101,10 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => {
       },
       aggregateRating: {
         '@type': 'AggregateRating',
-        ratingValue:  data?.product?.avg_rating?.value,
+        ratingValue: data?.product?.avg_rating?.value,
         reviewCount: data?.product.num_reviews?.value,
-      }
-    }
+      },
+    },
   } satisfies SeoConfig<Product>;
 };
 

@@ -16,7 +16,7 @@ import type {
   UserError,
   CartBuyerIdentityInput,
 } from '@shopify/hydrogen/storefront-api-types';
-import {isLocalPath} from '~/lib/utils';
+import {isLocalPath} from '~/utils';
 import {CartAction, type CartActions} from '~/lib/type';
 
 export async function action({request, context}: ActionArgs) {

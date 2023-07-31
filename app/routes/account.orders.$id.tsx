@@ -4,11 +4,11 @@ import {
   json,
   redirect,
   type LoaderArgs,
-  MetaFunction,
+  type V2_MetaFunction,
 } from '@shopify/remix-oxygen';
-import {useLoaderData, type V2_MetaFunction} from '@remix-run/react';
+import {useLoaderData} from '@remix-run/react';
 import {Money, Image, flattenConnection} from '@shopify/hydrogen';
-import {statusMessage} from '~/lib/utils';
+import {statusMessage} from '~/utils';
 import type {
   Order,
   OrderLineItem,
@@ -16,7 +16,7 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import {Link, Heading, PageHeader, Text} from '~/components';
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
+export const meta: V2_MetaFunction<typeof loader> = ({data}) => {
   return {title: `Order ${data?.order?.name}`};
 };
 

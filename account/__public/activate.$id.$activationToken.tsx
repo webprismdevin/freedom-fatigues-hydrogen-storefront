@@ -1,12 +1,12 @@
 import {
   json,
   redirect,
-  type MetaFunction,
+  type V2_MetaFunction,
   type ActionFunction,
 } from '@shopify/remix-oxygen';
 import {Form, useActionData} from '@remix-run/react';
 import {useRef, useState} from 'react';
-import {getInputStyleClasses} from '~/lib/utils';
+import {getInputStyleClasses} from '~/utils';
 import type {CustomerActivatePayload} from '@shopify/hydrogen/storefront-api-types';
 
 type ActionData = {
@@ -100,10 +100,12 @@ export const action: ActionFunction = async ({
   }
 };
 
-export const meta: MetaFunction = () => {
-  return {
-    title: 'Activate Account',
-  };
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: 'Activate Account',
+    },
+  ];
 };
 
 export default function Activate() {
@@ -141,19 +143,19 @@ export default function Activate() {
   };
 
   return (
-    <div className="flex justify-center my-24 px-4">
-      <div className="max-w-md w-full">
+    <div className="my-24 flex justify-center px-4">
+      <div className="w-full max-w-md">
         <h1 className="text-4xl">Activate Account.</h1>
         <p className="mt-4">Create your password to activate your account.</p>
         {/* TODO: Add onSubmit to validate _before_ submission with native? */}
         <Form
           method="post"
           noValidate
-          className="pt-6 pb-8 mt-4 mb-4 space-y-3"
+          className="mb-4 mt-4 space-y-3 pb-8 pt-6"
         >
           {actionData?.formError && (
-            <div className="flex items-center justify-center mb-6 bg-zinc-500">
-              <p className="m-4 text-s text-contrast">{actionData.formError}</p>
+            <div className="mb-6 flex items-center justify-center bg-zinc-500">
+              <p className="text-s m-4 text-contrast">{actionData.formError}</p>
             </div>
           )}
           <div className="mb-3">
@@ -187,7 +189,7 @@ export default function Activate() {
               }}
             />
             {nativePasswordError && (
-              <p className="text-red-500 text-xs">
+              <p className="text-xs text-red-500">
                 {' '}
                 {nativePasswordError} &nbsp;
               </p>
@@ -212,7 +214,7 @@ export default function Activate() {
               onBlur={validatePasswordConfirm}
             />
             {nativePasswordConfirmError && (
-              <p className="text-red-500 text-xs">
+              <p className="text-xs text-red-500">
                 {' '}
                 {nativePasswordConfirmError} &nbsp;
               </p>
@@ -220,7 +222,7 @@ export default function Activate() {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-primary text-contrast rounded py-2 px-4 focus:shadow-outline block w-full"
+              className="focus:shadow-outline block w-full rounded bg-primary px-4 py-2 text-contrast"
               type="submit"
             >
               Save

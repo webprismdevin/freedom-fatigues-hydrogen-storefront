@@ -2,7 +2,7 @@ import {forwardRef} from 'react';
 import {Link} from '@remix-run/react';
 import clsx from 'clsx';
 
-import {missingClass} from '~/lib/utils';
+import {missingClass} from '~/utils';
 
 export const Button = forwardRef(
   (

@@ -16,7 +16,7 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import invariant from 'tiny-invariant';
 import {Button, Text} from '~/components';
-import {assertApiErrors, getInputStyleClasses} from '~/lib/utils';
+import {assertApiErrors, getInputStyleClasses} from '~/utils';
 import type {AccountOutletContext} from '../edit';
 
 interface ActionData {

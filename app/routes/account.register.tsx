@@ -3,11 +3,11 @@ import {
   json,
   type ActionFunction,
   type LoaderArgs,
-  MetaFunction,
+  type V2_MetaFunction,
 } from '@shopify/remix-oxygen';
-import {Form, useActionData, type V2_MetaFunction} from '@remix-run/react';
+import {Form, useActionData} from '@remix-run/react';
 import {useState} from 'react';
-import {getInputStyleClasses} from '~/lib/utils';
+import {getInputStyleClasses} from '~/utils';
 import {doLogin} from './account.login';
 import type {CustomerCreatePayload} from '@shopify/hydrogen/storefront-api-types';
 import {Link} from '~/components';
@@ -88,8 +88,8 @@ export const action: ActionFunction = async ({request, context, params}) => {
   }
 };
 
-export const meta: MetaFunction = () => {
-  return {title: 'Register'};
+export const meta: V2_MetaFunction = () => {
+  return [{title: 'Register'}];
 };
 
 export default function Register() {

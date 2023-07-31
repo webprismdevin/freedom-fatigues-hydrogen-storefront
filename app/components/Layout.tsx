@@ -2,7 +2,7 @@ import {
   type EnhancedMenu,
   type EnhancedMenuItem,
   useIsHomePath,
-} from '~/lib/utils';
+} from '~/utils';
 import {
   Drawer,
   useDrawer,

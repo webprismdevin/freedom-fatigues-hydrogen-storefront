@@ -36,6 +36,30 @@ export const MEDIA_FRAGMENT = `#graphql
   }
 `;
 
+export const PRODUCT_METAFIELD_FRAGMENT = `#graphql
+  fragment Metafields on Product {
+    avg_rating: metafield(namespace: "loox", key: "avg_rating") {
+      value
+    }
+    num_reviews: metafield(namespace: "loox", key: "num_reviews") {
+      value
+    }
+    caption: metafield(namespace: "page", key: "caption") {
+      value
+    }
+    fabric_fit: metafield(namespace: "page", key: "fabric_fit") {
+      value
+    }
+    complete_the_look: metafield(namespace: "custom", key: "complete_the_look") {
+      references(first:10) {
+        nodes {
+          __typename
+          ...ProductCard
+        }
+      }
+    }
+  }`;
+
 export const PRODUCT_CARD_FRAGMENT = `#graphql
   fragment ProductCard on Product {
     id

@@ -9,7 +9,7 @@ import {
 } from '@shopify/hydrogen';
 import type {SerializeFrom} from '@shopify/remix-oxygen';
 import {Text, Link, AddToCartButton, Button} from '~/components';
-import {isDiscounted, isNewArrival} from '~/lib/utils';
+import {isDiscounted, isNewArrival} from '~/utils';
 import {getProductPlaceholder} from '~/lib/placeholders';
 import type {
   MoneyV2,

@@ -1,7 +1,7 @@
 import {flattenConnection} from '@shopify/hydrogen';
 import type {Order} from '@shopify/hydrogen/storefront-api-types';
 import {Heading, Text, Link} from '~/components';
-import {statusMessage} from '~/lib/utils';
+import {statusMessage} from '~/utils';
 
 export function OrderCard({order}: {order: Order}) {
   if (!order?.id) return null;

@@ -1,5 +1,4 @@
 import {ActionArgs, LoaderArgs, json} from "@shopify/remix-oxygen";
-import {logsnag} from '~/lib/logsnag';
 
 const klaviyo_endpoint =
   'https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/';

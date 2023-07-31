@@ -1,45 +1,37 @@
-import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
-import {useFetcher, useMatches} from '@remix-run/react';
-import {Button} from '~/components';
-import {CartAction} from '~/lib/type';
+import {CartForm} from '@shopify/hydrogen';
 
-export function AddToCartButton({
-  children,
-  lines,
-  className = '',
-  variant = 'primary',
-  width = 'full',
-  analytics,
-  ...props
-}: {
-  children: React.ReactNode;
-  lines: CartLineInput[];
-  className?: string;
-  variant?: 'primary' | 'secondary' | 'inline';
-  width?: 'auto' | 'full';
-  analytics?: unknown;
-  [key: string]: any;
-}) {
-  const [root] = useMatches();
-  const selectedLocale = root?.data?.selectedLocale;
-  const fetcher = useFetcher();
+// The action only executes on the server
+export async function action({request, context}) {
+  // The cart is setup on the context,
+  // so available in any of your actions and loaders
+  const {session, cart} = context;
 
+  // Here we assume all requests are to add lines, but you might want to switch on
+  // the action value to determine whether to add, remove, or update line items.
+  const {action, inputs} = CartForm.getFormInput(await request.formData());
+
+  // Built-in and custom cart methods are both available on the cart object
+  const {cart: cartResult, errors} = await cart.addLines(inputs.lines);
+
+  // Update the cookie headers because a new cart might have been created
+  const headers = cart.setCartId(cartResult.id);
+
+  return json(
+    {
+      cart: cartResult,
+      errors,
+      analytics: {
+        cartId,
+      },
+    },
+    {headers},
+  );
+}
+
+export function AddToCartButton({lines, children}) {
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input type="hidden" name="cartAction" value={CartAction.ADD_TO_CART} />
-      <input type="hidden" name="countryCode" value={selectedLocale.country} />
-      <input type="hidden" name="lines" value={JSON.stringify(lines)} />
-      <input type="hidden" name="analytics" value={JSON.stringify(analytics)} />
-      <Button
-        as="button"
-        type="submit"
-        width={width}
-        variant={variant}
-        className={className}
-        {...props}
-      >
-        {children}
-      </Button>
-    </fetcher.Form>
+    <CartForm route="/cart" action={CartForm.ACTIONS.LinesAdd} inputs={{lines}}>
+      <button>{children}</button>
+    </CartForm>
   );
 }

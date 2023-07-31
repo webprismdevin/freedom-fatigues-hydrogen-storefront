@@ -1,9 +1,9 @@
 import {
   defer,
   type LinksFunction,
-  type MetaFunction,
   type LoaderArgs,
   type AppLoadContext,
+  V2_MetaFunction,
 } from '@shopify/remix-oxygen';
 import {
   Await,
@@ -28,14 +28,13 @@ import {NotFound} from './components/NotFound';
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
-import {DEFAULT_LOCALE, useIsHomePath} from './lib/utils';
+import {DEFAULT_LOCALE, useIsHomePath} from './utils';
 import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 import {useEffect} from 'react';
 // analytics
-import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import useScript from './hooks/useScript';
 
@@ -101,10 +100,9 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  viewport: 'width=device-width,initial-scale=1',
-});
+export const meta: V2_MetaFunction = () => {
+  return [{charset: 'utf-8'}, {viewport: 'width=device-width,initial-scale=1'}];
+};
 
 export async function loader({context}: LoaderArgs) {
   const [cartId, shop] = await Promise.all([
