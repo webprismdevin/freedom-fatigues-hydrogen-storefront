@@ -20,7 +20,7 @@ import type {
 import {useFetcher} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
-import {cartRemove} from '~/routes/cart';
+// import {cartRemove} from '~/routes/cart';
 import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
 
@@ -38,10 +38,10 @@ export function Cart({
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
 
   return (
-    <>
+    <div className="grow max-h-full">
       <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
       <CartDetails cart={cart} layout={layout} />
-    </>
+    </div>
   );
 }
 
@@ -97,7 +97,7 @@ export function CartDetails({
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
   const container = {
-    drawer: 'h-screen-no-nav flex flex-col',
+    drawer: 'flex flex-col',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
   };
 
@@ -106,7 +106,7 @@ export function CartDetails({
   return (
     <div className={container[layout]}>
       {cart && layout == 'drawer' && (
-        <div className="bg-black px-6 py-2 text-white md:px-12">
+        <div className="px-6 pb-2 pt-3 md:px-12">
           <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
           <div className="mt-2 text-center text-xs font-bold">
             {
@@ -118,7 +118,9 @@ export function CartDetails({
           </div>
         </div>
       )}
-      <CartLines lines={cart?.lines} layout={layout} />
+      <div className="shrink overflow-scroll">
+        <CartLines lines={cart?.lines} layout={layout} />
+      </div>
       <div>
         {cart && layout == 'page' && (
           <div className="bg-primary/5 px-6 pb-4 pt-6 md:px-12 rounded">
@@ -133,13 +135,15 @@ export function CartDetails({
             </div>
           </div>
         )}
-        {!isZeroCost && (
-          <CartSummary cost={cart.cost} layout={layout}>
-            <CartDiscounts discountCodes={cart.discountCodes} />
-            <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
-            <GovXID center />
-          </CartSummary>
-        )}
+        <div>
+          {!isZeroCost && (
+            <CartSummary cost={cart.cost} layout={layout}>
+              <CartDiscounts discountCodes={cart.discountCodes} />
+              <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
+              <GovXID center />
+            </CartSummary>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -228,8 +232,8 @@ function CartLines({
   const className = clsx([
     y > 0 ? 'border-t' : '',
     layout === 'page'
-      ? 'flex-grow md:translate-y-4'
-      : 'px-6 pb-6 sm-max:pt-2 overflow-auto flex-grow transition md:px-12',
+      ? 'grow md:translate-y-4'
+      : 'px-6 pb-6 sm-max:pt-2 overflow-y-scroll flex-shrink transition md:px-12',
   ]);
 
   return (
@@ -351,13 +355,13 @@ function CartLineItem({line}: {line: CartLine}) {
 
   return (
     <li key={id} className="flex gap-4">
-      <div className="shrink-0">
+      <div className="shrink-0 max-w-[128px]">
         {merchandise.image && (
           <Image
-            width={220}
-            height={220}
+            width={128}
+            height={128}
             data={merchandise.image}
-            className="h-24 w-24 rounded border object-cover object-center md:h-28 md:w-28"
+            className="h-24 w-24 rounded border object-cover object-center md:h-24 md:w-24"
             alt={merchandise.title}
           />
         )}
@@ -365,23 +369,23 @@ function CartLineItem({line}: {line: CartLine}) {
 
       <div className="flex flex-grow justify-between">
         <div className="grid gap-2">
-          <Heading as="h3" size="copy">
+          <h4 className="text-sm">
             {merchandise?.product?.handle ? (
               <Link to={`/products/${merchandise.product.handle}`}>
                 {merchandise?.product?.title || ''}
               </Link>
             ) : (
-              <Text>{merchandise?.product?.title || ''}</Text>
+              <p>{merchandise?.product?.title || ''}</p>
             )}
-          </Heading>
+          </h4>
 
           <div className="grid pb-2">
             {(merchandise?.selectedOptions || []).map((option) => {
               if (option.value !== 'Default Title')
                 return (
-                  <Text color="subtle" key={option.name}>
+                  <p className="text-primary/50 text-sm" key={option.name}>
                     {option.name}: {option.value}
-                  </Text>
+                  </p>
                 );
             })}
           </div>
@@ -413,7 +417,7 @@ function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
       />
       <input type="hidden" name="linesIds" value={JSON.stringify(lineIds)} />
       <button
-        className="flex h-10 w-10 items-center justify-center rounded border"
+        className="flex h-8 w-8 items-center justify-center rounded border"
         type="submit"
       >
         <span className="sr-only">Remove</span>
@@ -439,7 +443,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
-            className="h-10 w-10 text-primary/50 transition hover:text-primary disabled:text-primary/10"
+            className="h-8 w-8 text-primary/50 transition hover:text-primary disabled:text-primary/10"
             value={prevQuantity}
             disabled={quantity <= 1}
           >
@@ -453,7 +457,7 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
 
         <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
-            className="h-10 w-10 text-primary/50 transition hover:text-primary"
+            className="h-8 w-8 text-primary/50 transition hover:text-primary"
             name="increase-quantity"
             value={nextQuantity}
             aria-label="Increase quantity"

@@ -60,9 +60,9 @@ export function Drawer({
                 leaveFrom="translate-x-0"
                 leaveTo={offScreen[openFrom]}
               >
-                <Dialog.Panel className="w-screen max-w-lg text-left align-middle transition-all transform shadow-xl h-screen-dynamic bg-contrast">
+                <Dialog.Panel className="flex h-full w-screen max-w-lg transform flex-col bg-contrast text-left align-middle shadow-xl transition-all ">
                   <header
-                    className={`sticky top-0 flex items-center px-6 h-nav sm:px-8 md:px-12 ${
+                    className={`sticky top-0 flex items-center px-6 py-4 sm:px-8 md:px-12 ${
                       heading ? 'justify-between' : 'justify-end'
                     }`}
                   >
@@ -75,7 +75,7 @@ export function Drawer({
                     )}
                     <button
                       type="button"
-                      className="p-4 -m-4 transition text-primary hover:text-primary/50"
+                      className="-m-4 p-4 text-primary transition hover:text-primary/50"
                       onClick={onClose}
                       data-test="close-cart"
                     >
