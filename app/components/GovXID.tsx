@@ -18,12 +18,12 @@ export default function GovXID({center}: {center?: boolean}) {
           style={{
             display: 'flex',
             width: '100% !important',
-            maxWidth: '300px',
+            maxWidth: '400px',
             color: '#333 !important',
             backgroundColor: 'white !important',
             flexDirection: 'row',
             padding: '10px',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             textAlign: 'left',
             textDecoration: 'none',
             borderRadius: '5px !important',
@@ -36,8 +36,7 @@ export default function GovXID({center}: {center?: boolean}) {
               flexGrow: '0',
               alignSelf: 'center',
               boxSizing: 'border-box',
-              width: '50px',
-              height: '50px',
+              width: '30px',
             }}
           >
             <img
@@ -49,7 +48,7 @@ export default function GovXID({center}: {center?: boolean}) {
           <span
             style={{
               display: 'block',
-              flexGrow: '2',
+              flexGrow: '0',
               flexWrap: 'wrap',
               alignSelf: 'center',
               paddingLeft: '15px',

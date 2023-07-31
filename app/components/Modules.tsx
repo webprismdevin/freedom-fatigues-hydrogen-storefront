@@ -10,6 +10,7 @@ import SlideShow from './Slideshow';
 import {Columns} from './Columns';
 import FAQ from './FAQ';
 import {RichContent} from './RichContent';
+import {ProductSwimlaneModule} from './ProductSwimlaneModule';
 
 export type PageModule = any;
 
@@ -39,8 +40,8 @@ const moduleSwitch = (module: PageModule) => {
           <RichContent content={module.content} key={module._key} />
         </div>
       );
-    // case 'component.swimlane':
-    //   return <div>Swimlane</div>;
+    case 'component.swimlane':
+      return <ProductSwimlaneModule data={module} key={module._key} />;
     default:
       return null;
   }

@@ -1,7 +1,7 @@
 import {SanityImageAssetDocument, createClient} from '@sanity/client';
 import imageUrlBuilder from '@sanity/image-url';
 import groq from 'groq';
-import { SanityImageProps } from 'sanity-image/dist/types';
+import {SanityImageProps} from 'sanity-image/dist/types';
 
 export const sanity = createClient({
   projectId: 'd7y2vv8s',
@@ -214,6 +214,14 @@ modules[]{
   (_type == 'component.hero') => {
     ${HERO_FRAGMENT}
   },
+  (_type == 'component.shippingAndReturns') => {
+    ...,
+    image {
+      ...,
+      "height": asset-> metadata.dimensions.height,
+      "width": asset-> metadata.dimensions.width
+    }
+  },
   (_type == 'component.slides') => {
     ...,
     slides[]{
@@ -244,5 +252,11 @@ modules[]{
       answer
     }
   },
+  (_type == 'component.swimlane') => {
+    ...,
+    "gid": collection->store.gid,
+    "to": "/collections/" + collection->store.slug.current,
+    "handle": collection->store.slug.current
+  }
 }
 `;

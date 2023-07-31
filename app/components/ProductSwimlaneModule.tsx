@@ -2,24 +2,37 @@ import type {SerializeFrom} from '@shopify/remix-oxygen';
 import type {Product} from '@shopify/hydrogen/storefront-api-types';
 import {ProductCard, Section} from '~/components';
 import {useIsHomePath} from '~/lib/utils';
+import {useEffect, useState} from 'react';
 
-const mockProducts = new Array(12).fill('');
+interface CollectionResponse {
+  collection: {
+    collectionByHandle: {
+      products: {
+        nodes: Product[];
+      };
+    };
+  };
+}
 
-export function ProductSwimlane({
-  title = 'Featured Products',
-  products = mockProducts,
-  count = 12,
-  ...props
-}: {
-  title?: string;
-  products?: SerializeFrom<Product[]>;
-  count?: number;
-}) {
+export function ProductSwimlaneModule({data, ...props}: {data: any}) {
   const isHome = useIsHomePath();
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      const response = await fetch('/get-collection/best-sellers');
+      const {collection} = (await response.json()) as CollectionResponse;
+      console.log(collection);
+      setProducts(collection.collectionByHandle.products.nodes);
+    }
+
+    fetchProducts();
+  }, []);
 
   return (
     <Section
-      heading={title}
+      heading={data.title}
       padding="y"
       className={`${
         isHome ? 'bg-primary text-contrast' : 'bg-contrast text-primary'
