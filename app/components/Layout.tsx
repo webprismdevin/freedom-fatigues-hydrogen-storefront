@@ -402,7 +402,7 @@ function DesktopHeader({
                   target="_parent"
                   prefetch="intent"
                   className={({isActive}) =>
-                    isActive ? '-mb-px border-b-2 border-red-500 pb-1' : 'pb-1'
+                    isActive ? '-mb-px border-b-2 border-red-500 pb-1' : 'pb-1 hover:border-b-2 hover:border-b-red-500'
                   }
                 >
                   <LinkTitle text={item.title} />
@@ -463,8 +463,10 @@ function MegaMenuLink({
   props?: any;
 }) {
   return (
-    <div {...props} className="flex cursor-pointer items-center tracking-wider">
-      <LinkTitle text={menu.title} />{' '}
+    <div {...props} className="flex cursor-pointer items-center tracking-wider ">
+      <div className="hover:border-b-2 hover:border-b-red-500">
+        <LinkTitle text={menu.title} />
+      </div>
       <IconCaret direction={open ? 'up' : 'down'} />
     </div>
   );
@@ -500,7 +502,7 @@ function MegaMenu({
         >
           <div className="text-lg">
             {menu.megaMenuTitle?.to ? (
-              <Link to={menu.megaMenuTitle.to} className="font-bold">
+              <Link to={menu.megaMenuTitle.to} className="font-bold hover:border-b-2 hover:border-b-red-500">
                 {menu.megaMenuTitle.title}
               </Link>
             ) : (
@@ -514,7 +516,7 @@ function MegaMenu({
                     target="_parent"
                     prefetch="intent"
                     className={({isActive}) =>
-                      isActive ? '-mb-px border-b-2 border-FF-red pb-1' : 'pb-1'
+                      isActive ? '-mb-px border-b-2 border-FF-red pb-1' : 'pb-1 hover:border-b-2 hover:border-b-red-500'
                     }
                   >
                     {link.title}

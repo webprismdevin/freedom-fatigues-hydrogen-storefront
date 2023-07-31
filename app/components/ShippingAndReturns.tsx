@@ -26,12 +26,16 @@ export default function ShippingAndReturns({
         </div>
         <div className="col-span-1 grid place-items-center">
           <Image
-            src={urlFor(image).width(200).height(166).format('webp').url()}
-            height={166 / 1.8}
-            width={200 / 1.8}
+            src={urlFor(image)
+              .width(image.width)
+              .height(image.height)
+              .format('webp')
+              .url()}
+            height={image.height}
+            width={image.width}
             loading="lazy"
             className="invert"
-            alt="Freedom Fatigues branded American flag"
+            alt={image?.alt}
           />
         </div>
         <div className="col-span-1 grid place-items-center">
@@ -56,11 +60,19 @@ export default function ShippingAndReturns({
       </div>
       <div className="col-span-1 grid place-items-center">
         <Image
-          src={urlFor(image).width(200).height(166).format('webp').url()}
-          height={166 / 1.8}
-          width={200 / 1.8}
+          src={urlFor(image)
+            .width(image.width)
+            .height(image.height)
+            .format('webp')
+            .url()}
+          height={image.height}
+          width={image.width}
+          style={{
+            maxHeight: 90,
+            width: 'auto',
+          }}
           loading="lazy"
-          alt="Freedom Fatigues branded American flag"
+          alt={image?.alt}
         />
       </div>
       <div className="col-span-1 grid place-items-center">

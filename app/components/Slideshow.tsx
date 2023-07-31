@@ -15,6 +15,7 @@ export interface Slide {
     text: string;
     to: string;
   };
+  colorTheme: 'light' | 'dark';
 }
 
 export default function SlideShow({data}: {data: any}) {
@@ -43,9 +44,9 @@ export default function SlideShow({data}: {data: any}) {
           transition={{ease: [0.17, 0.67, 0.83, 0.67]}}
           custom={direction}
           key={page}
-          className={`relative grid h-full w-full grid-cols-1 bg-white ${
+          className={`relative grid h-full w-full grid-cols-1 ${
             slides[index].image2 ? 'lg:grid-cols-2' : ''
-          }`}
+          } ${slides[index].colorTheme === 'dark' ? 'text-white' : 'text-black'}`}
         >
           <div className="absolute z-10 grid h-full w-full place-items-center px-12">
             <div className="text-center">
