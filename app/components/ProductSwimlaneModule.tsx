@@ -21,7 +21,7 @@ export function ProductSwimlaneModule({data, ...props}: {data: any}) {
 
   useEffect(() => {
     async function fetchProducts() {
-      const response = await fetch('/get-collection/best-sellers');
+      const response = await fetch(`/get-collection/${data.handle}`);
       const {collection} = (await response.json()) as CollectionResponse;
       console.log(collection);
       setProducts(collection.collectionByHandle.products.nodes);
