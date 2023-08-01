@@ -194,6 +194,7 @@ export default function Collection() {
     if (index > 0) {
       return title.substring(0, index);
     }
+    else return title;
   };
 
   const displayTitle = titleTransform(collection.title);
@@ -201,7 +202,7 @@ export default function Collection() {
   return (
     <>
       <Section>
-        <h1 className="font-heading text-2xl">{displayTitle}</h1>
+        <h1 className="font-heading text-4xl">{displayTitle}</h1>
         <Modules modules={modules.modules} />
         <SortFilter
           filters={collection.products.filters as Filter[]}
