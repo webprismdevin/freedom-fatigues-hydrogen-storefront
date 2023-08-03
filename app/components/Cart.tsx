@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import {useRef} from 'react';
+import React, {useRef} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -24,6 +24,7 @@ import {cartRemove} from '~/routes/cart';
 import {fromGID} from '~/lib/gidUtils';
 import {useState, useEffect} from 'react';
 import confetti from 'canvas-confetti';
+import { Rebuy_MiniProductCard } from './ProductCard';
 
 type Layouts = 'page' | 'drawer';
 
@@ -479,18 +480,40 @@ export function CartEmpty({
         <GovXID />
       </div>
       <section className="grid gap-8 pt-16">
-        <FeaturedProducts
+        {/* <FeaturedProducts
           count={4}
           heading="Shop Best Sellers"
           layout={layout}
           onClose={onClose}
           sortKey="BEST_SELLING"
-        />
+        /> */}
+        <RebuyRecommendations />
       </section>
     </div>
   );
 }
 
+const RebuyRecommendations = React.memo(() => {
+  const {load, data} = useFetcher();
+
+  useEffect(() => {
+    load('/rebuy/recommended');
+  }, [load])
+
+  useEffect( () => {
+    console.log(data)
+  }, [data])
+
+  if (!data) return <div>Loading...</div>
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {data.map((product: any) => (
+        <Rebuy_MiniProductCard product={product} key={product.admin_graph_ql_api_id} />
+      ))}
+    </div>
+  )
+});
 //Free Shipping Progress Bar
 
 function ProgressBar({value}: {value: number}) {

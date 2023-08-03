@@ -42,7 +42,7 @@ import StarRating from '~/components/StarRating';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {ProductDetail} from '~/components/ProductDetail';
-import {MiniProductCard} from '~/components/ProductCard';
+import {MiniProductCard_v1} from '~/components/ProductCard';
 import Modules from '~/components/Modules';
 import invariant from 'tiny-invariant';
 
@@ -637,7 +637,7 @@ function CompleteTheLook() {
         {product?.complete_the_look?.references.nodes.map((product: any) => (
           <div key={product.id}>
             {/* <InlineProductCard product={product} /> */}
-            <MiniProductCard product={product} />
+            <MiniProductCard_v1 product={product} />
           </div>
         ))}
       </div>
