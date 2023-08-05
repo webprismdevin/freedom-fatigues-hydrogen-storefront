@@ -397,6 +397,13 @@ function CompareAtPrice({
   );
 }
 
+
+interface RebuyPriceRange {
+  max: number;
+  min: number;
+  isRange: boolean;
+}
+
 export function Rebuy_MiniProductCard({
   product,
 }: {
@@ -409,11 +416,11 @@ export function Rebuy_MiniProductCard({
 
   const maxPrice = product.variants.reduce((max, variant) => {
     return variant.price > max ? variant.price : max;
-  }, 0);
+  }, 0) as number;
 
   const minPrice = product.variants.reduce((min, variant) => {
     return variant.price < min ? variant.price : min;
-  }, Infinity);
+  }, Infinity) as number;
 
   const isRange = maxPrice !== minPrice;
 

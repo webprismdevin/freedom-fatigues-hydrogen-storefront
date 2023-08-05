@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import {useRef} from 'react';
+import React, {useRef} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -46,6 +46,7 @@ export function Cart({
 }
 
 import {useState, useEffect} from 'react';
+import { Rebuy_MiniProductCard } from './ProductCard';
 
 function ProgressBar({value}: {value: number}) {
   const [width, setWidth] = useState(0);
