@@ -396,3 +396,52 @@ function CompareAtPrice({
     </span>
   );
 }
+
+export function Rebuy_MiniProductCard({
+  product,
+}: {
+  product: any;
+}){
+
+  const num_reviews = product.metafields.find((metafield: any) => metafield.key === 'num_reviews').value;
+  const avg_rating = product.metafields.find((metafield: any) => metafield.key === 'avg_rating').value;
+  const caption = product.metafields.find((metafield: any) => metafield.key === 'caption').value;
+
+  const maxPrice = product.variants.reduce((max, variant) => {
+    return variant.price > max ? variant.price : max;
+  }, 0);
+
+  const minPrice = product.variants.reduce((min, variant) => {
+    return variant.price < min ? variant.price : min;
+  }, Infinity);
+
+  const isRange = maxPrice !== minPrice;
+
+  const priceRange:RebuyPriceRange = {
+    max: maxPrice,
+    min: minPrice,
+    isRange: isRange,
+  };
+
+  return <div key={product.admin_graph_ql_api_id}>
+    <Image 
+      src={product.image.src}
+      sizes='128px'
+      aspectRatio='1/1'
+      alt={product.title}
+    />
+    <p
+      className="text-sm col-span-2 line-clamp-3 w-full overflow-hidden text-ellipsis"
+    >
+      {product.title}
+    </p>
+    <p className="text-sm text-slate-400">{product.caption?.value}</p>
+    <StarRating rating={avg_rating} />
+    <RebuyPriceRange priceRange={priceRange} />
+    </div>
+}
+
+const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
+  
+  return <div>${priceRange.min}&nbsp;{priceRange.isRange && `- $${priceRange.max}`}</div>
+}
