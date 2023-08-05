@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import {useRef} from 'react';
+import React, {useRef} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -46,6 +46,7 @@ export function Cart({
 }
 
 import {useState, useEffect} from 'react';
+import { Rebuy_MiniProductCard } from './ProductCard';
 
 function ProgressBar({value}: {value: number}) {
   const [width, setWidth] = useState(0);
@@ -556,3 +557,26 @@ export function CartEmpty({
     </div>
   );
 }
+
+
+const RebuyRecommendations = React.memo(() => {
+  const {load, data} = useFetcher();
+
+  useEffect(() => {
+    load('/rebuy/recommended');
+  }, [load])
+
+  useEffect( () => {
+    console.log(data)
+  }, [data])
+
+  if (!data) return <div>Loading...</div>
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {data.map((product: any) => (
+        <Rebuy_MiniProductCard product={product} key={product.admin_graph_ql_api_id} />
+      ))}
+    </div>
+  )
+});
