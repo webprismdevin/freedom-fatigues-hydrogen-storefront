@@ -556,3 +556,26 @@ export function CartEmpty({
     </div>
   );
 }
+
+
+const RebuyRecommendations = React.memo(() => {
+  const {load, data} = useFetcher();
+
+  useEffect(() => {
+    load('/rebuy/recommended');
+  }, [load])
+
+  useEffect( () => {
+    console.log(data)
+  }, [data])
+
+  if (!data) return <div>Loading...</div>
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {data.map((product: any) => (
+        <Rebuy_MiniProductCard product={product} key={product.admin_graph_ql_api_id} />
+      ))}
+    </div>
+  )
+});
