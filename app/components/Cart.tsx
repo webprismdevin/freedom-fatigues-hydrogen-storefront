@@ -98,14 +98,14 @@ export function CartDetails({
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
   const container = {
-    drawer: 'h-cart-content flex flex-col',
-    page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
+    drawer: 'flex h-cart-content flex-col',
+    page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12 h-full',
   };
 
   const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < 70;
 
   return (
-    <div className="flex h-cart-content flex-col">
+    <div className={container[layout]}>
       {!isZeroCost && (
         <>
           {cart && layout == 'drawer' && (
@@ -143,6 +143,21 @@ export function CartDetails({
           </div>
           {/* should stay at the bottom of the cart */}
           <CartSummary cost={cart.cost} layout={layout}>
+            {cart && layout == 'page' && (
+              <div className="pb-4 pt-6">
+                <ProgressBar
+                  value={Number(cart.cost.subtotalAmount.amount) / 70}
+                />
+                <div className="mt-2 text-center text-xs font-bold">
+                  {Number(cart.cost.subtotalAmount.amount) < 70
+                    ? `Add $${Math.floor(
+                        70 - Number(cart.cost.subtotalAmount.amount),
+                      )} for free U.S.
+            shipping`
+                    : "You've unlocked free U.S. shipping!"}
+                </div>
+              </div>
+            )}
             <CartDiscounts discountCodes={cart.discountCodes} />
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
@@ -150,44 +165,6 @@ export function CartDetails({
         </>
       )}
     </div>
-    // <div className={container[layout]}>
-    //   {cart && layout == 'drawer' && (
-    //     <div className="bg-black px-6 py-2 text-white md:px-12">
-    //       <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
-    //       <div className="mt-2 text-center text-xs font-bold">
-    //         {isFreeShipping
-    //           ? `Add $${Math.floor(
-    //               70 - Number(cart.cost.subtotalAmount.amount),
-    //             )} for free U.S.
-    //         shipping`
-    //           : "You've unlocked free U.S. shipping!"}
-    //       </div>
-    //     </div>
-    //   )}
-    //   <CartLines lines={cart?.lines} layout={layout} />
-    //   <div>
-    //     {cart && layout == 'page' && (
-    //       <div className="rounded bg-primary/5 px-6 pb-4 pt-6 md:px-12">
-    //         <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
-    //         <div className="mt-2 text-center text-xs font-bold">
-    //           {Number(cart.cost.subtotalAmount.amount) < 70
-    //             ? `Add $${Math.floor(
-    //                 70 - Number(cart.cost.subtotalAmount.amount),
-    //               )} for free U.S.
-    //         shipping`
-    //             : "You've unlocked free U.S. shipping!"}
-    //         </div>
-    //       </div>
-    //     )}
-    // {!isZeroCost && (
-    //   <CartSummary cost={cart.cost} layout={layout}>
-    //     <CartDiscounts discountCodes={cart.discountCodes} />
-    //     <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
-    //     <GovXID center />
-    //   </CartSummary>
-    // )}
-    //   </div>
-    // </div>
   );
 }
 
