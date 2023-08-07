@@ -397,7 +397,6 @@ function CompareAtPrice({
   );
 }
 
-
 interface RebuyPriceRange {
   max: number;
   min: number;
@@ -406,13 +405,20 @@ interface RebuyPriceRange {
 
 export function Rebuy_MiniProductCard({
   product,
+  className,
 }: {
   product: any;
-}){
-
-  const num_reviews = product.metafields.find((metafield: any) => metafield.key === 'num_reviews').value;
-  const avg_rating = product.metafields.find((metafield: any) => metafield.key === 'avg_rating').value;
-  const caption = product.metafields.find((metafield: any) => metafield.key === 'caption').value;
+  className?: string;
+}) {
+  const num_reviews = product.metafields.find(
+    (metafield: any) => metafield.key === 'num_reviews',
+  ).value;
+  const avg_rating = product.metafields.find(
+    (metafield: any) => metafield.key === 'avg_rating',
+  ).value;
+  const caption = product.metafields.find(
+    (metafield: any) => metafield.key === 'caption',
+  ).value;
 
   const maxPrice = product.variants.reduce((max, variant) => {
     return variant.price > max ? variant.price : max;
@@ -424,31 +430,39 @@ export function Rebuy_MiniProductCard({
 
   const isRange = maxPrice !== minPrice;
 
-  const priceRange:RebuyPriceRange = {
+  const priceRange: RebuyPriceRange = {
     max: maxPrice,
     min: minPrice,
     isRange: isRange,
   };
 
-  return <div key={product.admin_graph_ql_api_id}>
-    <Image 
-      src={product.image.src}
-      sizes='128px'
-      aspectRatio='1/1'
-      alt={product.title}
-    />
-    <p
-      className="text-sm col-span-2 line-clamp-3 w-full overflow-hidden text-ellipsis"
-    >
-      {product.title}
-    </p>
-    <p className="text-sm text-slate-400">{product.caption?.value}</p>
-    <StarRating rating={avg_rating} />
-    <RebuyPriceRange priceRange={priceRange} />
+  return (
+    <div className={className}>
+      <Link to={`/products/${product.handle}`}>
+        <Image
+          src={product.image.src}
+          sizes="128px"
+          aspectRatio="1/1"
+          alt={product.title}
+        />
+        <p className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm">
+          {product.title}
+        </p>
+      </Link>
+      <p className="text-sm text-slate-400">{product.caption?.value}</p>
+      <StarRating rating={avg_rating} />
+      <div className="grid grid-cols-2 gap-2">
+        <RebuyPriceRange priceRange={priceRange} />
+        {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
+      </div>
     </div>
+  );
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
-  
-  return <div>${priceRange.min}&nbsp;{priceRange.isRange && `- $${priceRange.max}`}</div>
-}
+  return (
+    <span className="text-sm">
+      ${priceRange.min}&nbsp;{priceRange.isRange && `- $${priceRange.max}`}
+    </span>
+  );
+};
