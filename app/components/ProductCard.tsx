@@ -410,15 +410,13 @@ export function Rebuy_MiniProductCard({
   product: any;
   className?: string;
 }) {
-  const num_reviews = product.metafields.find(
-    (metafield: any) => metafield.key === 'num_reviews',
-  ).value;
+
   const avg_rating = product.metafields.find(
     (metafield: any) => metafield.key === 'avg_rating',
-  ).value;
+  ).value ?? 0;
   const caption = product.metafields.find(
     (metafield: any) => metafield.key === 'caption',
-  ).value;
+  ).value ?? "";
 
   const maxPrice = product.variants.reduce((max, variant) => {
     return variant.price > max ? variant.price : max;
