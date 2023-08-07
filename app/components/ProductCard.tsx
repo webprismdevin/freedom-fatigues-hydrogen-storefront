@@ -437,23 +437,25 @@ export function Rebuy_MiniProductCard({
   };
 
   return (
-    <Link to={`/products/${product.handle}`} className={className}>
-      <Image
-        src={product.image.src}
-        sizes="128px"
-        aspectRatio="1/1"
-        alt={product.title}
-      />
-      <p className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm">
-        {product.title}
-      </p>
+    <div className={className}>
+      <Link to={`/products/${product.handle}`}>
+        <Image
+          src={product.image.src}
+          sizes="128px"
+          aspectRatio="1/1"
+          alt={product.title}
+        />
+        <p className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm">
+          {product.title}
+        </p>
+      </Link>
       <p className="text-sm text-slate-400">{product.caption?.value}</p>
       <StarRating rating={avg_rating} />
       <div className="grid grid-cols-2 gap-2">
         <RebuyPriceRange priceRange={priceRange} />
-        <div className="justify-self-end text-sm">Add &#43;</div>
+        {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
       </div>
-    </Link>
+    </div>
   );
 }
 

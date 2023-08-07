@@ -1,7 +1,8 @@
-import {Fragment, useState} from 'react';
+import {Fragment, useEffect, useState} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 
 import {Heading, IconClose} from '~/components';
+import {useLocation} from '@remix-run/react';
 
 /**
  * Drawer component that opens on user click.
@@ -28,6 +29,14 @@ export function Drawer({
     right: 'translate-x-full',
     left: '-translate-x-full',
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (open) {
+      onClose();
+    }
+  }, [location]);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -60,9 +69,10 @@ export function Drawer({
                 leaveFrom="translate-x-0"
                 leaveTo={offScreen[openFrom]}
               >
-                <Dialog.Panel className="w-screen max-w-lg text-left align-middle transition-all transform shadow-xl h-screen-dynamic bg-contrast">
+                <Dialog.Panel className="h-screen-dynamic w-screen max-w-lg transform bg-contrast text-left align-middle shadow-xl transition-all">
                   <header
-                    className={`sticky top-0 flex items-center px-6 h-nav sm:px-8 md:px-12 ${
+                    // h-nav
+                    className={`sticky top-0 flex items-center px-6 py-4 sm:px-8 md:px-12 ${
                       heading ? 'justify-between' : 'justify-end'
                     }`}
                   >
@@ -75,7 +85,7 @@ export function Drawer({
                     )}
                     <button
                       type="button"
-                      className="p-4 -m-4 transition text-primary hover:text-primary/50"
+                      className="-m-4 p-4 text-primary transition hover:text-primary/50"
                       onClick={onClose}
                       data-test="close-cart"
                     >

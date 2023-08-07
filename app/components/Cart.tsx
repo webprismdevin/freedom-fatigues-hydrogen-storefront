@@ -46,7 +46,7 @@ export function Cart({
 }
 
 import {useState, useEffect} from 'react';
-import { Rebuy_MiniProductCard } from './ProductCard';
+import {Rebuy_MiniProductCard} from './ProductCard';
 
 function ProgressBar({value}: {value: number}) {
   const [width, setWidth] = useState(0);
@@ -98,51 +98,93 @@ export function CartDetails({
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
   const container = {
-    drawer: 'h-screen-no-nav flex flex-col',
+    drawer: 'h-cart-content flex flex-col',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12',
   };
 
   const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < 70;
 
   return (
-    <div className={container[layout]}>
-      {cart && layout == 'drawer' && (
-        <div className="bg-black px-6 py-2 text-white md:px-12">
-          <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
-          <div className="mt-2 text-center text-xs font-bold">
-            {
-              isFreeShipping ? `Add $${Math.floor(
-                  70 - Number(cart.cost.subtotalAmount.amount),
-                )} for free U.S.
+    <div className="flex h-cart-content flex-col">
+      {!isZeroCost && (
+        <>
+          {cart && layout == 'drawer' && (
+            <div className="px-6 py-2 md:px-12">
+              <ProgressBar
+                value={Number(cart.cost.subtotalAmount.amount) / 70}
+              />
+              <div className="mt-2 text-center text-xs font-bold">
+                {isFreeShipping
+                  ? `Add $${Math.floor(
+                      70 - Number(cart.cost.subtotalAmount.amount),
+                    )} for free U.S.
             shipping`
-              : "You've unlocked free U.S. shipping!"}
-          </div>
-        </div>
-      )}
-      <CartLines lines={cart?.lines} layout={layout} />
-      <div>
-        {cart && layout == 'page' && (
-          <div className="bg-primary/5 px-6 pb-4 pt-6 md:px-12 rounded">
-            <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
-            <div className="mt-2 text-center text-xs font-bold">
-              {Number(cart.cost.subtotalAmount.amount) < 70
-                ? `Add $${Math.floor(
-                    70 - Number(cart.cost.subtotalAmount.amount),
-                  )} for free U.S.
-            shipping`
-                : "You've unlocked free U.S. shipping!"}
+                  : "You've unlocked free U.S. shipping!"}
+              </div>
             </div>
+          )}
+          {/* flex container for all content between header & cart summary */}
+          <div className="flex-1 overflow-auto">
+            {/* rebuy section */}
+            <div className="">
+              <h5 className="px-6 font-heading text-lg md:px-12">
+                You might also like
+              </h5>
+              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
+                <RebuyRecommendations className="max-w-1/3 grow-0" />
+              </div>
+            </div>
+            {/* end rebuy section */}
+            <hr />
+            <CartLines lines={cart?.lines} layout={layout} />
           </div>
-        )}
-        {!isZeroCost && (
+          {/* should stay at the bottom of the cart */}
           <CartSummary cost={cart.cost} layout={layout}>
             <CartDiscounts discountCodes={cart.discountCodes} />
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
           </CartSummary>
-        )}
-      </div>
+        </>
+      )}
     </div>
+    // <div className={container[layout]}>
+    //   {cart && layout == 'drawer' && (
+    //     <div className="bg-black px-6 py-2 text-white md:px-12">
+    //       <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+    //       <div className="mt-2 text-center text-xs font-bold">
+    //         {isFreeShipping
+    //           ? `Add $${Math.floor(
+    //               70 - Number(cart.cost.subtotalAmount.amount),
+    //             )} for free U.S.
+    //         shipping`
+    //           : "You've unlocked free U.S. shipping!"}
+    //       </div>
+    //     </div>
+    //   )}
+    //   <CartLines lines={cart?.lines} layout={layout} />
+    //   <div>
+    //     {cart && layout == 'page' && (
+    //       <div className="rounded bg-primary/5 px-6 pb-4 pt-6 md:px-12">
+    //         <ProgressBar value={Number(cart.cost.subtotalAmount.amount) / 70} />
+    //         <div className="mt-2 text-center text-xs font-bold">
+    //           {Number(cart.cost.subtotalAmount.amount) < 70
+    //             ? `Add $${Math.floor(
+    //                 70 - Number(cart.cost.subtotalAmount.amount),
+    //               )} for free U.S.
+    //         shipping`
+    //             : "You've unlocked free U.S. shipping!"}
+    //         </div>
+    //       </div>
+    //     )}
+    // {!isZeroCost && (
+    //   <CartSummary cost={cart.cost} layout={layout}>
+    //     <CartDiscounts discountCodes={cart.discountCodes} />
+    //     <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
+    //     <GovXID center />
+    //   </CartSummary>
+    // )}
+    //   </div>
+    // </div>
   );
 }
 
@@ -230,7 +272,8 @@ function CartLines({
     y > 0 ? 'border-t' : '',
     layout === 'page'
       ? 'flex-grow md:translate-y-4'
-      : 'px-6 pb-6 sm-max:pt-2 overflow-auto flex-grow transition md:px-12',
+      : // overflow-auto
+        'px-6 pb-6 sm-max:pt-2 flex-grow transition md:px-12',
   ]);
 
   return (
@@ -239,7 +282,7 @@ function CartLines({
       aria-labelledby="cart-contents"
       className={className}
     >
-      <ul className="grid flex-1 gap-6 md:gap-10 mt-6">
+      <ul className="mt-6 grid flex-1 gap-6 md:gap-10">
         {currentLines.map((line) => (
           <CartLineItem key={line.id} line={line as CartLine} />
         ))}
@@ -286,20 +329,20 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex flex-col">
-      <a
+      {/* <a
         href={checkoutUrl}
         target="_self"
         className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-      >
-        {/* <Button
+      > */}
+      <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
         as="span"
         width="full"
-      > */}
+      >
         Continue to Checkout
-        {/* </Button> */}
-      </a>
+      </Button>
+      {/* </a> */}
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );
@@ -315,7 +358,7 @@ function CartSummary({
   layout: Layouts;
 }) {
   const summary = {
-    drawer: 'grid gap-3 px-6 pt-6 pb-3 border-t md:px-12 align-end',
+    drawer: 'grid gap-3 px-6 pt-6 pb-0 border-t md:px-12 align-end',
     page: 'sticky top-nav grid gap-6 p-4 md:px-6 md:translate-y-4 bg-primary/5 rounded w-full',
   };
 
@@ -539,44 +582,46 @@ export function CartEmpty({
           started!
         </Text>
         <div>
-          <Button onClick={onClose}>Continue shopping</Button>
+          <Button onClick={onClose} width="full">
+            Continue shopping
+          </Button>
         </div>
       </section>
       <div className="mt-2">
         <GovXID />
       </div>
       <section className="grid gap-8 pt-16">
-        <FeaturedProducts
-          count={4}
-          heading="Shop Best Sellers"
-          layout={layout}
-          onClose={onClose}
-          sortKey="BEST_SELLING"
-        />
+        <h5 className="font-heading text-lg">You might like</h5>
+        <div className="grid grid-cols-3 gap-4">
+          <RebuyRecommendations />
+        </div>
       </section>
     </div>
   );
 }
 
-
-const RebuyRecommendations = React.memo(() => {
+const RebuyRecommendations = React.memo(({className}: {className?: string}) => {
   const {load, data} = useFetcher();
 
   useEffect(() => {
     load('/rebuy/recommended');
-  }, [load])
+  }, [load]);
 
-  useEffect( () => {
-    console.log(data)
-  }, [data])
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
 
-  if (!data) return <div>Loading...</div>
+  if (!data) return <div>Loading...</div>;
 
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <>
       {data.map((product: any) => (
-        <Rebuy_MiniProductCard product={product} key={product.admin_graph_ql_api_id} />
+        <Rebuy_MiniProductCard
+          className={className ?? ''}
+          product={product}
+          key={product.admin_graph_ql_api_id}
+        />
       ))}
-    </div>
-  )
+    </>
+  );
 });
