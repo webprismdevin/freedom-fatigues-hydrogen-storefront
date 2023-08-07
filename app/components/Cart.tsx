@@ -602,11 +602,15 @@ const RebuyRecommendations = ({
     load(`/rebuy/recommended?lines=${string_of_pids}`);
   }, [load]);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  if (!data) return <div>Loading...</div>;
+  if (!data)
+    return [1, 2, 3, 4].map(() => (
+      <div className={`${className} animate-pulse`}>
+        <div className="h-32 w-32 rounded bg-primary/5" />
+        <div className="h-8 bg-primary/5" />
+        <div className="h-3 bg-primary/5" />
+        <div className="h-2 bg-primary/5" />
+      </div>
+    ));
 
   return (
     <>

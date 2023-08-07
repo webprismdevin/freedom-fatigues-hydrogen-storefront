@@ -48,7 +48,7 @@ module.exports = {
         'screen-no-nav':
           'calc(var(--screen-height, 100vh) - var(--height-nav))',
         'screen-dynamic': 'var(--screen-height-dynamic, 100vh)',
-        'cart-content': 'calc(100vh - 4rem)', 
+        'cart-content': 'calc(100svh - 4rem)', 
       },
       width: {
         mobileGallery: 'calc(100vw - 3rem)',
