@@ -1,16 +1,24 @@
-import { LoaderFunction, json } from "@shopify/remix-oxygen";
+import {LoaderFunction, json} from '@shopify/remix-oxygen';
 
 interface RebuyResponse {
-    data: [any]
+  data: [any];
 }
 
-export const loader: LoaderFunction = async ({ params }) => {
-    const { resource } = params;
+export const loader: LoaderFunction = async ({params, request}) => {
+  const {resource} = params;
 
-    const response = await fetch(`https://rebuyengine.com/api/v1/products/${resource}?key=269507ca244802f7cfc0b6570a09d34463258094&limit=6&metafields=yes&filter_oos=yes`);
+  const url = new URL(request.url);
+  const searchParams = url.searchParams;
 
-    const data:RebuyResponse = await response.json();
+  const lines = searchParams.get('lines');
 
-    return json(data.data);
+  console.log(lines)
 
-}
+  const response = await fetch(
+    `https://rebuyengine.com/api/v1/products/${resource}?key=269507ca244802f7cfc0b6570a09d34463258094&limit=6&metafields=yes&filter_oos=yes&shopify_product_ids=${lines}`,
+  );
+
+  const data: RebuyResponse = await response.json();
+
+  return json(data.data);
+};

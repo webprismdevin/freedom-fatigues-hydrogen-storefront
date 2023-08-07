@@ -131,7 +131,10 @@ export function CartDetails({
                 You might also like
               </h5>
               <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
-                <RebuyRecommendations className="max-w-1/3 grow-0" />
+                <RebuyRecommendations
+                  className="max-w-1/3 grow-0"
+                  lines={cart?.lines}
+                />
               </div>
             </div>
             {/* end rebuy section */}
@@ -600,11 +603,26 @@ export function CartEmpty({
   );
 }
 
-const RebuyRecommendations = React.memo(({className}: {className?: string}) => {
+const RebuyRecommendations = ({
+  className,
+  lines,
+}: {
+  className?: string;
+  lines?: CartType['lines'] | undefined;
+}) => {
   const {load, data} = useFetcher();
 
+  let string_of_pids = '';
+
+  if (lines) {
+    const pids = lines?.edges.map(({node}) =>
+      fromGID(node.merchandise.product.id),
+    );
+    string_of_pids = pids.join(',');
+  }
+
   useEffect(() => {
-    load('/rebuy/recommended');
+    load(`/rebuy/recommended?lines=${string_of_pids}`);
   }, [load]);
 
   useEffect(() => {
@@ -624,4 +642,4 @@ const RebuyRecommendations = React.memo(({className}: {className?: string}) => {
       ))}
     </>
   );
-});
+};
