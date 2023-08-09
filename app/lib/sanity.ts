@@ -174,7 +174,7 @@ export const CTA_FRAGMENT = groq`
       (_type == "page") => {
         "to": "/pages/" + slug.current,
       },
-      (_type == "product" && store.isEnabled && store.status == "active") => {
+      (_type == "product") => {
         "to": "/products/" + store.slug.current,
       },
     }
