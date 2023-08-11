@@ -17,10 +17,10 @@ import type {
 } from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
 import {AnimatePresence, motion, useCycle} from 'framer-motion';
-import {useState} from 'react';
+import {Fragment, ReactNode, useState} from 'react';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
-import { Listbox, Popover } from '@headlessui/react';
+import { Dialog, Listbox, Popover, Transition } from '@headlessui/react';
 
 export function ProductCard({
   product,
@@ -46,14 +46,14 @@ export function ProductCard({
   const [isRedoInCart] = useRedo();
   const isClearance = useTags(product.tags, 'Clearance');
 
-  const [hovered, setHovered] = useState(false);
-  const [shown, cycleShown] = useCycle(false, true);
-  const [showOptions, cycleOptions] = useCycle(false, true);
-  const [selectedVariant, setSelectedVariant] = useState<
-    ProductVariant | (() => void)
-  >(() => {
-    return product.variants.nodes.find((variant) => variant.availableForSale);
-  });
+  // const [hovered, setHovered] = useState(false);
+  // const [shown, cycleShown] = useCycle(false, true);
+  // const [showOptions, cycleOptions] = useCycle(false, true);
+  // const [selectedVariant, setSelectedVariant] = useState<
+  //   ProductVariant | (() => void)
+  // >(() => {
+  //   return product.variants.nodes.find((variant) => variant.availableForSale);
+  // });
 
   const cardProduct: Product = product?.variants
     ? (product as Product)
@@ -88,8 +88,6 @@ export function ProductCard({
       <div className={clsx('grid gap-4', className)}>
         <div
           className="relative overflow-hidden"
-          onMouseEnter={() => cycleShown(1)}
-          onMouseLeave={() => cycleShown(0)}
         >
           <Link
             onClick={onClick}
@@ -114,167 +112,8 @@ export function ProductCard({
               )}
             </div>
           </Link>
-          {quickAdd && (
-            <div className="hidden md:block">
-              <AnimatePresence>
-                {product.variants.nodes.length > 1 &&
-                  shown &&
-                  product.availableForSale && (
-                    <motion.div
-                      initial={{y: '110%'}}
-                      animate={{y: 0}}
-                      exit={{y: '110%'}}
-                      onMouseEnter={() => cycleOptions(1)}
-                      onMouseLeave={() => cycleOptions(0)}
-                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white p-4 text-primary shadow"
-                    >
-                      {!showOptions && product.variants.nodes.length > 1 ? (
-                        <motion.p className="text-center font-bold">
-                          Quick Add
-                        </motion.p>
-                      ) : null}
-                      {product.variants.nodes.length > 1 && showOptions ? (
-                        <>
-                          {product.options.length === 1 && (
-                            <motion.div className="flex justify-center gap-2">
-                              {product.variants.nodes.map((variant) => (
-                                <AddToCartButton
-                                  disabled={!variant.availableForSale}
-                                  className={`bg-transparent ${
-                                    variant.availableForSale
-                                      ? 'hover:bg-red-500 hover:text-white'
-                                      : 'text-gray-300 line-through '
-                                  } rounded-sm px-1 py-0`}
-                                  analytics={{
-                                    products: [
-                                      {
-                                        productGid: product.id,
-                                        variantGid: variant.id,
-                                        name: product.title,
-                                        variantName: variant.title,
-                                        brand: product.vendor,
-                                        price: variant.price.amount,
-                                        quantity: 1,
-                                      },
-                                    ],
-                                    totalValue: parseFloat(
-                                      productAnalytics.price,
-                                    ),
-                                  }}
-                                  key={variant.id}
-                                  data-test="add-to-cart"
-                                  lines={
-                                    isRedoInCart || isClearance
-                                      ? [
-                                          {
-                                            quantity: 1,
-                                            merchandiseId: variant.id,
-                                          },
-                                        ]
-                                      : [
-                                          {
-                                            quantity: 1,
-                                            merchandiseId: variant.id,
-                                          },
-                                          {
-                                            merchandiseId:
-                                              'gid://shopify/ProductVariant/40053085339766',
-                                            quantity: 1,
-                                          },
-                                        ]
-                                  }
-                                >
-                                  <p className="text-sm">{variant.title}</p>
-                                </AddToCartButton>
-                              ))}
-                            </motion.div>
-                          )}
-                        </>
-                      ) : null}
-                    </motion.div>
-                  )}
-                {product.variants.nodes.length === 1 &&
-                  shown &&
-                  product.availableForSale && (
-                    <motion.div
-                      initial={{y: '110%'}}
-                      animate={{y: 0}}
-                      exit={{y: '110%'}}
-                      onMouseEnter={() => cycleOptions(1)}
-                      onMouseLeave={() => cycleOptions(0)}
-                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white p-4 text-primary shadow hover:bg-red-500 hover:text-white"
-                    >
-                      <AddToCartButton
-                        className="bg-transparent px-1 py-0"
-                        analytics={{
-                          products: [
-                            {
-                              productGid: product.id,
-                              variantGid: product.variants.nodes[0].id,
-                              name: product.title,
-                              variantName: product.variants.nodes[0].title,
-                              brand: product.vendor,
-                              price: product.variants.nodes[0].price.amount,
-                              quantity: 1,
-                            },
-                          ],
-                          totalValue: parseFloat(productAnalytics.price),
-                        }}
-                        key={product.variants.nodes[0].id}
-                        data-test="add-to-cart"
-                        lines={
-                          isRedoInCart || isClearance
-                            ? [
-                                {
-                                  quantity: 1,
-                                  merchandiseId: product.variants.nodes[0].id,
-                                },
-                              ]
-                            : [
-                                {
-                                  quantity: 1,
-                                  merchandiseId: product.variants.nodes[0].id,
-                                },
-                                //redo
-                                {
-                                  merchandiseId:
-                                    'gid://shopify/ProductVariant/40053085339766',
-                                  quantity: 1,
-                                },
-                              ]
-                        }
-                      >
-                        <p className="font-bold">Quick Add</p>
-                      </AddToCartButton>
-                    </motion.div>
-                  )}
-                {product.variants.nodes.length === 1 &&
-                  shown &&
-                  !product.availableForSale && (
-                    <motion.div
-                      initial={{y: '110%'}}
-                      animate={{y: 0}}
-                      exit={{y: '110%'}}
-                      onMouseEnter={() => cycleOptions(1)}
-                      onMouseLeave={() => cycleOptions(0)}
-                      className="absolute bottom-2 left-2 right-2 z-10 rounded-md bg-white text-primary shadow hover:bg-black hover:text-white"
-                    >
-                      <Link
-                        onClick={onClick}
-                        to={`/products/${product.handle}`}
-                        prefetch="intent"
-                      >
-                        <p className="p-4 text-center font-bold">
-                          Out of stock. Get notified.
-                        </p>
-                      </Link>
-                    </motion.div>
-                  )}
-              </AnimatePresence>
-            </div>
-          )}
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4 h-12">
           <Text
             className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
             as="h3"
@@ -294,7 +133,7 @@ export function ProductCard({
           </div>
         </div>
         {/* for metafield captions later */}
-        <div>
+        <div className="h-10">
           <p className="text-sm text-slate-400">{product.caption?.value}</p>
           {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
         </div>
@@ -306,7 +145,7 @@ export function ProductCard({
           count={Number(product.num_reviews?.value)}
         />
       </div>
-      {/* </Link> */}
+      {quickAdd && <QuickAddModal className="mt-2 border-2 border-contrast/20 rounded py-2 w-full">Add to Bag</QuickAddModal>}
     </div>
   );
 }
@@ -446,6 +285,7 @@ export function Rebuy_MiniProductCard({
           sizes="128px"
           aspectRatio="1/1"
           alt={product.title}
+          className="rounded"
         />
         <p className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm">
           {product.title}
@@ -453,18 +293,78 @@ export function Rebuy_MiniProductCard({
       </Link>
       <p className="text-sm text-slate-400">{product.caption?.value}</p>
       <StarRating rating={avg_rating} />
-      <div className="grid grid-cols-2 gap-2">
-        <RebuyPriceRange priceRange={priceRange} />
-        <div className="text-sm">Add&#43;</div>
-        </div>
+      <QuickAddModal className="rounded py-px px-1 mt-1 w-full border-2 border-primary/10 flex items-center justify-center gap-1 text-sm"/>
     </div>
   );
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   return (
-    <span className="text-sm">
+    <span>
       ${priceRange.min}&nbsp;{priceRange.isRange && `- $${priceRange.max}`}
     </span>
   );
 };
+
+export function QuickAddModal({ children, className }: { children?: ReactNode; className?: string }){
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <>
+    <button onClick={() => setIsOpen(true)} className={className}>{children ?? "Add"}</button>
+    <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Payment successful
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Your payment has been successfully submitted. We’ve sent
+                      you an email with all of the details of your order.
+                    </p>
+                  </div>
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Got it, thanks!
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+  </>)
+}
