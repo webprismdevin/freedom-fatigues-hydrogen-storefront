@@ -130,9 +130,9 @@ export function CartDetails({
               <h5 className="px-6 font-heading text-lg md:px-12">
                 You might also like
               </h5>
-              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
+              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative">
                 <RebuyRecommendations
-                  className="max-w-1/3 grow-0"
+                  className="max-w-1/3 grow-0 relative"
                   lines={cart?.lines}
                 />
               </div>
@@ -603,8 +603,8 @@ const RebuyRecommendations = ({
   }, [load]);
 
   if (!data)
-    return [1, 2, 3, 4].map(() => (
-      <div className={`${className} animate-pulse`}>
+    return [1, 2, 3, 4].map((i) => (
+      <div key={i} className={`${className} animate-pulse`}>
         <div className="h-32 w-32 rounded bg-primary/5" />
         <div className="h-8 bg-primary/5" />
         <div className="h-3 bg-primary/5" />
@@ -618,7 +618,7 @@ const RebuyRecommendations = ({
         <Rebuy_MiniProductCard
           className={className ?? ''}
           product={product}
-          key={product.admin_graph_ql_api_id}
+          key={product.admin_graphql_api_id}
         />
       ))}
     </>

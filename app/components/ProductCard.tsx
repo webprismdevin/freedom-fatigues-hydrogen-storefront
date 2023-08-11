@@ -1,4 +1,3 @@
-import {QuickAdd} from './QuickAdd';
 import clsx from 'clsx';
 import {
   flattenConnection,
@@ -19,9 +18,9 @@ import type {
 import StarRating from './StarRating';
 import {AnimatePresence, motion, useCycle} from 'framer-motion';
 import {useState} from 'react';
-import {Listbox} from '@headlessui/react';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
+import { Listbox, Popover } from '@headlessui/react';
 
 export function ProductCard({
   product,
@@ -31,7 +30,7 @@ export function ProductCard({
   onClick,
   quickAdd,
 }: {
-  product: SerializeFrom<Product> & {
+  product: Product & {
     caption?: {value: string};
     avg_rating?: {value: string};
     num_reviews?: {value: string};
@@ -185,7 +184,7 @@ export function ProductCard({
                                         ]
                                   }
                                 >
-                                  <p>{variant.title}</p>
+                                  <p className="text-sm">{variant.title}</p>
                                 </AddToCartButton>
                               ))}
                             </motion.div>
@@ -236,6 +235,7 @@ export function ProductCard({
                                   quantity: 1,
                                   merchandiseId: product.variants.nodes[0].id,
                                 },
+                                //redo
                                 {
                                   merchandiseId:
                                     'gid://shopify/ProductVariant/40053085339766',
@@ -434,6 +434,10 @@ export function Rebuy_MiniProductCard({
     isRange: isRange,
   };
 
+  const handleAddToCart = (variant: any) => {
+    console.log(variant)
+  }
+
   return (
     <div className={className}>
       <Link to={`/products/${product.handle}`}>
@@ -451,8 +455,8 @@ export function Rebuy_MiniProductCard({
       <StarRating rating={avg_rating} />
       <div className="grid grid-cols-2 gap-2">
         <RebuyPriceRange priceRange={priceRange} />
-        {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
-      </div>
+        <div className="text-sm">Add&#43;</div>
+        </div>
     </div>
   );
 }
