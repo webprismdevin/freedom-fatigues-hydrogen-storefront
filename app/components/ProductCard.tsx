@@ -448,7 +448,7 @@ export function Rebuy_MiniProductCard({
         </p>
       </Link>
       <p className="text-sm text-slate-400">{product.caption?.value}</p>
-      <StarRating rating={avg_rating ?? 0} />
+      {/* <StarRating rating={avg_rating ?? 0} /> */}
       <div className="grid grid-cols-2 gap-2">
         <RebuyPriceRange priceRange={priceRange} />
         {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
