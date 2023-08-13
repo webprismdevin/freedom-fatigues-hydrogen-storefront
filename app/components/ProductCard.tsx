@@ -139,7 +139,6 @@ export function ProductCard({
         {/* for metafield captions later */}
         <div className="h-10">
           <p className="text-sm text-slate-400">{product.caption?.value}</p>
-          {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
         </div>
       </div>
       {/* star rating placeholder */}
@@ -290,9 +289,11 @@ const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
 export function QuickAddModal({
   children,
   className,
+  product
 }: {
   children?: ReactNode;
   className?: string;
+  product?: Product;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
