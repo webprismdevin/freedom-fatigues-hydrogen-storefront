@@ -126,7 +126,7 @@ export function CartDetails({
           {/* flex container for all content between header & cart summary */}
           <div className="flex-1 overflow-auto">
             {/* rebuy section */}
-            {/* <div className="">
+            <div className="">
               <h5 className="px-6 font-heading text-lg md:px-12">
                 You might also like
               </h5>
@@ -136,7 +136,7 @@ export function CartDetails({
                   lines={cart?.lines}
                 />
               </div>
-            </div> */}
+            </div>
             {/* end rebuy section */}
             <hr />
             <CartLines lines={cart?.lines} layout={layout} />
@@ -570,12 +570,12 @@ export function CartEmpty({
       <div className="mt-2">
         <GovXID />
       </div>
-      {/* <section className="grid gap-8 pt-16">
+      <section className="grid gap-8 pt-16">
         <h5 className="font-heading text-lg">You might like</h5>
         <div className="grid grid-cols-3 gap-4">
-          <RebuyRecommendations />
+          <RebuyRecommendations className="w-full grow-0 shrink-0" />
         </div>
-      </section> */}
+      </section>
     </div>
   );
 }
@@ -605,7 +605,7 @@ const RebuyRecommendations = ({
   if (!data)
     return [1, 2, 3, 4].map(() => (
       <div className={`${className} animate-pulse`}>
-        <div className="h-[176px] w-[104px] rounded bg-primary/5" />
+        <div className="h-[176px] w-full rounded bg-primary/5" />
       </div>
     ));
 
