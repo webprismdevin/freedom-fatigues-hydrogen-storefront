@@ -20,7 +20,7 @@ import {AnimatePresence, motion, useCycle} from 'framer-motion';
 import {Fragment, ReactNode, useState} from 'react';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
-import { Dialog, Listbox, Popover, Transition } from '@headlessui/react';
+import {Dialog, Listbox, Popover, Transition} from '@headlessui/react';
 
 export function ProductCard({
   product,
@@ -86,9 +86,7 @@ export function ProductCard({
   return (
     <div className="flex flex-col gap-2">
       <div className={clsx('grid gap-4', className)}>
-        <div
-          className="relative overflow-hidden"
-        >
+        <div className="relative overflow-hidden">
           <Link
             onClick={onClick}
             to={`/products/${product.handle}`}
@@ -113,25 +111,31 @@ export function ProductCard({
             </div>
           </Link>
         </div>
-        <div className="grid grid-cols-3 gap-4 h-12">
-          <Text
-            className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
-            as="h3"
-          >
-            {product.title}
-          </Text>
-          <div className="flex place-items-start justify-end gap-4">
-            <Text className="flex flex-col md:flex-row md:gap-2">
-              <Money withoutTrailingZeros data={price!} />
-              {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
-                <CompareAtPrice
-                  className={'opacity-50'}
-                  data={compareAtPrice as MoneyV2}
-                />
-              )}
+        <Link
+          onClick={onClick}
+          to={`/products/${product.handle}`}
+          prefetch="intent"
+        >
+          <div className="grid grid-cols-3 gap-4 h-12">
+            <Text
+              className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
+              as="h3"
+            >
+              {product.title}
             </Text>
+            <div className="flex place-items-start justify-end gap-4">
+              <Text className="flex flex-col md:flex-row md:gap-2">
+                <Money withoutTrailingZeros data={price!} />
+                {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
+                  <CompareAtPrice
+                    className={'opacity-50'}
+                    data={compareAtPrice as MoneyV2}
+                  />
+                )}
+              </Text>
+            </div>
           </div>
-        </div>
+        </Link>
         {/* for metafield captions later */}
         <div className="h-10">
           <p className="text-sm text-slate-400">{product.caption?.value}</p>
@@ -145,7 +149,11 @@ export function ProductCard({
           count={Number(product.num_reviews?.value)}
         />
       </div>
-      {quickAdd && <QuickAddModal className="mt-2 border-2 border-contrast/20 rounded py-2 w-full">Add to Bag</QuickAddModal>}
+      {quickAdd && (
+        <QuickAddModal className="mt-2 border-2 border-contrast/20 rounded py-2 w-full">
+          Add to Bag
+        </QuickAddModal>
+      )}
     </div>
   );
 }
@@ -266,7 +274,6 @@ export function Rebuy_MiniProductCard({
       <StarRating rating={product.avg_rating ?? 0} />
       <div className="grid grid-cols-2 gap-2">
         <RebuyPriceRange priceRange={product.priceRange} />
-        {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
       </div>
     </div>
   );
@@ -275,19 +282,31 @@ export function Rebuy_MiniProductCard({
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   return (
     <span className="text-xs">
-      {`$${priceRange.min}${priceRange.isRange ? '+': ''}`}
+      {`$${priceRange.min}${priceRange.isRange ? '+' : ''}`}
     </span>
   );
 };
 
-export function QuickAddModal({ children, className }: { children?: ReactNode; className?: string }){
-  const [isOpen, setIsOpen] = useState(false)
+export function QuickAddModal({
+  children,
+  className,
+}: {
+  children?: ReactNode;
+  className?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-    <button onClick={() => setIsOpen(true)} className={className}>{children ?? "Add"}</button>
-    <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
+      <button onClick={() => setIsOpen(true)} className={className}>
+        {children ?? 'Add'}
+      </button>
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-50"
+          onClose={() => setIsOpen(false)}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -340,5 +359,6 @@ export function QuickAddModal({ children, className }: { children?: ReactNode; c
           </div>
         </Dialog>
       </Transition>
-  </>)
+    </>
+  );
 }
