@@ -605,7 +605,7 @@ const RebuyRecommendations = ({
   if (!data)
     return [1, 2, 3, 4].map(() => (
       <div className={`${className} animate-pulse`}>
-        <div className="h-[200px] w-[104px] rounded bg-primary/5" />
+        <div className="h-[176px] w-[104px] rounded bg-primary/5" />
       </div>
     ));
 
