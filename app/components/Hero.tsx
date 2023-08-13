@@ -1,9 +1,9 @@
-import { urlFor } from '~/lib/sanity';
-import { Button } from './Button';
-import { SanityImageAssetDocument } from '@sanity/client';
-import { Image } from '@shopify/hydrogen';
-import { useScroll, useTransform, motion } from 'framer-motion';
-import { useRef } from 'react';
+import {urlFor} from '~/lib/sanity';
+import {Button} from './Button';
+import {SanityImageAssetDocument} from '@sanity/client';
+import {Image} from '@shopify/hydrogen';
+import {useScroll, useTransform, motion} from 'framer-motion';
+import {useRef} from 'react';
 
 export type Hero = {
   _key: string;
@@ -19,6 +19,7 @@ export type Hero = {
       height: number;
       width: number;
     };
+    overlay: number;
   };
   title: string;
   caption: string;
@@ -30,12 +31,12 @@ export type Hero = {
   size?: 'small' | 'medium' | 'large';
 };
 
-export function Hero({ data }: { data: Hero }) {
-  const { image, title, caption, cta, layout, size } = data;
+export function Hero({data}: {data: Hero}) {
+  const {image, title, caption, cta, layout, size} = data;
 
   const ref = useRef(null);
 
-  const { scrollYProgress } = useScroll({
+  const {scrollYProgress} = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
   });
@@ -44,13 +45,19 @@ export function Hero({ data }: { data: Hero }) {
   return (
     <div
       key={data._key}
-      className={`flex-column align-center relative flex ${size === 'small' ? 'h-[500px]' : 'h-[800px]'
-        } overflow-hidden p-8 lg:p-24 ${layout === 'right' && 'justify-end'} ${layout === 'center' && 'justify-center text-center'
-        }`}
+      className={`flex-column align-center relative flex ${
+        size === 'small' ? 'h-[500px]' : 'h-[800px]'
+      } overflow-hidden p-8 lg:p-24 ${layout === 'right' && 'justify-end'} ${
+        layout === 'center' && 'justify-center text-center'
+      }`}
       ref={ref}
     >
+      <div
+        style={{background: 'black', opacity: image?.overlay ? image.overlay/100 : 0}}
+        className="absolute bottom-0 left-0 right-0 top-0 z-10"
+      />
       <motion.div
-        style={{ y }}
+        style={{y}}
         className="absolute left-0 top-0 z-0 h-full w-full"
       >
         <Image
@@ -62,8 +69,9 @@ export function Hero({ data }: { data: Hero }) {
         />
       </motion.div>
       <div
-        className={`${layout === 'right' && 'text-right'
-          } z-1 relative self-center text-contrast`}
+        className={`${
+          layout === 'right' && 'text-right'
+        } relative z-20 self-center text-contrast`}
       >
         <p className="text-shadow text-xl font-bold lg:text-2xl">{caption}</p>
         <h2 className="text-shadow mb-4 font-heading text-4xl uppercase lg:text-6xl">

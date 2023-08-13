@@ -3,7 +3,7 @@ import type {MediaEdge} from '@shopify/hydrogen/storefront-api-types';
 import type {MediaImage} from '@shopify/hydrogen/storefront-api-types';
 import {Video} from '@shopify/hydrogen-react';
 import {useScroll, useMotionValueEvent} from 'framer-motion';
-import {useEffect, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 
 /**
  * A client component that defines a media gallery for hosting images, 3D models, and videos of products
@@ -20,10 +20,11 @@ export function ProductGallery({
   const [position, setPosition] = useState<number>(0);
 
   useMotionValueEvent(scrollXProgress, 'change', (latest) => {
-    const clamped = Number(latest.toFixed(2));
+    const clamped = Number(latest);
 
-    console.log('x changed to', clamped);
-    setPosition(clamped as number);
+    const index = Math.floor(clamped * (media.length - 1));
+
+    setPosition(index as number);
   });
 
   if (!media.length) {
@@ -34,7 +35,7 @@ export function ProductGallery({
     <>
       <div
         ref={ref}
-        className={`swimlane hiddenScroll md:grid-flow-row md:grid-cols-2 md:overflow-x-auto md:p-0 ${className}`}
+        className={`swimlane md:grid-flow-row md:grid-cols-2 md:overflow-x-auto md:p-0 ${className}`}
       >
         {media.map((med, i) => {
           const isFirst = i === 0;
@@ -101,17 +102,19 @@ export function ProductGallery({
           );
         })}
       </div>
-      {/* <div className="flex h-4 w-full justify-center gap-2">
+      <div className="flex h-4 w-full justify-center gap-2 md:hidden">
         {media.map((med, i) => (
           <div
-            data-key={i / media.length}
+            data-key={(i / media.length).toFixed(2)}
             key={i}
-            className={`h-1 w-4 rounded-full bg-black/20 `}
+            className={`h-1 w-4 rounded-full  ${
+              position === i ? 'bg-red-500' : 'bg-black/20'
+            } `}
           >
             &#x200B;
           </div>
         ))}
-      </div> */}
+      </div>
     </>
   );
 }
