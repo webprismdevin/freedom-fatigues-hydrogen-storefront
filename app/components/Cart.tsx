@@ -132,7 +132,7 @@ export function CartDetails({
               </h5>
               <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative">
                 <RebuyRecommendations
-                  className="max-w-1/3 grow-0 relative"
+                  className="w-1/4 grow-0 shrink-0"
                   lines={cart?.lines}
                 />
               </div>
@@ -603,12 +603,9 @@ const RebuyRecommendations = ({
   }, [load]);
 
   if (!data)
-    return [1, 2, 3, 4].map((i) => (
-      <div key={i} className={`${className} animate-pulse`}>
-        <div className="h-32 w-32 rounded bg-primary/5" />
-        <div className="h-8 bg-primary/5" />
-        <div className="h-3 bg-primary/5" />
-        <div className="h-2 bg-primary/5" />
+    return [1, 2, 3, 4].map(() => (
+      <div className={`${className} animate-pulse`}>
+        <div className="h-[200px] w-[104px] rounded bg-primary/5" />
       </div>
     ));
 

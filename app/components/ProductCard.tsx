@@ -236,7 +236,7 @@ function CompareAtPrice({
   );
 }
 
-interface RebuyPriceRange {
+export interface RebuyPriceRange {
   max: number;
   min: number;
   isRange: boolean;
@@ -249,34 +249,6 @@ export function Rebuy_MiniProductCard({
   product: any;
   className?: string;
 }) {
-
-  const avg_rating = product.metafields.find(
-    (metafield: any) => metafield.key === 'avg_rating',
-  ).value ?? 0;
-  const caption = product.metafields.find(
-    (metafield: any) => metafield.key === 'caption',
-  ).value ?? "";
-
-  const maxPrice = product.variants.reduce((max, variant) => {
-    return variant.price > max ? variant.price : max;
-  }, 0) as number;
-
-  const minPrice = product.variants.reduce((min, variant) => {
-    return variant.price < min ? variant.price : min;
-  }, Infinity) as number;
-
-  const isRange = maxPrice !== minPrice;
-
-  const priceRange: RebuyPriceRange = {
-    max: maxPrice,
-    min: minPrice,
-    isRange: isRange,
-  };
-
-  const handleAddToCart = (variant: any) => {
-    console.log(variant)
-  }
-
   return (
     <div className={className}>
       <Link to={`/products/${product.handle}`}>
@@ -291,17 +263,19 @@ export function Rebuy_MiniProductCard({
           {product.title}
         </p>
       </Link>
-      <p className="text-sm text-slate-400">{product.caption?.value}</p>
-      <StarRating rating={avg_rating} />
-      <QuickAddModal className="rounded py-px px-1 mt-1 w-full border-2 border-primary/10 flex items-center justify-center gap-1 text-sm"/>
+      <StarRating rating={product.avg_rating ?? 0} />
+      <div className="grid grid-cols-2 gap-2">
+        <RebuyPriceRange priceRange={product.priceRange} />
+        {/* <div className="justify-self-end text-sm">Add &#43;</div> */}
+      </div>
     </div>
   );
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   return (
-    <span>
-      ${priceRange.min}&nbsp;{priceRange.isRange && `- $${priceRange.max}`}
+    <span className="text-xs">
+      {`$${priceRange.min}${priceRange.isRange ? '+': ''}`}
     </span>
   );
 };

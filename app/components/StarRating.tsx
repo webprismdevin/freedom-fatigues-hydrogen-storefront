@@ -5,7 +5,18 @@ export default function StarRating({
   rating: number;
   count?: number | string | null | undefined;
 }) {
-  if (!rating) return null;
+  if (!rating) return (
+    <div className="flex flex-row items-center">
+      <IconStar color={"#e5d5d5"} />
+      <IconStar color={"#e5d5d5"} />
+      <IconStar color={"#e5d5d5"} />
+      <IconStar color={"#e5d5d5"} />
+      <IconStar color={"#e5d5d5"} />
+      <span className="ml-2 text-xs text-slate-500">
+        [0]
+      </span>
+    </div>
+  );
 
   return (
     <div className="flex flex-row items-center">
@@ -19,14 +30,14 @@ export default function StarRating({
   );
 }
 
-export function IconStar({size}: {size?: number}) {
+export function IconStar({size, color}: {size?: number, color?:string}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 96 960 960"
       width={size ? `${size}px` : '16px'}
       height={size ? `${size}px` : '16px'}
-      fill="#FFCC66"
+      fill={color ? color : "#FFCC66"}
     >
       <path d="m233 976 65-281L80 506l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Z" />
     </svg>
