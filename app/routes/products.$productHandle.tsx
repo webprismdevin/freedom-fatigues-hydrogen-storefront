@@ -780,12 +780,12 @@ function BackInStock({variant}: {variant: any}) {
   );
 }
 
-function ProductOptions({
+export function ProductOptions({
   options,
   searchParamsWithDefaults,
 }: {
   options: ProductType['options'];
-  searchParamsWithDefaults: URLSearchParams;
+  searchParamsWithDefaults?: URLSearchParams;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   return (
