@@ -26,6 +26,8 @@ import confetti from 'canvas-confetti';
 
 type Layouts = 'page' | 'drawer';
 
+const freeShippingThreshold = 75;
+
 export function Cart({
   layout,
   onClose,
@@ -102,7 +104,7 @@ export function CartDetails({
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12 h-full',
   };
 
-  const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < 70;
+  const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < freeShippingThreshold;
 
   return (
     <div className={container[layout]}>
@@ -111,12 +113,12 @@ export function CartDetails({
           {cart && layout == 'drawer' && (
             <div className="px-6 py-2 md:px-12">
               <ProgressBar
-                value={Number(cart.cost.subtotalAmount.amount) / 70}
+                value={Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold}
               />
               <div className="mt-2 text-center text-xs font-bold">
                 {isFreeShipping
                   ? `Add $${Math.floor(
-                      70 - Number(cart.cost.subtotalAmount.amount),
+                      freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
                     )} for free U.S.
             shipping`
                   : "You've unlocked free U.S. shipping!"}
@@ -146,12 +148,12 @@ export function CartDetails({
             {cart && layout == 'page' && (
               <div className="pb-4 pt-6">
                 <ProgressBar
-                  value={Number(cart.cost.subtotalAmount.amount) / 70}
+                  value={Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold}
                 />
                 <div className="mt-2 text-center text-xs font-bold">
-                  {Number(cart.cost.subtotalAmount.amount) < 70
+                  {Number(cart.cost.subtotalAmount.amount) < freeShippingThreshold
                     ? `Add $${Math.floor(
-                        70 - Number(cart.cost.subtotalAmount.amount),
+                        freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
                       )} for free U.S.
             shipping`
                     : "You've unlocked free U.S. shipping!"}
