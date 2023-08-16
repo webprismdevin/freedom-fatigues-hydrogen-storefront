@@ -135,11 +135,11 @@ export function ProductCard({
       </div>
       {quickAdd && (
         <QuickAdd
-          className="mt-2 border-2 border-contrast/20 rounded py-2 w-full"
+          className="mt-2 border-2 border-contrast/20 py-2 w-full"
           product={product}
           image={image}
         >
-          Add to Bag
+          Quick Add
         </QuickAdd>
       )}
     </div>
@@ -262,6 +262,9 @@ export function Rebuy_MiniProductCard({
       <StarRating rating={product.avg_rating ?? 0} />
       <div className="grid grid-cols-2 gap-2">
         <RebuyPriceRange priceRange={product.priceRange} />
+        {/* <QuickAdd product={product} image={product.image.src} rebuy>
+          <span className="text-xs">Add+</span>
+        </QuickAdd> */}
       </div>
     </div>
   );
