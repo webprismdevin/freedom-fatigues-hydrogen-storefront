@@ -134,7 +134,7 @@ export function CartDetails({
               </h5>
               <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative">
                 <RebuyRecommendations
-                  className="w-1/4 grow-0 shrink-0"
+                  className="w-1/3 md:w-1/4 grow-0 shrink-0"
                   lines={cart?.lines}
                 />
               </div>
