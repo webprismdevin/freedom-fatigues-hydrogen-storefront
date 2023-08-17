@@ -6,6 +6,7 @@ import {useCartFetchers} from '~/hooks/useCartFetchers';
 import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
+import toast from 'react-hot-toast';
 
 export default function QuickAdd({
   children,

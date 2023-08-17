@@ -123,7 +123,9 @@ export function ProductCard({
         </Link>
         {/* for metafield captions later */}
         <div className="h-14 md:h-10">
-          <p className="text-sm text-slate-400 line-clamp-3">{product.caption?.value}</p>
+          <p className="text-sm text-slate-400 line-clamp-3">
+            {product.caption?.value}
+          </p>
         </div>
       </div>
       {/* star rating placeholder */}
@@ -268,7 +270,7 @@ export function Rebuy_MiniProductCard({
           rebuy
           className="border-0 border-transparent p-0 bg-transparent"
         >
-          <span className="text-xs">Add+</span>
+          <span className="text-sm">+ ADD</span>
         </QuickAdd>
       </div>
     </div>
@@ -276,9 +278,16 @@ export function Rebuy_MiniProductCard({
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
+  function removeCents(dollarAmount:number) {
+    if (dollarAmount.toString().endsWith('.00')) {
+      return dollarAmount.toString().slice(0, -3); // Remove the last 3 characters (.00)
+    }
+    return dollarAmount; // Return the original input if it doesn't end with .00
+  }
+
   return (
-    <div className="text-xs mt-[2px]">
-      {`$${priceRange.min}${priceRange.isRange ? '+' : ''}`}
+    <div className="text-sm mt-[2px]">
+      {`$${removeCents(priceRange.min)}${priceRange.isRange ? '+' : ''}`}
     </div>
   );
 };

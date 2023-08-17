@@ -14,11 +14,10 @@ export default function GovXID({center}: {center?: boolean}) {
       <span style={{display: 'flex !important', boxSizing: 'border-box'}}>
         <a
           target="popup"
-          className={center ? 'mx-auto' : ''}
+          className={`${center ? 'mx-auto' : ''}`}
           style={{
             display: 'flex',
             width: '100% !important',
-            maxWidth: '400px',
             color: '#333 !important',
             backgroundColor: 'white !important',
             flexDirection: 'row',
@@ -52,10 +51,10 @@ export default function GovXID({center}: {center?: boolean}) {
               flexWrap: 'wrap',
               alignSelf: 'center',
               paddingLeft: '15px',
-              maxWidth: '400px',
             }}
           >
             <p
+              className="max-w-[175px] md:max-w-[300px]"
               style={{
                 color: '#333',
                 lineHeight: '16px',
