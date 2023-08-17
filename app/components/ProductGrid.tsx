@@ -68,7 +68,7 @@ export function ProductGrid({
             key={product.id}
             product={product}
             loading={getImageLoadingPriority(i)}
-            quickAdd={true}
+            quickAdd={false}
           />
         ))}
       </Grid>
