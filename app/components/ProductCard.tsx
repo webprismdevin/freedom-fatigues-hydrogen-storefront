@@ -135,7 +135,7 @@ export function ProductCard({
       </div>
       {quickAdd && (
         <QuickAdd
-          className="mt-2 border-2 border-contrast/20 py-3 w-full font-medium"
+          className="mt-2 border-2 border-contrast/20 py-3 w-full font-medium hover:bg-FF-red hover:text-white transition-colors duration-200"
           product={product}
           image={image}
         >
@@ -266,7 +266,7 @@ export function Rebuy_MiniProductCard({
           product={product}
           image={product.image.src}
           rebuy
-          className="border-0 border-transparent"
+          className="border-0 border-transparent p-0 bg-transparent"
         >
           <span className="text-xs">Add+</span>
         </QuickAdd>

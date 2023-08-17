@@ -4,8 +4,8 @@ import {Image} from '@shopify/hydrogen';
 import {AddToCartButton} from './AddToCartButton';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import useRedo from '~/hooks/useRedo';
-import {toGID} from '~/lib/gidUtils';
-import {add} from 'cypress/types/lodash';
+import StarRating from './StarRating';
+import {IconClose} from './Icon';
 
 export default function QuickAdd({
   children,
@@ -32,8 +32,8 @@ export default function QuickAdd({
   // toggle modal when adding to cart
   const addToCartFetchers = useCartFetchers('ADD_TO_CART');
   useEffect(() => {
-    if(addToCartFetchers[0]?.state === 'loading'){
-      setIsOpen(false)
+    if (addToCartFetchers[0]?.state === 'loading') {
+      setIsOpen(false);
     }
   }, [addToCartFetchers]);
 
@@ -58,7 +58,7 @@ export default function QuickAdd({
     return (
       <AddToCartButton
         disabled={!availableForSale}
-        variant="inline"
+        variant="primary"
         className={className + ' cursor-pointer'}
         lines={[
           ...redoLine,
@@ -109,7 +109,10 @@ export default function QuickAdd({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white p-6 md:p-8 text-left align-middle shadow-xl transition-all">
+                  <div className="absolute top-4 right-4 z-50 text-lg cursor-pointer">
+                    <IconClose onClick={() => setIsOpen(false)} />
+                  </div>
                   <div className="mt-2 grid md:grid-cols-2 gap-4">
                     <div>
                       {image && (
@@ -125,6 +128,13 @@ export default function QuickAdd({
                       )}
                     </div>
                     <div className="relative">
+                      {product?.avg_rating?.value &&
+                        product?.num_reviews?.value && (
+                          <StarRating
+                            rating={Number(product.avg_rating.value)}
+                            count={product.num_reviews.value}
+                          />
+                        )}
                       <h3 className="text-lg font-medium leading-6 text-gray-900 font-heading">
                         {product.title}
                       </h3>
@@ -192,7 +202,7 @@ export default function QuickAdd({
                             },
                           ]}
                         >
-                          Add to Bag
+                          {selectedVariant ? 'Add to Bag' : 'Select an option'}
                         </AddToCartButton>
                       </div>
                     </div>
