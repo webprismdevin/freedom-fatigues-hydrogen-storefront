@@ -98,10 +98,10 @@ const seo: SeoHandleFunction<typeof loader> = ({data}) => {
       },
       aggregateRating: {
         '@type': 'AggregateRating',
-        ratingValue:  data?.product?.avg_rating?.value,
+        ratingValue: data?.product?.avg_rating?.value,
         reviewCount: data?.product.num_reviews?.value,
-      }
-    }
+      },
+    },
   } satisfies SeoConfig<Product>;
 };
 
@@ -780,7 +780,7 @@ function BackInStock({variant}: {variant: any}) {
   );
 }
 
-function ProductOptions({
+export function ProductOptions({
   options,
   searchParamsWithDefaults,
 }: {

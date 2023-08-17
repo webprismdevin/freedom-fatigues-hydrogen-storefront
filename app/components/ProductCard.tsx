@@ -7,20 +7,14 @@ import {
   useMoney,
 } from '@shopify/hydrogen';
 import type {SerializeFrom} from '@shopify/remix-oxygen';
-import {Text, Link, AddToCartButton, Button} from '~/components';
-import {isDiscounted, isNewArrival} from '~/lib/utils';
+import {Text, Link} from '~/components';
+import {isDiscounted, isNewArrival, useIsHomePath} from '~/lib/utils';
 import {getProductPlaceholder} from '~/lib/placeholders';
-import type {
-  MoneyV2,
-  Product,
-  ProductVariant,
-} from '@shopify/hydrogen/storefront-api-types';
+import type {MoneyV2, Product} from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
-import {AnimatePresence, motion, useCycle} from 'framer-motion';
-import {Fragment, ReactNode, useState} from 'react';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
-import {Dialog, Listbox, Popover, Transition} from '@headlessui/react';
+import QuickAdd from './QuickAdd';
 
 export function ProductCard({
   product,
@@ -45,15 +39,7 @@ export function ProductCard({
   let cardLabel;
   const [isRedoInCart] = useRedo();
   const isClearance = useTags(product.tags, 'Clearance');
-
-  // const [hovered, setHovered] = useState(false);
-  // const [shown, cycleShown] = useCycle(false, true);
-  // const [showOptions, cycleOptions] = useCycle(false, true);
-  // const [selectedVariant, setSelectedVariant] = useState<
-  //   ProductVariant | (() => void)
-  // >(() => {
-  //   return product.variants.nodes.find((variant) => variant.availableForSale);
-  // });
+  const isHome = useIsHomePath();
 
   const cardProduct: Product = product?.variants
     ? (product as Product)
@@ -137,9 +123,10 @@ export function ProductCard({
           </div>
         </Link>
         {/* for metafield captions later */}
-        <div className="h-10">
-          <p className="text-sm text-slate-400">{product.caption?.value}</p>
-          {/* <p className="text-sm text-slate-400">Do elit proident.</p> */}
+        <div className="h-14 md:h-10">
+          <p className="text-sm text-slate-400 line-clamp-3">
+            {product.caption?.value}
+          </p>
         </div>
       </div>
       {/* star rating placeholder */}
@@ -150,9 +137,13 @@ export function ProductCard({
         />
       </div>
       {quickAdd && (
-        <QuickAddModal className="mt-2 border-2 border-contrast/20 rounded py-2 w-full">
-          Add to Bag
-        </QuickAddModal>
+        <QuickAdd
+          className={`${isHome ? 'border-contrast/20' : 'border-primary/20' } mt-2 border-2 py-3 w-full font-medium hover:bg-FF-red hover:text-white transition-colors duration-200`}
+          product={product}
+          image={image}
+        >
+          Quick Add
+        </QuickAdd>
       )}
     </div>
   );
@@ -272,93 +263,32 @@ export function Rebuy_MiniProductCard({
         </p>
       </Link>
       <StarRating rating={product.avg_rating ?? 0} />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-row items-center justify-between">
         <RebuyPriceRange priceRange={product.priceRange} />
+        <QuickAdd
+          product={product}
+          image={product.image.src}
+          rebuy
+          className="border-0 border-transparent p-0 bg-transparent"
+        >
+          <span className="text-sm">+ ADD</span>
+        </QuickAdd>
       </div>
     </div>
   );
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
+  function removeCents(dollarAmount:number) {
+    if (dollarAmount.toString().endsWith('.00')) {
+      return dollarAmount.toString().slice(0, -3); // Remove the last 3 characters (.00)
+    }
+    return dollarAmount; // Return the original input if it doesn't end with .00
+  }
+
   return (
-    <span className="text-xs">
-      {`$${priceRange.min}${priceRange.isRange ? '+' : ''}`}
-    </span>
+    <div className="text-sm mt-[2px]">
+      {`$${removeCents(priceRange.min)}${priceRange.isRange ? '+' : ''}`}
+    </div>
   );
 };
-
-export function QuickAddModal({
-  children,
-  className,
-}: {
-  children?: ReactNode;
-  className?: string;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <>
-      <button onClick={() => setIsOpen(true)} className={className}>
-        {children ?? 'Add'}
-      </button>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50"
-          onClose={() => setIsOpen(false)}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Payment successful
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Your payment has been successfully submitted. We’ve sent
-                      you an email with all of the details of your order.
-                    </p>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Got it, thanks!
-                    </button>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
-    </>
-  );
-}
