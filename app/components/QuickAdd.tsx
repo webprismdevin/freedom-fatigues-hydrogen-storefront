@@ -7,6 +7,7 @@ import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
 import toast from 'react-hot-toast';
+import {Link} from './Link';
 
 export default function QuickAdd({
   children,
@@ -57,24 +58,31 @@ export default function QuickAdd({
       ? product.variants.nodes[0].availableForSale
       : true;
 
-    return (
-      <AddToCartButton
-        disabled={!availableForSale}
-        variant="primary"
-        className={className + ' cursor-pointer'}
-        lines={[
-          ...redoLine,
-          {
-            merchandiseId:
-              product.variants[0]?.admin_graphql_api_id ??
-              product.variants.nodes[0].id,
-            quantity: 1,
-          },
-        ]}
-      >
-        {children ?? 'Add'}
-      </AddToCartButton>
-    );
+    if (availableForSale)
+      return (
+        <AddToCartButton
+          disabled={!availableForSale}
+          variant="primary"
+          className={className + ' cursor-pointer'}
+          lines={[
+            ...redoLine,
+            {
+              merchandiseId:
+                product.variants[0]?.admin_graphql_api_id ??
+                product.variants.nodes[0].id,
+              quantity: 1,
+            },
+          ]}
+        >
+          {children ?? 'Add'}
+        </AddToCartButton>
+      );
+    else
+      return (
+        <Link to={`/products/${product.handle}`}>
+          <button className={` ${className} bg-primary/10`}>Notify me</button>
+        </Link>
+      );
   }
 
   return (

@@ -287,7 +287,7 @@ const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   }
 
   return (
-    <div className="text-sm mt-[2px]">
+    <div className="text-sm mt-[2px] font-medium">
       {`$${removeCents(priceRange.min)}${priceRange.isRange ? '+' : ''}`}
     </div>
   );
