@@ -122,8 +122,8 @@ export function ProductCard({
           </div>
         </Link>
         {/* for metafield captions later */}
-        <div className="h-10">
-          <p className="text-sm text-slate-400">{product.caption?.value}</p>
+        <div className="h-14 md:h-10">
+          <p className="text-sm text-slate-400 line-clamp-3">{product.caption?.value}</p>
         </div>
       </div>
       {/* star rating placeholder */}

@@ -5,7 +5,7 @@ import {AddToCartButton} from './AddToCartButton';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
-import {IconClose} from './Icon';
+import {IconClose, IconSelect} from './Icon';
 
 export default function QuickAdd({
   children,
@@ -31,6 +31,7 @@ export default function QuickAdd({
 
   // toggle modal when adding to cart
   const addToCartFetchers = useCartFetchers('ADD_TO_CART');
+
   useEffect(() => {
     if (addToCartFetchers[0]?.state === 'loading') {
       setIsOpen(false);
@@ -128,33 +129,33 @@ export default function QuickAdd({
                       )}
                     </div>
                     <div className="relative">
-                      {product?.avg_rating?.value &&
-                        product?.num_reviews?.value && (
-                          <StarRating
-                            rating={Number(product.avg_rating.value)}
-                            count={product.num_reviews.value}
-                          />
-                        )}
+                      <StarRating
+                        rating={product.avg_rating?.value ?? product.avg_rating}
+                        count={
+                          product.num_reviews?.value ?? product.num_reviews
+                        }
+                      />
                       <h3 className="text-lg font-medium leading-6 text-gray-900 font-heading">
                         {product.title}
                       </h3>
                       <p className="text-xs text-primary/50 mt-1 mb-2">
-                        {product?.caption?.value}
+                        {product?.caption?.value ?? product.caption}
                       </p>
                       <Listbox
                         onChange={setSelectedVariant}
                         value={selectedVariant}
                       >
-                        <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-1 pr-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm flex items-center justify-between">
                           <span className="flex items-center">
                             {selectedVariant ? (
                               <span>Selected: {selectedVariant.title}</span>
                             ) : (
                               <span className="ml-3 block truncate">
-                                Choose an option
+                                Select an option
                               </span>
                             )}
                           </span>
+                          <IconSelect />
                         </Listbox.Button>
                         <Listbox.Options className="absolute top-[-82%] md:top-auto mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
                           {variants.map((variant: any) => {
