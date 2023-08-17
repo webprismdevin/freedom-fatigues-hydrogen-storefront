@@ -146,19 +146,19 @@ export default function QuickAdd({
                         onChange={setSelectedVariant}
                         value={selectedVariant}
                       >
-                        <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-1 pr-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm flex items-center justify-between">
+                        <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm flex items-center justify-between">
                           <span className="flex items-center">
                             {selectedVariant ? (
                               <span>Selected: {selectedVariant.title}</span>
                             ) : (
-                              <span className="ml-3 block truncate">
+                              <span className="block truncate">
                                 Select an option
                               </span>
                             )}
                           </span>
                           <IconSelect />
                         </Listbox.Button>
-                        <Listbox.Options className="absolute top-[-82%] md:top-auto mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                        <Listbox.Options className="absolute top-[-82%] md:top-auto mt-1 max-h-60 w-full overflow-auto rounded-md bg-white pl-5 py-3 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
                           {variants.map((variant: any) => {
                             const soldOut = rebuy
                               ? false

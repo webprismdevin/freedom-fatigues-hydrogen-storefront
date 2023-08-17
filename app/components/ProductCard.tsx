@@ -8,7 +8,7 @@ import {
 } from '@shopify/hydrogen';
 import type {SerializeFrom} from '@shopify/remix-oxygen';
 import {Text, Link} from '~/components';
-import {isDiscounted, isNewArrival} from '~/lib/utils';
+import {isDiscounted, isNewArrival, useIsHomePath} from '~/lib/utils';
 import {getProductPlaceholder} from '~/lib/placeholders';
 import type {MoneyV2, Product} from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
@@ -39,6 +39,7 @@ export function ProductCard({
   let cardLabel;
   const [isRedoInCart] = useRedo();
   const isClearance = useTags(product.tags, 'Clearance');
+  const isHome = useIsHomePath();
 
   const cardProduct: Product = product?.variants
     ? (product as Product)
@@ -137,7 +138,7 @@ export function ProductCard({
       </div>
       {quickAdd && (
         <QuickAdd
-          className="mt-2 border-2 border-contrast/20 py-3 w-full font-medium hover:bg-FF-red hover:text-white transition-colors duration-200"
+          className={`${isHome ? 'border-contrast/20' : 'border-primary/20' } mt-2 border-2 py-3 w-full font-medium hover:bg-FF-red hover:text-white transition-colors duration-200`}
           product={product}
           image={image}
         >
