@@ -38,7 +38,6 @@ import {useEffect} from 'react';
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import useScript from './hooks/useScript';
-import { Toaster } from 'react-hot-toast';
 
 declare global {
   interface Window {
