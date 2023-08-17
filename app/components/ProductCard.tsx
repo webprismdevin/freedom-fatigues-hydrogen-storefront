@@ -135,7 +135,7 @@ export function ProductCard({
       </div>
       {quickAdd && (
         <QuickAdd
-          className="mt-2 border-2 border-contrast/20 py-2 w-full"
+          className="mt-2 border-2 border-contrast/20 py-3 w-full font-medium"
           product={product}
           image={image}
         >
@@ -260,11 +260,16 @@ export function Rebuy_MiniProductCard({
         </p>
       </Link>
       <StarRating rating={product.avg_rating ?? 0} />
-      <div className="grid grid-cols-2 gap-2">
+      <div className="flex flex-row items-center justify-between">
         <RebuyPriceRange priceRange={product.priceRange} />
-        {/* <QuickAdd product={product} image={product.image.src} rebuy>
+        <QuickAdd
+          product={product}
+          image={product.image.src}
+          rebuy
+          className="border-0 border-transparent"
+        >
           <span className="text-xs">Add+</span>
-        </QuickAdd> */}
+        </QuickAdd>
       </div>
     </div>
   );
@@ -272,8 +277,8 @@ export function Rebuy_MiniProductCard({
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   return (
-    <span className="text-xs">
+    <div className="text-xs mt-[2px]">
       {`$${priceRange.min}${priceRange.isRange ? '+' : ''}`}
-    </span>
+    </div>
   );
 };

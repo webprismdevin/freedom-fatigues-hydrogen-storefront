@@ -5,6 +5,7 @@ import {AddToCartButton} from './AddToCartButton';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import useRedo from '~/hooks/useRedo';
 import {toGID} from '~/lib/gidUtils';
+import {add} from 'cypress/types/lodash';
 
 export default function QuickAdd({
   children,
@@ -28,6 +29,14 @@ export default function QuickAdd({
 
   const [isRedoInCart] = useRedo();
 
+  // toggle modal when adding to cart
+  const addToCartFetchers = useCartFetchers('ADD_TO_CART');
+  useEffect(() => {
+    if(addToCartFetchers[0]?.state === 'loading'){
+      setIsOpen(false)
+    }
+  }, [addToCartFetchers]);
+
   const redoLine = isRedoInCart
     ? []
     : [
@@ -37,7 +46,34 @@ export default function QuickAdd({
         },
       ];
 
+  //started at 9:45 am
   //   return simple ATC if only one variant
+  if (product.variants.nodes?.length === 1 || product.variants.length === 1) {
+    const isFromShopify = product.variants.nodes !== undefined;
+
+    const availableForSale = isFromShopify
+      ? product.variants.nodes[0].availableForSale
+      : true;
+
+    return (
+      <AddToCartButton
+        disabled={!availableForSale}
+        variant="inline"
+        className={className + ' cursor-pointer'}
+        lines={[
+          ...redoLine,
+          {
+            merchandiseId:
+              product.variants[0]?.admin_graphql_api_id ??
+              product.variants.nodes[0].id,
+            quantity: 1,
+          },
+        ]}
+      >
+        {children ?? 'Add'}
+      </AddToCartButton>
+    );
+  }
 
   return (
     <>
