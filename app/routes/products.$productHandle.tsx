@@ -398,7 +398,6 @@ function CompleteTheLook() {
       <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
         {product?.complete_the_look?.references.nodes.map((product: any) => (
           <div key={product.id}>
-            {/* <InlineProductCard product={product} /> */}
             <MiniProductCard product={product} />
           </div>
         ))}
@@ -526,7 +525,7 @@ export function ProductForm() {
    */
   const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
     const clonedParams = new URLSearchParams(searchParams);
-
+  // 👇 remove if statement to enable first variant
     if (onlyHasDefault) {
       for (const {name, value} of firstVariant.selectedOptions) {
         if (!searchParams.has(name)) {
@@ -538,11 +537,8 @@ export function ProductForm() {
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
 
-  /**
-   * Likewise, we're defaulting to the first variant for purposes
-   * of add to cart if there is none returned from the loader.
-   * A developer can opt out of this, too.
-   */
+  // 👇 swap this line with the one below to enable first variant
+  // const selectedVariant = product.selectedVariant ?? firstVariant;
   const selectedVariant = onlyHasDefault
     ? firstVariant
     : product.selectedVariant;
