@@ -102,7 +102,7 @@ export function ProductCard({
           to={`/products/${product.handle}`}
           prefetch="intent"
         >
-          <div className="grid grid-cols-3 gap-4 h-12">
+          <div className="grid h-12 grid-cols-3 gap-4">
             <Text
               className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis"
               as="h3"
@@ -124,7 +124,7 @@ export function ProductCard({
         </Link>
         {/* for metafield captions later */}
         <div className="h-14 md:h-10">
-          <p className="text-sm text-slate-400 line-clamp-3">
+          <p className="line-clamp-3 text-sm text-slate-400">
             {product.caption?.value}
           </p>
         </div>
@@ -138,7 +138,9 @@ export function ProductCard({
       </div>
       {quickAdd && (
         <QuickAdd
-          className={`${isHome ? 'border-contrast/20' : 'border-primary/20' } mt-2 border-2 py-3 w-full font-medium hover:bg-FF-red hover:text-white transition-colors duration-200`}
+          className={`${
+            isHome ? 'border-contrast/20' : 'border-primary/20'
+          } mt-2 w-full border-2 py-3 font-medium transition-colors duration-200 hover:bg-FF-red hover:text-white`}
           product={product}
           image={image}
         >
@@ -177,36 +179,38 @@ export function MiniProductCard({
   const {image, price, compareAtPrice} = firstVariant;
 
   return (
-    <div className="flex gap-4">
-      <div className="aspect-square bg-primary/5 min-w-[128px] max-w-[128px]">
-        {image && (
-          <Image
-            className="fadeIn aspect-[4/5] w-full object-cover"
-            sizes="320px"
-            aspectRatio="1/1"
-            data={image}
-            alt={image.altText || `Picture of ${product.title}`}
-            loading={loading}
-          />
-        )}
-      </div>
-      <div className="flex flex-col gap-2">
-        <StarRating
-          rating={Number(product.avg_rating?.value)}
-          count={Number(product.num_reviews?.value)}
-        />
-        <p>{product.title}</p>
-        <Text className="flex flex-col md:flex-row md:gap-2 text-sm">
-          <Money withoutTrailingZeros data={price!} />
-          {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
-            <CompareAtPrice
-              className={'opacity-50'}
-              data={compareAtPrice as MoneyV2}
+    <Link to={`/products/${product.handle}`}>
+      <div className="flex gap-4">
+        <div className="aspect-square min-w-[128px] max-w-[128px] bg-primary/5">
+          {image && (
+            <Image
+              className="fadeIn aspect-[4/5] w-full object-cover"
+              sizes="320px"
+              aspectRatio="1/1"
+              data={image}
+              alt={image.altText || `Picture of ${product.title}`}
+              loading={loading}
             />
           )}
-        </Text>
+        </div>
+        <div className="flex flex-col gap-2">
+          <StarRating
+            rating={Number(product.avg_rating?.value)}
+            count={Number(product.num_reviews?.value)}
+          />
+          <p>{product.title}</p>
+          <Text className="flex flex-col text-sm md:flex-row md:gap-2">
+            <Money withoutTrailingZeros data={price!} />
+            {isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2) && (
+              <CompareAtPrice
+                className={'opacity-50'}
+                data={compareAtPrice as MoneyV2}
+              />
+            )}
+          </Text>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -269,7 +273,7 @@ export function Rebuy_MiniProductCard({
           product={product}
           image={product.image.src}
           rebuy
-          className="border-0 border-transparent p-0 bg-transparent"
+          className="border-0 border-transparent bg-transparent p-0"
         >
           <span className="text-sm">+ ADD</span>
         </QuickAdd>
@@ -279,7 +283,7 @@ export function Rebuy_MiniProductCard({
 }
 
 const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
-  function removeCents(dollarAmount:number) {
+  function removeCents(dollarAmount: number) {
     if (dollarAmount.toString().endsWith('.00')) {
       return dollarAmount.toString().slice(0, -3); // Remove the last 3 characters (.00)
     }
@@ -287,7 +291,7 @@ const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   }
 
   return (
-    <div className="text-sm mt-[2px] font-medium">
+    <div className="mt-[2px] text-sm font-medium">
       {`$${removeCents(priceRange.min)}${priceRange.isRange ? '+' : ''}`}
     </div>
   );
