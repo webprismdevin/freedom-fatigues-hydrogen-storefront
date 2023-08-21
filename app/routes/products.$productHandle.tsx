@@ -460,6 +460,9 @@ export function ProductForm() {
 
   const firstVariant = product.variants.nodes[0];
 
+  const onlyHasDefault =
+    product.options.length === 1 && product.options[0].values.length == 1;
+
   // klaviyo 'viewed product' snippet
   useEffect(() => {
     const _learnq = window._learnq || [];
@@ -524,24 +527,25 @@ export function ProductForm() {
   const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
     const clonedParams = new URLSearchParams(searchParams);
 
-    for (const {name, value} of firstVariant.selectedOptions) {
-      if (!searchParams.has(name)) {
-        clonedParams.set(name, value);
+    if (onlyHasDefault) {
+      for (const {name, value} of firstVariant.selectedOptions) {
+        if (!searchParams.has(name)) {
+          clonedParams.set(name, value);
+        }
       }
     }
 
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
 
-  const onlyHasDefault =
-    product.options.length === 1 && product.options[0].values.length == 1;
-
   /**
    * Likewise, we're defaulting to the first variant for purposes
    * of add to cart if there is none returned from the loader.
    * A developer can opt out of this, too.
    */
-  const selectedVariant = product.selectedVariant ?? firstVariant;
+  const selectedVariant = onlyHasDefault
+    ? firstVariant
+    : product.selectedVariant;
 
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
