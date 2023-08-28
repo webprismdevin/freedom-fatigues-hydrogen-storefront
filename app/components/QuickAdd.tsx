@@ -6,7 +6,6 @@ import {useCartFetchers} from '~/hooks/useCartFetchers';
 import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
-import toast from 'react-hot-toast';
 import {Link} from './Link';
 
 export default function QuickAdd({
@@ -119,11 +118,11 @@ export default function QuickAdd({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white p-6 md:p-8 text-left align-middle shadow-xl transition-all">
-                  <div className="absolute top-4 right-4 z-50 text-lg cursor-pointer">
+                <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all md:p-8">
+                  <div className="absolute right-4 top-4 z-50 cursor-pointer text-lg">
                     <IconClose onClick={() => setIsOpen(false)} />
                   </div>
-                  <div className="mt-2 grid md:grid-cols-2 gap-4">
+                  <div className="mt-2 grid gap-4 md:grid-cols-2">
                     <div>
                       {image && (
                         <Image
@@ -144,17 +143,17 @@ export default function QuickAdd({
                           product.num_reviews?.value ?? product.num_reviews
                         }
                       />
-                      <h3 className="text-lg font-medium leading-6 text-gray-900 font-heading">
+                      <h3 className="font-heading text-lg font-medium leading-6 text-gray-900">
                         {product.title}
                       </h3>
-                      <p className="text-xs text-primary/50 mt-1 mb-2">
+                      <p className="mb-2 mt-1 text-xs text-primary/50">
                         {product?.caption?.value ?? product.caption}
                       </p>
                       <Listbox
                         onChange={setSelectedVariant}
                         value={selectedVariant}
                       >
-                        <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-4 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm flex items-center justify-between">
+                        <Listbox.Button className="relative flex w-full cursor-default items-center justify-between rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm">
                           <span className="flex items-center">
                             {selectedVariant ? (
                               <span>Selected: {selectedVariant.title}</span>
@@ -166,7 +165,7 @@ export default function QuickAdd({
                           </span>
                           <IconSelect />
                         </Listbox.Button>
-                        <Listbox.Options className="absolute top-[-82%] md:top-auto mt-1 max-h-60 w-full overflow-auto rounded-md bg-white pl-5 py-3 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                        <Listbox.Options className="absolute top-[-82%] z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-3 pl-5 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm md:top-auto">
                           {variants.map((variant: any) => {
                             const soldOut = rebuy
                               ? false

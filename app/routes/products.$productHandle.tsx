@@ -70,6 +70,7 @@ import useScript from '~/hooks/useScript';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
+import useRebuyEvent from '~/hooks/useRebuyEvent';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -202,6 +203,8 @@ export default function Product() {
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
+
+  useRebuyEvent({handle: product.handle, event: 'viewed'});
 
   return (
     <>
