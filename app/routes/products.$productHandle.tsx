@@ -70,6 +70,7 @@ import useScript from '~/hooks/useScript';
 import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
+import useRebuyEvent from '~/hooks/useRebuyEvent';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -202,6 +203,8 @@ export default function Product() {
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
+
+  useRebuyEvent({handle: product.handle, event: 'viewed'});
 
   return (
     <>
@@ -653,12 +656,9 @@ export function ProductForm() {
                 />
                 <div className="flex flex-wrap items-center gap-1">
                   <span className="text-[11px]">
-                    Get free returns for store credit, or exchange, for $1 via
+                    Get free returns for store credit, or exchange, for $1.98 via
                     re:do
                   </span>
-                  {/* <div className="max-h-[18px] md:max-h-[20px]">
-                    <IconRedo />
-                  </div> */}
                 </div>
               </div>
             )}

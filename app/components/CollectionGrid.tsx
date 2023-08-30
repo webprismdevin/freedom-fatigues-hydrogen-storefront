@@ -27,6 +27,7 @@ export function CollectionGrid({data}: {data: any}) {
           to={collection.to}
           className={collectionClass}
           key={collection._key}
+          prefetch="intent"
         >
           <Image
             className={imageClass}
@@ -35,7 +36,7 @@ export function CollectionGrid({data}: {data: any}) {
             loading={data.loading ?? 'lazy'}
             sizes={'33vw'}
           />
-          <span className="z-1 text-shadow relative text-center text-2xl text-white md:text-3xl lg:text-5xl">
+          <span className="z-1 text-shadow relative text-center text-2xl border-b-2 border-transparent text-white md:text-3xl lg:text-5xl  hover:border-red-500">
             {collection.title}
           </span>
         </Link>
