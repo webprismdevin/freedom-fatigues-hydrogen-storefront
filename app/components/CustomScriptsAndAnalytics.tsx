@@ -115,7 +115,7 @@ export function CustomScriptsAndAnalytics() {
       <script
         defer
         data-domain="freedomfatigues.com"
-        src="https://plausible.io/js/script.js"
+        src="/js/script.js"
       ></script>
     </>
   );
