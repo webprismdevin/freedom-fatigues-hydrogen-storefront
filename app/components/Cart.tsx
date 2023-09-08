@@ -311,20 +311,20 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex flex-col">
-      {/* <a
+      <a
         href={checkoutUrl}
         target="_self"
         className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-      > */}
-      <Button
+      >
+      {/* <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
         as="span"
         width="full"
-      >
+      > */}
         Continue to Checkout
-      </Button>
-      {/* </a> */}
+      {/* </Button> */}
+      </a>
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );
