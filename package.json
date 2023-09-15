@@ -46,6 +46,7 @@
     "remix-island": "^0.1.2",
     "sanity-image": "^0.1.4",
     "schema-dts": "^1.1.0",
+    "tailwind-scrollbar": "^3.0.5",
     "tiny-invariant": "^1.2.0",
     "typographic-base": "^1.0.4",
     "uuid": "^9.0.0",
