@@ -37,7 +37,7 @@ import {useEffect} from 'react';
 // analytics
 import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import useScript from './hooks/useScript';
+import {OverlayScrollbarsComponent} from 'overlayscrollbars-react';
 
 declare global {
   interface Window {

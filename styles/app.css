@@ -4,8 +4,10 @@
 
 @font-face {
   font-family: 'Norwester-Regular';
-  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/norwester.woff?v=1681662075') format('woff'),
-    url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100') format('opentype');
+  src: url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/norwester.woff?v=1681662075')
+      format('woff'),
+    url('https://cdn.shopify.com/s/files/1/0056/6342/4630/files/Norwester_400.otf?v=1679588100')
+      format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -123,6 +125,29 @@ shop-pay-button {
   html {
     scroll-padding-top: 10rem;
     @apply font-sans;
+    overflow-x: hidden;
+  }
+
+  body {
+    /* Foreground, Background */
+    scrollbar-color: transparent rgb(233, 57, 43);
+    scrollbar-gutter: 0px;
+  }
+  body::-webkit-scrollbar {
+    width: 10px; /* Mostly for vertical scrollbars */
+    height: 10px; /* Mostly for horizontal scrollbars */
+  }
+  body::-webkit-scrollbar-thumb {
+    /* Foreground */
+    background: rgb(233, 57, 43);
+  }
+  body.dark::-webkit-scrollbar-track {
+    /* Background */
+    background: rgb(var(--color-contrast));
+  }
+  body.light::-webkit-scrollbar-track {
+    /* Background */
+    background: rgb(var(--color-primary));
   }
 
   model-viewer::part(default-progress-mask) {
@@ -145,7 +170,6 @@ shop-pay-button {
   }
 
   .prose {
-
     h1,
     h2,
     h3,
@@ -161,7 +185,6 @@ shop-pay-button {
 
 @layer components {
   .article {
-
     h2,
     h3,
     h4,
@@ -203,14 +226,6 @@ shop-pay-button {
     animation: fadeInAnimation ease 500ms forwards;
   }
 
-  .hiddenScroll {
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
   .absolute-center {
     @apply absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2;
   }
@@ -232,6 +247,14 @@ shop-pay-button {
     }
   }
 
+  .hiddenScroll {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   .card-image {
     @apply relative flex items-center justify-center overflow-clip rounded;
 
@@ -248,19 +271,6 @@ shop-pay-button {
 
 .text-shadow {
   text-shadow: 5px 3px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-*::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-* {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
 }
 
 /*! Inherited styles */
