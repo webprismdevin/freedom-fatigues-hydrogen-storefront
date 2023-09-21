@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async ({params, request}) => {
   const lines = searchParams.get('lines');
 
   const response = await fetch(
-    `https://rebuyengine.com/api/v1/products/${resource}?key=269507ca244802f7cfc0b6570a09d34463258094&limit=6&metafields=yes&filter_oos=yes&shopify_product_ids=${lines}`,
+    `https://rebuyengine.com/api/v1/custom/id/114823?key=269507ca244802f7cfc0b6570a09d34463258094&limit=6&metafields=yes&filter_oos=yes&shopify_product_ids=${lines}`,
   );
 
   const data: RebuyResponse = await response.json();
