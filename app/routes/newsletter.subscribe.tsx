@@ -1,5 +1,4 @@
 import {ActionArgs, LoaderArgs, json} from "@shopify/remix-oxygen";
-import {logsnag} from '~/lib/logsnag';
 
 const klaviyo_endpoint =
   'https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/';
@@ -39,16 +38,6 @@ export async function action({request, context}: ActionArgs) {
       },
     }),
   });
-
-  if (response.status !== 202) {
-    await logsnag.publish({
-      channel: 'email-form-submission',
-      event: `Email Signup Error: ${response.status}`,
-      description: `Email: ${email} - Source: ${source} - Status: ${response.status}`,
-      icon: '❌',
-      notify: true,
-    });
-  }
 
   return json({
     error: null,

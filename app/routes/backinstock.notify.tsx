@@ -1,5 +1,4 @@
 import {ActionArgs, LoaderArgs, json} from '@shopify/remix-oxygen';
-import {logsnag} from '~/lib/logsnag';
 
 const klaviyo_endpoint =
   'https://a.klaviyo.com/onsite/components/back-in-stock/subscribe';
@@ -25,16 +24,6 @@ export async function action({request, context}: ActionArgs) {
     body: urlencoded,
     redirect: 'follow',
   });
-
-  // if (response.status !== 202) {
-  //   await logsnag.publish({
-  //     channel: 'email-form-submission',
-  //     event: `Back In Stock Signup Error: ${response.status}`,
-  //     description: `Email: ${email} - Source: ${source} - Status: ${response.status}`,
-  //     icon: '❌',
-  //     notify: true,
-  //   });
-  // }
 
   return json({
     error: null,

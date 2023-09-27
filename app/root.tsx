@@ -35,7 +35,6 @@ import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 import {useEffect} from 'react';
 // analytics
-import {logsnag} from './lib/logsnag';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import {OverlayScrollbarsComponent} from 'overlayscrollbars-react';
 
@@ -166,17 +165,6 @@ export function CatchBoundary() {
   const caught = useCatch();
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
-
-  useEffect(() => {
-    if (isNotFound)
-      logsnag.publish({
-        channel: 'navigation',
-        event: `404: Not found`,
-        description: `User navigated to ${window.location.pathname}`,
-        icon: '👀',
-        notify: true,
-      });
-  }, [isNotFound]);
 
   return (
     <html lang={locale.language}>
