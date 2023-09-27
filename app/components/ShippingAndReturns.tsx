@@ -20,7 +20,7 @@ export default function ShippingAndReturns({
       >
         <div className="col-span-1 grid place-items-center">
           <div className="text-center">
-            <h1 className={titleClass}>{contentLeft.title}</h1>
+            <h2 className={titleClass}>{contentLeft.title}</h2>
             <p>{contentLeft.content}</p>
           </div>
         </div>
@@ -40,7 +40,7 @@ export default function ShippingAndReturns({
         </div>
         <div className="col-span-1 grid place-items-center">
           <div className="text-center">
-            <h1 className={titleClass}>{contentRight.title}</h1>
+            <h2 className={titleClass}>{contentRight.title}</h2>
             <p>{contentRight.content}</p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function ShippingAndReturns({
     >
       <div className="col-span-1 grid place-items-center">
         <div className="text-center">
-          <h1 className={titleClass}>{contentLeft.title}</h1>
+          <h2 className={titleClass}>{contentLeft.title}</h2>
           <p>{contentLeft.content}</p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default function ShippingAndReturns({
       </div>
       <div className="col-span-1 grid place-items-center">
         <div className="text-center">
-          <h1 className={titleClass}>{contentRight.title}</h1>
+          <h2 className={titleClass}>{contentRight.title}</h2>
           <p>{contentRight.content}</p>
         </div>
       </div>

@@ -132,7 +132,7 @@ export function CartDetails({
               <h5 className="px-6 font-heading text-lg md:px-12">
                 You might also like
               </h5>
-              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative">
+              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative hiddenScroll">
                 <RebuyRecommendations
                   className="w-1/3 md:w-1/4 grow-0 shrink-0"
                   lines={cart?.lines}
@@ -605,7 +605,7 @@ const RebuyRecommendations = ({
   }, [load]);
 
   if (!data)
-    return [1, 2, 3, 4].map(() => (
+    return [1, 2, 3].map(() => (
       <div className={`${className} animate-pulse`}>
         <div className="h-[176px] w-full rounded bg-primary/5" />
       </div>
