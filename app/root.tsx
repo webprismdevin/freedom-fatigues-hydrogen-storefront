@@ -156,7 +156,9 @@ export default function App() {
 
     window.fbq('track', 'PageView', {}, {eventID: event_id});
 
-    fetch(`/server/PageView?fbp=${fbpCookie}&event_id=${event_id}`)
+    fetch(
+      `/server/PageView?fbp=${fbcCookie?.split('=')[1]}&event_id=${event_id}`,
+    );
   }, []);
 
   useAnalytics(hasUserConsent, locale);

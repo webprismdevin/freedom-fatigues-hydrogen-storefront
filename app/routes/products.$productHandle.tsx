@@ -575,8 +575,6 @@ export function ProductForm() {
   useEffect(() => {
     const _learnq = window._learnq || [];
 
-    console.log(_learnq);
-
     const item = {
       ProductName: product.title,
       ProductID: product.id,
@@ -632,14 +630,11 @@ export function ProductForm() {
 
     fetch(
       `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${product.title}&content_type=product&value=${value}&currency=USD&event_source_url=${window.location}`,
-    ).then((res) => {
-      console.log(res);
-    });
+    )
 
     const trackViewContent = () => {
       // facebook pixel
       if (typeof window !== 'undefined' && window.fbq) {
-        console.log("firing 'ViewContent' event");
         window.fbq('track', 'ViewContent', data, {
           eventID: event_id,
           test_event_code:

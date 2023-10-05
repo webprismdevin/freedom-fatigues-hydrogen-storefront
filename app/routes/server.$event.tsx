@@ -44,8 +44,6 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
     body,
   });
 
-  console.log(body);
-
   if (response.status !== 200) {
     return new Response('Error', {status: 500});
   }
