@@ -23,6 +23,7 @@ declare global {
     PUBLIC_STORE_DOMAIN: string;
     PUBLIC_STOREFRONT_ID: string;
     KLAVIYO_API_KEY: string;
+    FB_CAPI_TOKEN: string;
   }
 }
 

@@ -7,6 +7,8 @@ import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
 import {Link} from './Link';
+import {RebuyPriceRange} from './ProductCard';
+import {fromGID} from '~/lib/gidUtils';
 
 export default function QuickAdd({
   children,
@@ -26,6 +28,7 @@ export default function QuickAdd({
   const [selectedVariant, setSelectedVariant] = useState<null | {
     title: string;
     id: string;
+    price: string;
   }>(null);
 
   const [isRedoInCart] = useRedo();
@@ -48,8 +51,40 @@ export default function QuickAdd({
         },
       ];
 
-  //started at 9:45 am
-  //   return simple ATC if only one variant
+  function fireAnalytics() {
+    const ff_id = window.sessionStorage.getItem('ff_id');
+
+    const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
+    const event_source_url = window.location.href;
+    const content_ids = [fromGID(selectedVariant?.id)];
+    const content_name = product.title;
+    const content_type = 'product';
+    const value = selectedVariant?.price;
+    const currency = 'USD';
+
+    if (window.fbq)
+      window.fbq(
+        'track',
+        'AddToCart',
+        {
+          content_ids,
+          content_name,
+          content_type,
+          value,
+          currency,
+        },
+        {
+          eventID: event_id,
+          test_event_code:
+            process.env.NODE_ENV === 'development' ? 'TEST65251' : null,
+        },
+      );
+
+    fetch(
+      `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${selectedVariant?.price}&currency=${currency}`,
+    );
+  }
+
   if (product.variants.nodes?.length === 1 || product.variants.length === 1) {
     const isFromShopify = product.variants.nodes !== undefined;
 
@@ -63,6 +98,7 @@ export default function QuickAdd({
           disabled={!availableForSale}
           variant="primary"
           className={className + ' cursor-pointer'}
+          onClick={() => fireAnalytics()}
           lines={[
             ...redoLine,
             {
@@ -149,6 +185,7 @@ export default function QuickAdd({
                       <p className="mb-2 mt-1 text-xs text-primary/50">
                         {product?.caption?.value ?? product.caption}
                       </p>
+                      {/* <p>{selectedVariant?.price}</p> */}
                       <Listbox
                         onChange={setSelectedVariant}
                         value={selectedVariant}
@@ -178,6 +215,8 @@ export default function QuickAdd({
                                   title: variant.title,
                                   id:
                                     variant.admin_graphql_api_id ?? variant.id,
+                                  price:
+                                    variant.price ?? variant.priceV2.amount,
                                 }}
                                 disabled={soldOut}
                                 className={({active}) =>
@@ -200,6 +239,7 @@ export default function QuickAdd({
                         <AddToCartButton
                           disabled={!selectedVariant}
                           variant="primary"
+                          onClick={() => fireAnalytics()}
                           className={!selectedVariant ? 'opacity-50' : ''}
                           lines={[
                             ...redoLine,

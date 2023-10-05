@@ -72,7 +72,7 @@ export async function loader({params, context}: LoaderArgs) {
     featuredProducts: context.storefront.query<{
       products: ProductConnection;
     }>(HOMEPAGE_FEATURED_PRODUCTS_QUERY),
-    saleProducts: context.storefront.query<{collection: CollectionConnection}>(
+    newlyReleased: context.storefront.query<{collection: CollectionConnection}>(
       HOMEPAGE_SALE_PRODUCTS_QUERY,
       {
         variables: {handle: 'newly-released'},
@@ -87,7 +87,7 @@ export async function loader({params, context}: LoaderArgs) {
 export type PageModule = any;
 
 export default function Homepage() {
-  const {hero, modules, featuredProducts, saleProducts} =
+  const {hero, modules, featuredProducts, newlyReleased} =
     useLoaderData<typeof loader>();
 
   // TODO: analytics
@@ -123,7 +123,7 @@ export default function Homepage() {
       </Suspense>
 
       <Suspense>
-        <Await resolve={saleProducts}>
+        <Await resolve={newlyReleased}>
           {({collection}) => {
             if (!collection?.products?.nodes) return <></>;
             return (
