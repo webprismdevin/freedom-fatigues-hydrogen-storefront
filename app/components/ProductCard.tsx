@@ -282,7 +282,7 @@ export function Rebuy_MiniProductCard({
   );
 }
 
-const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
+export const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
   function removeCents(dollarAmount: number) {
     if (dollarAmount.toString().endsWith('.00')) {
       return dollarAmount.toString().slice(0, -3); // Remove the last 3 characters (.00)

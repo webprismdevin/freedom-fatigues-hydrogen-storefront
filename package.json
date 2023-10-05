@@ -44,6 +44,7 @@
     "react-intersection-observer": "^9.4.1",
     "react-use": "^17.4.0",
     "remix-island": "^0.1.2",
+    "remix-utils": "^6.6.0",
     "sanity-image": "^0.1.4",
     "schema-dts": "^1.1.0",
     "tailwind-scrollbar": "^3.0.5",

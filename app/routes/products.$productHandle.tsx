@@ -465,9 +465,117 @@ export function ProductForm() {
   const onlyHasDefault =
     product.options.length === 1 && product.options[0].values.length == 1;
 
+  /**
+   * We're making an explicit choice here to display the product options
+   * UI with a default variant, rather than wait for the user to select
+   * options first. Developers are welcome to opt-out of this behavior.
+   * By default, the first variant's options are used.
+   */
+  const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
+    const clonedParams = new URLSearchParams(searchParams);
+    // 👇 remove if statement to enable first variant
+    if (onlyHasDefault) {
+      for (const {name, value} of firstVariant.selectedOptions) {
+        if (!searchParams.has(name)) {
+          clonedParams.set(name, value);
+        }
+      }
+    }
+
+    return clonedParams;
+  }, [searchParams, firstVariant.selectedOptions]);
+
+  // 👇 swap this line with the one below to enable first variant
+  // const selectedVariant = product.selectedVariant ?? firstVariant;
+  const selectedVariant = onlyHasDefault
+    ? firstVariant
+    : product.selectedVariant;
+
+  const isOutOfStock = !selectedVariant?.availableForSale;
+  const availableForSale = selectedVariant?.availableForSale;
+
+  const isOnSale =
+    selectedVariant?.price?.amount &&
+    selectedVariant?.compareAtPrice?.amount &&
+    selectedVariant?.price?.amount < selectedVariant?.compareAtPrice?.amount;
+
+  const productAnalytics: ShopifyAnalyticsProduct = {
+    ...analytics.products[0],
+    quantity: 1,
+  };
+
+  const quantityAvailable = selectedVariant?.quantityAvailable;
+
+  //ATC analytics
+  function fireAnalytics() {
+    if (window.plausible) {
+      window.plausible('AddToCart', {
+        props: {
+          product: product.title,
+          value: selectedVariant?.price!.amount,
+        },
+      });
+    }
+    if (window.dataLayer) {
+      //@ts-ignore
+      window.dataLayer.push({ecommerce: null});
+      // @ts-ignore
+      window.dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          currency: 'USD',
+          value: selectedVariant?.price!.amount,
+          items: [
+            {
+              item_id: fromGID(product.id),
+              item_name: product.title,
+              affiliation: 'Hydrogen',
+              item_brand: 'Freedom Fatigues',
+              item_variant: selectedVariant.id,
+              price: selectedVariant?.price!.amount,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+    }
+    if (window.TriplePixel)
+      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+
+    const ff_id = window.sessionStorage.getItem('ff_id');
+    const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
+
+    if (window.fbq)
+      window.fbq(
+        'track',
+        'AddToCart',
+        {
+          content_ids: [fromGID(product.id)],
+          content_type: 'product',
+          value: selectedVariant?.price!.amount,
+          currency: 'USD',
+        },
+        {
+          eventID: event_id,
+          test_event_code:
+            process.env.NODE_ENV == 'development' ? 'TEST65251' : null,
+        },
+      );
+
+    fetch(
+      `/server/AddToCart?event_id=${event_id}&content_ids=${fromGID(
+        product.id,
+      )}&content_name=${product.title}&content_type=product&value=${
+        selectedVariant?.price!.amount
+      }&currency=USD&event_source_url=${window.location}`,
+    );
+  }
+
   // klaviyo 'viewed product' snippet
   useEffect(() => {
     const _learnq = window._learnq || [];
+
+    console.log(_learnq);
 
     const item = {
       ProductName: product.title,
@@ -508,102 +616,53 @@ export function ProductForm() {
   }, []);
 
   useEffect(() => {
-    // facebook pixel
-    if (window.fbq) {
-      window.fbq('track', 'ViewContent', {
-        content_ids: [fromGID(product.id)],
-        content_name: product.title,
-        content_type: 'product',
-        value: firstVariant.price.amount,
-        currency: 'USD',
-      });
-    }
-  }, []);
+    const ff_id = sessionStorage.getItem('ff_id');
 
-  /**
-   * We're making an explicit choice here to display the product options
-   * UI with a default variant, rather than wait for the user to select
-   * options first. Developers are welcome to opt-out of this behavior.
-   * By default, the first variant's options are used.
-   */
-  const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
-    const clonedParams = new URLSearchParams(searchParams);
-  // 👇 remove if statement to enable first variant
-    if (onlyHasDefault) {
-      for (const {name, value} of firstVariant.selectedOptions) {
-        if (!searchParams.has(name)) {
-          clonedParams.set(name, value);
-        }
+    const content_ids = [fromGID(product.id)];
+    const event_id = `vc__${ff_id}__${crypto.randomUUID()}`;
+    const value = Number(firstVariant.price.amount);
+
+    const data = {
+      content_ids,
+      content_name: product.title,
+      content_type: 'product',
+      value,
+      currency: 'USD',
+    };
+
+    fetch(
+      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${product.title}&content_type=product&value=${value}&currency=USD&event_source_url=${window.location}`,
+    ).then((res) => {
+      console.log(res);
+    });
+
+    const trackViewContent = () => {
+      // facebook pixel
+      if (typeof window !== 'undefined' && window.fbq) {
+        console.log("firing 'ViewContent' event");
+        window.fbq('track', 'ViewContent', data, {
+          eventID: event_id,
+          test_event_code:
+            process.env.NODE_ENV == 'development' ? 'TEST65251' : null,
+        });
       }
+    };
+
+    if (typeof window !== 'undefined' && window.fbq) {
+      trackViewContent();
+    } else {
+      const interval = setInterval(() => {
+        if (typeof window !== 'undefined' && window.fbq) {
+          clearInterval(interval);
+          trackViewContent();
+        }
+      }, 100);
     }
 
-    return clonedParams;
-  }, [searchParams, firstVariant.selectedOptions]);
+    console.log(data, window.fbq, ff_id);
+  }, [product.id, firstVariant.price.amount, selectedVariant]);
 
-  // 👇 swap this line with the one below to enable first variant
-  // const selectedVariant = product.selectedVariant ?? firstVariant;
-  const selectedVariant = onlyHasDefault
-    ? firstVariant
-    : product.selectedVariant;
-
-  const isOutOfStock = !selectedVariant?.availableForSale;
-  const availableForSale = selectedVariant?.availableForSale;
-
-  const isOnSale =
-    selectedVariant?.price?.amount &&
-    selectedVariant?.compareAtPrice?.amount &&
-    selectedVariant?.price?.amount < selectedVariant?.compareAtPrice?.amount;
-
-  const productAnalytics: ShopifyAnalyticsProduct = {
-    ...analytics.products[0],
-    quantity: 1,
-  };
-
-  const quantityAvailable = selectedVariant?.quantityAvailable;
-
-  function fireAnalytics() {
-    if (window.plausible) {
-      window.plausible('AddToCart', {
-        props: {
-          product: product.title,
-          value: selectedVariant?.price!.amount,
-        },
-      });
-    }
-    if (window.dataLayer) {
-      //@ts-ignore
-      window.dataLayer.push({ecommerce: null});
-      // @ts-ignore
-      window.dataLayer.push({
-        event: 'add_to_cart',
-        ecommerce: {
-          currency: 'USD',
-          value: selectedVariant?.price!.amount,
-          items: [
-            {
-              item_id: fromGID(product.id),
-              item_name: product.title,
-              affiliation: 'Hydrogen',
-              item_brand: 'Freedom Fatigues',
-              item_variant: selectedVariant.id,
-              price: selectedVariant?.price!.amount,
-              quantity: 1,
-            },
-          ],
-        },
-      });
-    }
-    if (window.TriplePixel)
-      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
-    if (window.fbq)
-      window.fbq('track', 'AddToCart', {
-        content_ids: [fromGID(product.id)],
-        content_type: 'product',
-        value: selectedVariant?.price!.amount,
-        currency: 'USD',
-      });
-  }
-
+  // klaviyo ATC code
   useEffect(() => {
     const _learnq = window._learnq || [];
 
@@ -656,8 +715,8 @@ export function ProductForm() {
                 />
                 <div className="flex flex-wrap items-center gap-1">
                   <span className="text-[11px]">
-                    Get free returns for store credit, or exchange, for $1.98 via
-                    re:do
+                    Get free returns for store credit, or exchange, for $1.98
+                    via re:do
                   </span>
                 </div>
               </div>

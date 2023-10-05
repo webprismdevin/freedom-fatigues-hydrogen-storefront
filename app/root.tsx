@@ -33,10 +33,9 @@ import invariant from 'tiny-invariant';
 import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
-import {useEffect} from 'react';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import {OverlayScrollbarsComponent} from 'overlayscrollbars-react';
+import {useEffect} from 'react';
 
 declare global {
   interface Window {
@@ -130,6 +129,35 @@ export default function App() {
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
+
+  useEffect(() => {
+    const fbpCookie = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('_fbp='));
+    if (fbpCookie) {
+      const fbpValue = fbpCookie.split('=')[1];
+      console.log(fbpValue);
+    }
+
+    const fbcCookie = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('_fbc='));
+    if (fbcCookie) {
+      const fbcValue = fbcCookie.split('=')[1];
+      console.log(fbcValue);
+    }
+
+    // Generate a unique identifier
+    const sessionId = crypto.randomUUID();
+    // Store the unique identifier in sessionStorage
+    sessionStorage.setItem('ff_id', sessionId);
+
+    const event_id = `pv__${sessionId}__${crypto.randomUUID()}`;
+
+    window.fbq('track', 'PageView', {}, {eventID: event_id});
+
+    fetch(`/server/PageView?fbp=${fbpCookie}&event_id=${event_id}`)
+  }, []);
 
   useAnalytics(hasUserConsent, locale);
 
