@@ -539,8 +539,8 @@ export function ProductForm() {
         },
       });
     }
-    if (window.TriplePixel)
-      window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+    // if (window.TriplePixel)
+    //   window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
 
     const ff_id = window.sessionStorage.getItem('ff_id');
     const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
