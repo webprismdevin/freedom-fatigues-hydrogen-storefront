@@ -153,9 +153,6 @@ export default function App() {
         eventID: event_id,
         // test_event_code: 'TEST26570',
       };
-
-      console.log(customData);
-
       window.fbq('track', 'PageView', {}, customData);
 
       fetch(
@@ -165,7 +162,6 @@ export default function App() {
       );
     }
 
-    console.log(location.href);
   }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);
