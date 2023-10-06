@@ -151,7 +151,7 @@ export default function App() {
 
       const customData = {
         eventID: event_id,
-        test_event_code: 'TEST26570',
+        // test_event_code: 'TEST26570',
       };
 
       console.log(customData);

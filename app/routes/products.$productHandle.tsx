@@ -560,7 +560,7 @@ export function ProductForm() {
         },
         {
           eventID: event_id,
-          test_event_code: 'TEST26570',
+          // test_event_code: 'TEST26570',
         },
       );
 
@@ -647,7 +647,7 @@ export function ProductForm() {
       if (typeof window !== 'undefined' && window.fbq) {
         window.fbq('track', 'ViewContent', data, {
           eventID: event_id,
-          test_event_code: 'TEST26570',
+          // test_event_code: 'TEST26570',
         });
       }
     };
