@@ -3,8 +3,6 @@ import {getClientIPAddress} from 'remix-utils';
 
 const PIXEL_ID = '280447639311369';
 const API_VER = 'v18.0';
-// const FB_CAPI_TOKEN = process.env.FB_CAPI_TOKEN;
-//api endpoint
 
 export const loader: LoaderFunction = async ({params, request, context}) => {
   const endpoint = `https://graph.facebook.com/${API_VER}/${PIXEL_ID}/events?access_token=${context.env.FB_CAPI_TOKEN}`;
@@ -34,7 +32,6 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
         },
       },
     ],
-    // test_event_code: 'TEST26570',
   });
 
   const response = await fetch(endpoint, {
