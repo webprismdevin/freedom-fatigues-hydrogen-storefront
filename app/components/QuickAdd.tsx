@@ -9,6 +9,7 @@ import {IconClose, IconSelect} from './Icon';
 import {Link} from './Link';
 import {RebuyPriceRange} from './ProductCard';
 import {fromGID} from '~/lib/gidUtils';
+import useFbCookies from '~/hooks/useFbCookies';
 
 export default function QuickAdd({
   children,
@@ -30,6 +31,7 @@ export default function QuickAdd({
     id: string;
     price: string;
   }>(null);
+  const [fbp, fbc] = useFbCookies();
 
   const [isRedoInCart] = useRedo();
 
@@ -56,7 +58,7 @@ export default function QuickAdd({
 
     const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
     const event_source_url = window.location.href;
-    const content_ids = [fromGID(selectedVariant?.id)];
+    const content_ids = [fromGID(selectedVariant?.id!)];
     const content_name = product.title;
     const content_type = 'product';
     const value = selectedVariant?.price;
@@ -75,12 +77,16 @@ export default function QuickAdd({
         },
         {
           eventID: event_id,
-          test_event_code: "TEST26570"
+          test_event_code: 'TEST26570',
         },
       );
 
     fetch(
-      `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${selectedVariant?.price}&currency=${currency}`,
+      `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${
+        selectedVariant?.price
+      }&currency=${currency}${fbp ? `&fbp=${fbp}` : ''}${
+        fbc !== null ? `&fbc=${fbc}` : ''
+      }`,
     );
   }
 

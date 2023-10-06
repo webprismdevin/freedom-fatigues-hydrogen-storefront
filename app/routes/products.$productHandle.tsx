@@ -71,6 +71,7 @@ import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
+import useFbCookies from '~/hooks/useFbCookies';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -449,6 +450,8 @@ export function ProductForm() {
 
   const [isRedoInCart] = useRedo();
 
+  const [fbp, fbc] = useFbCookies();
+
   /**
    * We update `searchParams` with in-flight request data from `transition` (if available)
    * to create an optimistic UI, e.g. check the product option before the
@@ -557,7 +560,7 @@ export function ProductForm() {
         },
         {
           eventID: event_id,
-          test_event_code: "TEST26570"
+          test_event_code: 'TEST26570',
         },
       );
 
@@ -566,6 +569,8 @@ export function ProductForm() {
         product.id,
       )}&content_name=${product.title}&content_type=product&value=${
         selectedVariant?.price!.amount
+      }${fbp ? `&fbp=${fbp}` : ''}${
+        fbc !== null ? `&fbc=${fbc}` : ''
       }&currency=USD&event_source_url=${window.location.href}`,
     );
   }
@@ -628,15 +633,21 @@ export function ProductForm() {
     };
 
     fetch(
-      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${product.title}&content_type=product&value=${value}&currency=USD&event_source_url=${window.location.href}`,
-    )
+      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${
+        product.title
+      }${fbp ? `&fbp=${fbp}` : ''}${
+        fbc !== null ? `&fbc=${fbc}` : ''
+      }&content_type=product&value=${value}&currency=USD&event_source_url=${
+        window.location.href
+      }`,
+    );
 
     const trackViewContent = () => {
       // facebook pixel
       if (typeof window !== 'undefined' && window.fbq) {
         window.fbq('track', 'ViewContent', data, {
           eventID: event_id,
-          test_event_code: "TEST26570"
+          test_event_code: 'TEST26570',
         });
       }
     };
@@ -651,8 +662,6 @@ export function ProductForm() {
         }
       }, 100);
     }
-
-    console.log(data, window.fbq, ff_id);
   }, [product.id, firstVariant.price.amount, selectedVariant]);
 
   // klaviyo ATC code

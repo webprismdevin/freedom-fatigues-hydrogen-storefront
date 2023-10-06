@@ -22,6 +22,8 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
         user_data: {
           client_ip_address: getClientIPAddress(request),
           client_user_agent: request.headers.get('user-agent'),
+          fbp: searchParams.get('fbp') ?? undefined,
+          fbc: searchParams.get('fbc') ?? undefined,
         },
         custom_data: {
           content_ids: [searchParams.get('content_ids')],
@@ -32,7 +34,7 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
         },
       },
     ],
-    test_event_code: "TEST26570"
+    test_event_code: 'TEST26570',
   });
 
   const response = await fetch(endpoint, {

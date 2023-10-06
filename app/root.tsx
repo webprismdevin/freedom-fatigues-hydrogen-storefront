@@ -35,7 +35,10 @@ import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
+import {useLocation} from 'react-use';
+import {custom} from 'zod';
+import useFbCookies from './hooks/useFbCookies';
 
 declare global {
   interface Window {
@@ -129,50 +132,41 @@ export default function App() {
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
+  const location = useLocation();
+  const [fbp, fbc] = useFbCookies();
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fbpCookie = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('_fbp='));
-    if (fbpCookie) {
-      const fbpValue = fbpCookie.split('=')[1];
-      console.log(fbpValue);
-    }
-
-    const fbcCookie = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('_fbc='));
-    if (fbcCookie) {
-      const fbcValue = fbcCookie.split('=')[1];
-      console.log(fbcValue);
-    }
-
     // Generate a unique identifier
     const sessionId = crypto.randomUUID();
     // Store the unique identifier in sessionStorage
     sessionStorage.setItem('ff_id', sessionId);
+    // Set the state variable
+    setSessionId(sessionId);
+  }, []);
 
-    const event_id = `pv__${sessionId}__${crypto.randomUUID()}`;
+  useEffect(() => {
+    if (sessionId) {
+      const event_id = `pv__${sessionId}__${crypto.randomUUID()}`;
 
-    window.fbq(
-      'track',
-      'PageView',
-      {
-        eventID: event_id,
-        event_source_url: window.location.href,
-      },
-      {
+      const customData = {
         eventID: event_id,
         test_event_code: 'TEST26570',
-      },
-    );
+      };
 
-    fetch(
-      `/server/PageView?fbp=${
-        fbcCookie?.split('=')[1]
-      }&event_id=${event_id}&event_source_url=${window.location.href}`,
-    );
-  }, []);
+      console.log(customData);
+
+      window.fbq('track', 'PageView', {}, customData);
+
+      fetch(
+        `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
+          fbc !== null ? `&fbc=${fbc}` : ''
+        }&event_source_url=${location.href}`,
+      );
+    }
+
+    console.log(location.href);
+  }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);
 
