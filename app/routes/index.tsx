@@ -218,7 +218,7 @@ export const HOMEPAGE_SALE_PRODUCTS_QUERY = `#graphql
   query homepageSaleProducts($handle: String, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
-      products(first: 8, sortKey: BEST_SELLING) {
+      products(first: 8) {
         nodes {
           ...ProductCard
         }
