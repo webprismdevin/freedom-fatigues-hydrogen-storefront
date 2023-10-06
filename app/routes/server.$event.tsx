@@ -32,8 +32,7 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
         },
       },
     ],
-    test_event_code:
-      process.env.NODE_ENV === 'development' ? 'TEST65251' : null,
+    test_event_code: "TEST26570"
   });
 
   const response = await fetch(endpoint, {

@@ -154,10 +154,23 @@ export default function App() {
 
     const event_id = `pv__${sessionId}__${crypto.randomUUID()}`;
 
-    window.fbq('track', 'PageView', {}, {eventID: event_id});
+    window.fbq(
+      'track',
+      'PageView',
+      {
+        eventID: event_id,
+        event_source_url: window.location,
+      },
+      {
+        eventID: event_id,
+        test_event_code: 'TEST26570',
+      },
+    );
 
     fetch(
-      `/server/PageView?fbp=${fbcCookie?.split('=')[1]}&event_id=${event_id}`,
+      `/server/PageView?fbp=${
+        fbcCookie?.split('=')[1]
+      }&event_id=${event_id}&event_source_url=${window.location}`,
     );
   }, []);
 

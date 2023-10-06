@@ -75,8 +75,7 @@ export default function QuickAdd({
         },
         {
           eventID: event_id,
-          test_event_code:
-            process.env.NODE_ENV === 'development' ? 'TEST65251' : null,
+          test_event_code: "TEST26570"
         },
       );
 
