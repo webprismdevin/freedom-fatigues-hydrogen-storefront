@@ -566,7 +566,7 @@ export function ProductForm() {
         product.id,
       )}&content_name=${product.title}&content_type=product&value=${
         selectedVariant?.price!.amount
-      }&currency=USD&event_source_url=${window.location}`,
+      }&currency=USD&event_source_url=${window.location.href}`,
     );
   }
 
@@ -628,7 +628,7 @@ export function ProductForm() {
     };
 
     fetch(
-      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${product.title}&content_type=product&value=${value}&currency=USD&event_source_url=${window.location}`,
+      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${product.title}&content_type=product&value=${value}&currency=USD&event_source_url=${window.location.href}`,
     )
 
     const trackViewContent = () => {

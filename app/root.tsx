@@ -159,7 +159,7 @@ export default function App() {
       'PageView',
       {
         eventID: event_id,
-        event_source_url: window.location,
+        event_source_url: window.location.href,
       },
       {
         eventID: event_id,
@@ -170,7 +170,7 @@ export default function App() {
     fetch(
       `/server/PageView?fbp=${
         fbcCookie?.split('=')[1]
-      }&event_id=${event_id}&event_source_url=${window.location}`,
+      }&event_id=${event_id}&event_source_url=${window.location.href}`,
     );
   }, []);
 
