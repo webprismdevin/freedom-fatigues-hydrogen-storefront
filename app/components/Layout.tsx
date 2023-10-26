@@ -26,7 +26,6 @@ import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
-import type {LayoutData} from '../root';
 import {AnimatePresence, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
@@ -42,7 +41,7 @@ export function Layout({
   settings,
 }: {
   children: React.ReactNode;
-  layout: LayoutData;
+  layout: any;
   settings: any;
 }) {
   const {announcements} = settings;
