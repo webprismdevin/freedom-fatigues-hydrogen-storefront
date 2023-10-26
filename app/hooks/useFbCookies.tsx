@@ -1,4 +1,3 @@
-import {set} from 'cypress/types/lodash';
 import {useEffect, useState} from 'react';
 
 export default function useFbCookies() {

@@ -24,14 +24,15 @@ export const loader: LoaderFunction = async ({params, request, context}) => {
           fbc: searchParams.get('fbc') ?? undefined,
         },
         custom_data: {
-          content_ids: [searchParams.get('content_ids')],
-          content_name: searchParams.get('content_name'),
-          content_type: searchParams.get('content_type'),
-          value: Number(searchParams.get('value')),
-          currency: searchParams.get('currency'),
+          content_ids: [searchParams.get('content_ids') ?? ''],
+          content_name: searchParams.get('content_name') ?? '',
+          content_type: searchParams.get('content_type') ?? '',
+          value: Number(searchParams.get('value')) ?? '',
+          currency: searchParams.get('currency') ?? '',
         },
       },
     ],
+    // test_event_code: "TEST88960"
   });
 
   const response = await fetch(endpoint, {

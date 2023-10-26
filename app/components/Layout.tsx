@@ -33,6 +33,9 @@ import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
 
+import whiteLogo from '../../public/branding/logo_white.png';
+import blackLogo from '../../public/branding/logo_black.png';
+
 export function Layout({
   children,
   layout,
@@ -132,13 +135,18 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
   const [root] = useMatches();
 
   return (
-    <Drawer open={isOpen} onClose={onClose} heading="Your Cart" openFrom="right">
+    <Drawer
+      open={isOpen}
+      onClose={onClose}
+      heading="Your Cart"
+      openFrom="right"
+    >
       {/* <div className="grid"> */}
-        <Suspense fallback={<CartLoading />}>
-          <Await resolve={root.data?.cart}>
-            {(cart) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
-          </Await>
-        </Suspense>
+      <Suspense fallback={<CartLoading />}>
+        <Await resolve={root.data?.cart}>
+          {(cart) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
+        </Await>
+      </Suspense>
       {/* </div> */}
     </Drawer>
   );
@@ -291,7 +299,7 @@ function MobileHeader({
         <div>
           <img
             src={
-              isHome ? '/branding/logo_white.png' : '/branding/logo_black.png'
+              isHome ? whiteLogo : blackLogo
             }
             alt="logo"
             height={84}
@@ -402,7 +410,9 @@ function DesktopHeader({
                   target="_parent"
                   prefetch="intent"
                   className={({isActive}) =>
-                    isActive ? '-mb-px border-b-2 border-red-500 pb-1' : 'pb-1 hover:border-b-2 hover:border-b-red-500'
+                    isActive
+                      ? '-mb-px border-b-2 border-red-500 pb-1'
+                      : 'pb-1 hover:border-b-2 hover:border-b-red-500'
                   }
                 >
                   <LinkTitle text={item.title} />
@@ -463,7 +473,10 @@ function MegaMenuLink({
   props?: any;
 }) {
   return (
-    <div {...props} className="flex cursor-pointer items-center tracking-wider ">
+    <div
+      {...props}
+      className="flex cursor-pointer items-center tracking-wider "
+    >
       <div className="hover:border-b-2 hover:border-b-red-500">
         <LinkTitle text={menu.title} />
       </div>
@@ -502,7 +515,10 @@ function MegaMenu({
         >
           <div className="text-lg">
             {menu.megaMenuTitle?.to ? (
-              <Link to={menu.megaMenuTitle.to} className="font-bold hover:border-b-2 hover:border-b-red-500">
+              <Link
+                to={menu.megaMenuTitle.to}
+                className="font-bold hover:border-b-2 hover:border-b-red-500"
+              >
                 {menu.megaMenuTitle.title}
               </Link>
             ) : (
@@ -516,7 +532,9 @@ function MegaMenu({
                     target="_parent"
                     prefetch="intent"
                     className={({isActive}) =>
-                      isActive ? '-mb-px border-b-2 border-FF-red pb-1' : 'pb-1 hover:border-b-2 hover:border-b-red-500'
+                      isActive
+                        ? '-mb-px border-b-2 border-FF-red pb-1'
+                        : 'pb-1 hover:border-b-2 hover:border-b-red-500'
                     }
                   >
                     {link.title}
