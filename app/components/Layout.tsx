@@ -32,9 +32,6 @@ import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
 
-import whiteLogo from '../../public/branding/logo_white.png';
-import blackLogo from '../../public/branding/logo_black.png';
-
 export function Layout({
   children,
   layout,
@@ -298,7 +295,9 @@ function MobileHeader({
         <div>
           <img
             src={
-              isHome ? whiteLogo : blackLogo
+              isHome
+                ? 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/logo_white.png?v=1698351208'
+                : 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/logo_black_9e33daf2-1fce-4685-b677-5e86902fdf2d.png?v=1698351208'
             }
             alt="logo"
             height={84}
@@ -705,8 +704,10 @@ const Footer = ({text, footer}: any) => {
             </a>
           </div>
           <img
-            src={'/branding/veteran_owned-footer_badge.png'}
-            alt="Veteran Owned"
+            src={
+              'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/veteran_owned-footer_badge.png?v=1698351211'
+            }
+            alt="Service-disabled Veteran Owned Small Business"
           />
         </div>
         {links.map((submenu: any) => (
