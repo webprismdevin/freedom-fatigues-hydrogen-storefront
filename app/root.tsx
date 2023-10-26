@@ -37,7 +37,6 @@ import {getSiteSettings} from './lib/sanity';
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import {useEffect, useState} from 'react';
 import {useLocation} from 'react-use';
-import {custom} from 'zod';
 import useFbCookies from './hooks/useFbCookies';
 
 declare global {
@@ -151,7 +150,6 @@ export default function App() {
 
       const customData = {
         eventID: event_id,
-        // test_event_code: 'TEST26570',
       };
       window.fbq('track', 'PageView', {}, customData);
 
@@ -159,9 +157,8 @@ export default function App() {
         `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
           fbc !== null ? `&fbc=${fbc}` : ''
         }&event_source_url=${location.href}`,
-      );
+      ).then((res) => res.json());
     }
-
   }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);

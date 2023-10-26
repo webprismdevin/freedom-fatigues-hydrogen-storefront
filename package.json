@@ -11,8 +11,7 @@
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
     "format": "prettier --write --ignore-unknown .",
     "format:check": "prettier --check --ignore-unknown .",
-    "typecheck": "tsc --noEmit",
-    "cypress:open": "cypress open"
+    "typecheck": "tsc --noEmit"
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
@@ -30,8 +29,6 @@
     "clsx": "^1.2.1",
     "concurrently": "^7.5.0",
     "cross-env": "^7.0.3",
-    "cy-spok": "^1.6.1",
-    "cypress-map": "^1.19.1",
     "framer-motion": "^10.3.1",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
@@ -67,7 +64,7 @@
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
     "@types/uuid": "^9.0.2",
-    "concurrently": "^7.4.0",
+    "concurrently": "^7.5.0",
     "cross-env": "^7.0.3",
     "cypress": "^12.11.0",
     "eslint": "^8.20.0",
@@ -83,6 +80,6 @@
     "typescript": "^4.9.5"
   },
   "engines": {
-    "node": ">=16.13"
+    "node": ">=18"
   }
 }

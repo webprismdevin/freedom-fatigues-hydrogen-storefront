@@ -77,7 +77,6 @@ export default function QuickAdd({
         },
         {
           eventID: event_id,
-          // test_event_code: 'TEST26570',
         },
       );
 
