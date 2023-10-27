@@ -37,10 +37,10 @@ export function TextWithImage({data}: {data: any}) {
               <RichContent content={data.richContent} />
             </div>
           )}
-          {data.cta && (
+          {data.cta?.text && (
             <div className="mt-4">
               <Link to={data.cta.to} className="border-b-2 border-white">
-                Learn more
+                {data.cta.title ?? "Learn more"}
               </Link>
             </div>
           )}
