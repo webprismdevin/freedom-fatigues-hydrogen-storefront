@@ -136,8 +136,10 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const selectedOptions: SelectedOptionInput[] = [];
   searchParams.forEach((value, name) => {
-    selectedOptions.push({name, value});
+    if(!name.includes("lid") && !name.includes("utm")) selectedOptions.push({name, value});
   });
+
+  console.log(selectedOptions)
 
   const {shop, product} = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
@@ -479,27 +481,26 @@ export function ProductForm() {
     // 👇 remove if statement to enable first variant
     if (onlyHasDefault) {
       for (const {name, value} of firstVariant.selectedOptions) {
-
         if (!searchParams.has(name)) {
           clonedParams.set(name, value);
         }
       }
     }
 
-    if(clonedParams.has('lid')){
+    if (clonedParams.has('lid')) {
       clonedParams.delete('lid');
 
-      console.log(clonedParams)
+      console.log(clonedParams);
     }
 
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
 
   // 👇 swap this line with the one below to enable first variant
-  const selectedVariant = product.selectedVariant ?? firstVariant;
-  // const selectedVariant = onlyHasDefault
-  //   ? firstVariant
-  //   : product.selectedVariant;
+  // const selectedVariant = product.selectedVariant ?? firstVariant;
+  const selectedVariant = onlyHasDefault
+    ? firstVariant
+    : product.selectedVariant;
 
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
