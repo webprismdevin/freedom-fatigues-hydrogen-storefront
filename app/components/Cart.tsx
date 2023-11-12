@@ -115,6 +115,7 @@ export function CartDetails({
 }) {
   const {settings} = useLoaderData();
   const [offerUnlocked, setOfferUnlocked] = useState(false);
+  const [offerValid, setOfferValid] = useState(false);
 
   useEffect(() => {
     console.log(settings.cart_offer);
@@ -124,6 +125,10 @@ export function CartDetails({
         settings.cart_offer,
         cart?.cost?.subtotalAmount?.amount,
       );
+
+      if (isValid) {
+        setOfferValid(true);
+      }
 
       const isItemInCart = cart?.lines?.edges?.some((line) => {
         return (
@@ -159,12 +164,20 @@ export function CartDetails({
         <>
           {cart && layout == 'drawer' && <FreeShippingProgress cart={cart} />}
           {/* flex container for all content between header & cart summary */}
+          {offerValid && !offerUnlocked && (
+            <div className="bg-primary px-6 py-3 text-contrast md:px-12">
+              <p className="text-center font-heading">
+                {settings.cart_offer.copy}
+              </p>
+            </div>
+          )}
           <div className="flex-1 overflow-auto">
             {offerUnlocked ? (
               <div className="px-6 pb-6 md:px-12">
                 <div className="flex gap-3">
-                  <div className="aspect-square overflow-hidden rounded border">
+                  <div>
                     <img
+                      className="aspect-square overflow-hidden rounded border"
                       src={settings.cart_offer.product.store.previewImageUrl}
                       alt={settings.cart_offer.product.store.title}
                       height={96}
@@ -172,8 +185,10 @@ export function CartDetails({
                     />
                   </div>
                   <div className="flex min-h-full flex-1 flex-col justify-between">
-                    <p className="font-bold">
-                      You unlocked a free {product_name}
+                    <p className="line-clamp-2 font-bold">
+                      {/* prettier-ignore */}
+                      You unlocked a free{' '}
+                      {settings.cart_offer.product.store.title}
                     </p>
                     <p>
                       <span className="line-through">$39.95</span>&nbsp;
