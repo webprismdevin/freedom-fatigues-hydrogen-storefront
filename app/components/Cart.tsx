@@ -98,6 +98,7 @@ function checkCartOffer(offerSettings: any, cart_total: any) {
   const offerStartDate = new Date(offer_period.start);
   const offerEndDate = new Date(offer_period.end);
   const cart_value = Number(cart_total);
+  console.log(currentDate);
   const isOfferValid =
     currentDate.getTime() >= offerStartDate.getTime() &&
     currentDate.getTime() <= offerEndDate.getTime() &&
