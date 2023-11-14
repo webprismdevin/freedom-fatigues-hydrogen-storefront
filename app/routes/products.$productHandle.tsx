@@ -13,7 +13,6 @@ import {
   Await,
   useSearchParams,
   useLocation,
-  useTransition,
   useFetcher,
   useMatches,
   useNavigation,
@@ -22,7 +21,6 @@ import {
   AnalyticsPageType,
   Money,
   ShopifyAnalyticsProduct,
-  ShopPayButton,
   flattenConnection,
   type SeoHandleFunction,
   type SeoConfig,
@@ -40,9 +38,7 @@ import {
   Text,
   Link,
   AddToCartButton,
-  ProductCard,
   Button,
-  IconRedo,
 } from '~/components';
 import {getExcerpt} from '~/lib/utils';
 import invariant from 'tiny-invariant';
@@ -72,6 +68,7 @@ import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
+import { v4 as uuidv4 } from 'uuid';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -546,7 +543,7 @@ export function ProductForm() {
     //   window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
 
     const ff_id = window.sessionStorage.getItem('ff_id');
-    const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
+    const event_id = `atc__${ff_id}__${uuidv4()}`;
 
     if (window.fbq)
       window.fbq(
@@ -620,7 +617,7 @@ export function ProductForm() {
     const ff_id = sessionStorage.getItem('ff_id');
 
     const content_ids = [fromGID(product.id)];
-    const event_id = `vc__${ff_id}__${crypto.randomUUID()}`;
+    const event_id = `vc__${ff_id}__${uuidv4()}`;
     const value = Number(firstVariant.price.amount);
 
     const data = {

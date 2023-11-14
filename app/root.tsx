@@ -38,6 +38,7 @@ import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics'
 import {useEffect, useState} from 'react';
 import {useLocation} from 'react-use';
 import useFbCookies from './hooks/useFbCookies';
+import { v4 as uuidv4 } from 'uuid';
 
 declare global {
   interface Window {
@@ -137,7 +138,7 @@ export default function App() {
 
   useEffect(() => {
     // Generate a unique identifier
-    const sessionId = crypto.randomUUID();
+    const sessionId = uuidv4();
     // Store the unique identifier in sessionStorage
     sessionStorage.setItem('ff_id', sessionId);
     // Set the state variable
@@ -146,7 +147,7 @@ export default function App() {
 
   useEffect(() => {
     if (sessionId) {
-      const event_id = `pv__${sessionId}__${crypto.randomUUID()}`;
+      const event_id = `pv__${sessionId}__${uuidv4()}`;
 
       const customData = {
         eventID: event_id,

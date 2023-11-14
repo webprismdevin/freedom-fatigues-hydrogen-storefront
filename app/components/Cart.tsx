@@ -90,20 +90,14 @@ function ProgressBar({value}: {value: number}) {
   );
 }
 
-const product_name = 'Multi-cam hat';
-
-function checkCartOffer(offerSettings: any, cart_total: any) {
+function checkCartOffer(offerSettings: any) {
   const {offer_period} = offerSettings;
   const currentDate = new Date();
   const offerStartDate = new Date(offer_period.start);
   const offerEndDate = new Date(offer_period.end);
-  const cart_value = Number(cart_total);
-  console.log(currentDate);
   const isOfferValid =
     currentDate.getTime() >= offerStartDate.getTime() &&
-    currentDate.getTime() <= offerEndDate.getTime() &&
-    cart_value >= offerSettings.threshold;
-
+    currentDate.getTime() <= offerEndDate.getTime();
   return isOfferValid;
 }
 
@@ -119,13 +113,12 @@ export function CartDetails({
   const [offerValid, setOfferValid] = useState(false);
 
   useEffect(() => {
-    console.log(settings.cart_offer);
+    console.log(checkCartOffer(settings.cart_offer));
+
+    console.log('fired!');
 
     if (cart) {
-      const isValid = checkCartOffer(
-        settings.cart_offer,
-        cart?.cost?.subtotalAmount?.amount,
-      );
+      const isValid = checkCartOffer(settings.cart_offer);
 
       if (isValid) {
         setOfferValid(true);
@@ -138,15 +131,17 @@ export function CartDetails({
         );
       });
 
-      console.log(isValid, isItemInCart);
-
-      if (isValid && !isItemInCart) {
+      if (
+        isValid &&
+        !isItemInCart &&
+        cart.cost.totalAmount.amount >= settings.cart_offer.threshold
+      ) {
         setOfferUnlocked(true);
-      } else if (isItemInCart) {
+      } else {
         setOfferUnlocked(false);
       }
     }
-  }, [cart]);
+  }, [cart, cart?.cost.totalAmount.amount, cart?.lines?.edges?.length]);
 
   // @todo: get optimistic cart cost
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
@@ -165,15 +160,17 @@ export function CartDetails({
         <>
           {cart && layout == 'drawer' && <FreeShippingProgress cart={cart} />}
           {/* flex container for all content between header & cart summary */}
-          {offerValid && !offerUnlocked && (
-            <div className="bg-primary px-6 py-3 text-contrast md:px-12">
-              <p className="text-center font-heading">
-                {settings.cart_offer.copy}
-              </p>
-            </div>
-          )}
+          {offerValid &&
+            cart.cost.totalAmount.amount <=
+              settings?.cart_offer.threshold && (
+                <div className="bg-primary px-6 py-3 text-contrast md:px-12">
+                  <p className="text-center font-heading">
+                    {settings.cart_offer.copy}
+                  </p>
+                </div>
+              )}
           <div className="flex-1 overflow-auto">
-            {offerUnlocked ? (
+            {offerUnlocked ?  (
               <div className="px-6 pb-6 md:px-12">
                 <div className="flex gap-3">
                   <div>

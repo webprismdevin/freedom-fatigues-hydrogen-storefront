@@ -7,9 +7,10 @@ import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
 import {Link} from './Link';
-import {RebuyPriceRange} from './ProductCard';
+// import {RebuyPriceRange} from './ProductCard';
 import {fromGID} from '~/lib/gidUtils';
 import useFbCookies from '~/hooks/useFbCookies';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function QuickAdd({
   children,
@@ -56,7 +57,7 @@ export default function QuickAdd({
   function fireAnalytics() {
     const ff_id = window.sessionStorage.getItem('ff_id');
 
-    const event_id = `atc__${ff_id}__${crypto.randomUUID()}`;
+    const event_id = `atc__${ff_id}__${uuidv4()}`;
     const event_source_url = window.location.href;
     const content_ids = [fromGID(selectedVariant?.id!)];
     const content_name = product.title;
