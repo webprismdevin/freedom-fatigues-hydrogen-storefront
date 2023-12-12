@@ -18,7 +18,7 @@ import type {
   CartLine,
   CartLineUpdateInput,
 } from '@shopify/hydrogen/storefront-api-types';
-import {useFetcher, useLoaderData} from '@remix-run/react';
+import {useFetcher, useLoaderData, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import {cartRemove} from '~/routes/cart';
@@ -108,12 +108,14 @@ export function CartDetails({
   layout: Layouts;
   cart: CartType | null;
 }) {
-  const {settings} = useLoaderData();
+  const [ root ] = useMatches();
   const [offerUnlocked, setOfferUnlocked] = useState(false);
   const [offerValid, setOfferValid] = useState(false);
 
+  const settings = root.data.settings;
+
   useEffect(() => {
-    console.log(checkCartOffer(settings.cart_offer));
+    console.log(checkCartOffer(root.data.settings.cart_offer));
 
     console.log('fired!');
 
