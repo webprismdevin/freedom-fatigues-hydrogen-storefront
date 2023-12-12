@@ -84,7 +84,17 @@ export async function getSiteSettings() {
         }
       },
     },
-    announcements
+    announcements,
+    cart_offer {
+      ...,
+      product-> {
+        ...,
+        store {
+          ...,
+          variants[]->
+        }
+      }
+    }
   }`;
 
   return sanity.fetch(query);

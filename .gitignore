@@ -7,3 +7,6 @@ node_modules
 .env
 /app/styles/app.css
 .vscode
+
+.shopify
+.DS_Store

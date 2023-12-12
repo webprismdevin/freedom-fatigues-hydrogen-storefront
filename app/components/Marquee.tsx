@@ -1,12 +1,13 @@
 import {Fragment} from 'react';
 import {urlFor} from '~/lib/sanity';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function Marquee({data}: {data: any}) {
   return (
     <div className="flex select-none gap-[1rem] overflow-hidden py-4">
       <div className="scroll flex min-w-full flex-shrink-0 items-center justify-around gap-[1rem]">
         {data.items.map((item: any) => (
-          <Fragment key={crypto.randomUUID()}>
+          <Fragment key={uuidv4()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -22,7 +23,7 @@ export default function Marquee({data}: {data: any}) {
           </Fragment>
         ))}
         {data.items.map((item: any) => (
-          <Fragment key={crypto.randomUUID()}>
+          <Fragment key={uuidv4()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -40,7 +41,7 @@ export default function Marquee({data}: {data: any}) {
       </div>
       <div className="scroll flex min-w-full flex-shrink-0 items-center justify-around gap-[1rem]">
         {data.items.map((item: any) => (
-          <Fragment key={crypto.randomUUID()}>
+          <Fragment key={uuidv4()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>
@@ -56,7 +57,7 @@ export default function Marquee({data}: {data: any}) {
           </Fragment>
         ))}
         {data.items.map((item: any) => (
-          <Fragment key={crypto.randomUUID()}>
+          <Fragment key={uuidv4()}>
             <div>
               <span className="font-heading text-4xl uppercase">{item}</span>
             </div>

@@ -9,6 +9,7 @@ import {
   Text,
   Link,
   FeaturedProducts,
+  AddToCartButton,
 } from '~/components';
 import {getInputStyleClasses} from '~/lib/utils';
 import type {
@@ -17,7 +18,7 @@ import type {
   CartLine,
   CartLineUpdateInput,
 } from '@shopify/hydrogen/storefront-api-types';
-import {useFetcher} from '@remix-run/react';
+import {useFetcher, useLoaderData, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import {cartRemove} from '~/routes/cart';
@@ -89,6 +90,17 @@ function ProgressBar({value}: {value: number}) {
   );
 }
 
+function checkCartOffer(offerSettings: any) {
+  const {offer_period} = offerSettings;
+  const currentDate = new Date();
+  const offerStartDate = new Date(offer_period.start);
+  const offerEndDate = new Date(offer_period.end);
+  const isOfferValid =
+    currentDate.getTime() >= offerStartDate.getTime() &&
+    currentDate.getTime() <= offerEndDate.getTime();
+  return isOfferValid;
+}
+
 export function CartDetails({
   layout,
   cart,
@@ -96,6 +108,43 @@ export function CartDetails({
   layout: Layouts;
   cart: CartType | null;
 }) {
+  const [ root ] = useMatches();
+  const [offerUnlocked, setOfferUnlocked] = useState(false);
+  const [offerValid, setOfferValid] = useState(false);
+
+  const settings = root.data.settings;
+
+  useEffect(() => {
+    console.log(checkCartOffer(root.data.settings.cart_offer));
+
+    console.log('fired!');
+
+    if (cart) {
+      const isValid = checkCartOffer(settings.cart_offer);
+
+      if (isValid) {
+        setOfferValid(true);
+      }
+
+      const isItemInCart = cart?.lines?.edges?.some((line) => {
+        return (
+          line?.node?.merchandise?.product?.id ===
+          settings.cart_offer.product.store.gid
+        );
+      });
+
+      if (
+        isValid &&
+        !isItemInCart &&
+        cart.cost.totalAmount.amount >= settings.cart_offer.threshold
+      ) {
+        setOfferUnlocked(true);
+      } else {
+        setOfferUnlocked(false);
+      }
+    }
+  }, [cart, cart?.cost.totalAmount.amount, cart?.lines?.edges?.length]);
+
   // @todo: get optimistic cart cost
   const isZeroCost = !cart || cart?.cost?.subtotalAmount?.amount === '0.0';
 
@@ -104,62 +153,82 @@ export function CartDetails({
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12 h-full',
   };
 
-  const isFreeShipping = Number(cart?.cost.subtotalAmount.amount) < freeShippingThreshold;
+  const isFreeShipping =
+    Number(cart?.cost.subtotalAmount.amount) < freeShippingThreshold;
 
   return (
     <div className={container[layout]}>
       {!isZeroCost && (
         <>
-          {cart && layout == 'drawer' && (
-            <div className="px-6 py-2 md:px-12">
-              <ProgressBar
-                value={Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold}
-              />
-              <div className="mt-2 text-center text-xs font-bold">
-                {isFreeShipping
-                  ? `Add $${Math.floor(
-                      freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
-                    )} for free U.S.
-            shipping`
-                  : "You've unlocked free U.S. shipping!"}
-              </div>
-            </div>
-          )}
+          {cart && layout == 'drawer' && <FreeShippingProgress cart={cart} />}
           {/* flex container for all content between header & cart summary */}
+          {offerValid &&
+            cart.cost.totalAmount.amount <=
+              settings?.cart_offer.threshold && (
+                <div className="bg-primary px-6 py-3 text-contrast md:px-12">
+                  <p className="text-center font-heading">
+                    {settings.cart_offer.copy}
+                  </p>
+                </div>
+              )}
           <div className="flex-1 overflow-auto">
-            {/* rebuy section */}
-            <div className="">
-              <h5 className="px-6 font-heading text-lg md:px-12">
-                You might also like
-              </h5>
-              <div className="min-h-48 flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12 relative hiddenScroll">
-                <RebuyRecommendations
-                  className="w-1/3 md:w-1/4 grow-0 shrink-0"
-                  lines={cart?.lines}
-                />
+            {offerUnlocked ?  (
+              <div className="px-6 pb-6 md:px-12">
+                <div className="flex gap-3">
+                  <div>
+                    <img
+                      className="aspect-square overflow-hidden rounded border"
+                      src={settings.cart_offer.product.store.previewImageUrl}
+                      alt={settings.cart_offer.product.store.title}
+                      height={96}
+                      width={96}
+                    />
+                  </div>
+                  <div className="flex min-h-full flex-1 flex-col justify-between">
+                    <p className="line-clamp-2 font-bold">
+                      {/* prettier-ignore */}
+                      You unlocked a free{' '}
+                      {settings.cart_offer.product.store.title}
+                    </p>
+                    <p>
+                      <span className="line-through">$39.95</span>&nbsp;
+                      <span className="font-bold text-red-500">FREE</span>
+                    </p>
+                    <AddToCartButton
+                      lines={[
+                        {
+                          merchandiseId:
+                            settings.cart_offer.product.store.variants[0].store
+                              .gid,
+                          quantity: 1,
+                        },
+                      ]}
+                      className="w-full"
+                    >
+                      Add to cart
+                    </AddToCartButton>
+                  </div>
+                </div>
               </div>
-            </div>
-            {/* end rebuy section */}
+            ) : (
+              <div>
+                <h5 className="px-6 font-heading text-lg md:px-12">
+                  You might also like
+                </h5>
+                <div className="min-h-48 hiddenScroll relative flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
+                  <RebuyRecommendations
+                    className="w-1/3 shrink-0 grow-0 md:w-1/4"
+                    lines={cart?.lines}
+                  />
+                </div>
+              </div>
+            )}
             <hr />
             <CartLines lines={cart?.lines} layout={layout} />
           </div>
           {/* should stay at the bottom of the cart */}
           <CartSummary cost={cart.cost} layout={layout}>
-            {cart && layout == 'page' && (
-              <div className="pb-4 pt-6">
-                <ProgressBar
-                  value={Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold}
-                />
-                <div className="mt-2 text-center text-xs font-bold">
-                  {Number(cart.cost.subtotalAmount.amount) < freeShippingThreshold
-                    ? `Add $${Math.floor(
-                        freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
-                      )} for free U.S.
-            shipping`
-                    : "You've unlocked free U.S. shipping!"}
-                </div>
-              </div>
-            )}
+            {cart && layout == 'page' && <FreeShippingProgress cart={cart} />}
             <CartDiscounts discountCodes={cart.discountCodes} />
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
@@ -168,6 +237,26 @@ export function CartDetails({
       )}
     </div>
   );
+
+  function FreeShippingProgress({cart}: any) {
+    return (
+      <div className="px-6 py-2 md:px-12">
+        <ProgressBar
+          value={
+            Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold
+          }
+        />
+        <div className="mt-2 text-center text-xs font-bold">
+          {isFreeShipping
+            ? `Add $${Math.floor(
+                freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
+              )} for free U.S.
+            shipping`
+            : "You've unlocked free U.S. shipping!"}
+        </div>
+      </div>
+    );
+  }
 }
 
 /**
@@ -316,14 +405,14 @@ function CartCheckoutActions({
         target="_self"
         className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
       >
-      {/* <Button
+        {/* <Button
         className="cursor-pointer hover:opacity-80"
         onClick={handleCheckout}
         as="span"
         width="full"
       > */}
         Continue to Checkout
-      {/* </Button> */}
+        {/* </Button> */}
       </a>
       {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
@@ -575,7 +664,7 @@ export function CartEmpty({
       <section className="grid gap-8 pt-16">
         <h5 className="font-heading text-lg">You might like</h5>
         <div className="grid grid-cols-3 gap-4">
-          <RebuyRecommendations className="w-full grow-0 shrink-0" />
+          <RebuyRecommendations className="w-full shrink-0 grow-0" />
         </div>
       </section>
     </div>
