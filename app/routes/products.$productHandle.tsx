@@ -133,8 +133,10 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const selectedOptions: SelectedOptionInput[] = [];
   searchParams.forEach((value, name) => {
-    selectedOptions.push({name, value});
+    if(!name.includes("lid") && !name.includes("utm")) selectedOptions.push({name, value});
   });
+
+  console.log(selectedOptions)
 
   const {shop, product} = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
@@ -482,6 +484,12 @@ export function ProductForm() {
       }
     }
 
+    if (clonedParams.has('lid')) {
+      clonedParams.delete('lid');
+
+      console.log(clonedParams);
+    }
+
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
 
@@ -681,6 +689,7 @@ export function ProductForm() {
   const addRedo = redo && !isRedoInCart;
 
   const isClearance = useTags(product.tags, 'Clearance');
+  const isExcludeRebuy = useTags(product.tags, 'exclude_rebuy');
 
   return (
     <div className="grid gap-10">
@@ -702,7 +711,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant && !isRedoInCart && !isClearance && (
+            {selectedVariant && !isRedoInCart && !isClearance && !isExcludeRebuy && (
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
