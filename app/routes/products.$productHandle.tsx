@@ -689,6 +689,7 @@ export function ProductForm() {
   const addRedo = redo && !isRedoInCart;
 
   const isClearance = useTags(product.tags, 'Clearance');
+  const isExcludeRebuy = useTags(product.tags, 'exclude_redo');
 
   return (
     <div className="grid gap-10">
@@ -710,7 +711,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant && !isRedoInCart && !isClearance && (
+            {selectedVariant && !isRedoInCart && !isClearance && !isExcludeRebuy && (
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
