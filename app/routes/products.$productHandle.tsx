@@ -689,7 +689,7 @@ export function ProductForm() {
   const addRedo = redo && !isRedoInCart;
 
   const isClearance = useTags(product.tags, 'Clearance');
-  const isExcludeRebuy = useTags(product.tags, 'exclude_rebuy');
+  const isExcludeRebuy = useTags(product.tags, 'exclude_redo');
 
   return (
     <div className="grid gap-10">
