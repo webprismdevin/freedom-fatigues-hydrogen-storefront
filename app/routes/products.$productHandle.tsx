@@ -68,7 +68,7 @@ import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -133,10 +133,11 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const selectedOptions: SelectedOptionInput[] = [];
   searchParams.forEach((value, name) => {
-    if(!name.includes("lid") && !name.includes("utm")) selectedOptions.push({name, value});
+    if (!name.includes('lid') && !name.includes('utm'))
+      selectedOptions.push({name, value});
   });
 
-  console.log(selectedOptions)
+  console.log(selectedOptions);
 
   const {shop, product} = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
@@ -158,6 +159,7 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const pageContent =
     await sanity.fetch(`*[_type == 'product' && store.slug.current == '${productHandle}'][0]{
+      redoCopy,
       ${MODULE_FRAGMENT},
       "badges": badges[]
     }
@@ -711,22 +713,26 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant && !isRedoInCart && !isClearance && !isExcludeRebuy && (
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  ref={redoBox}
-                  onChange={(e) => setRedo(e.target.checked)}
-                  checked={redo}
-                />
-                <div className="flex flex-wrap items-center gap-1">
-                  <span className="text-[11px]">
-                    Get free returns for store credit, or exchange, for $1.98
-                    via re:do
-                  </span>
+            {selectedVariant &&
+              !isRedoInCart &&
+              !isClearance &&
+              !isExcludeRebuy && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    ref={redoBox}
+                    onChange={(e) => setRedo(e.target.checked)}
+                    checked={redo}
+                  />
+                  <div className="flex flex-wrap items-center gap-1">
+                    <span className="text-[11px]">
+                      {defaults.product.redoCopy}
+                      {/* Free Return for Store Credit or Exchange + Package
+                      Protection (US only) for $2.98 via re:do */}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
