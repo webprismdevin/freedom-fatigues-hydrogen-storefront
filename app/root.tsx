@@ -200,6 +200,7 @@ export function CatchBoundary() {
 
   useEffect(() => {
     window.clarity('event', '404');
+    window.clarity('set', '404');
   }, []);
 
   return (
@@ -235,7 +236,8 @@ export function ErrorBoundary({error}: {error: Error}) {
   const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
 
   useEffect(() => {
-    window.clarity('event', `generic error ${error?.message ?? "unknown"}`);
+    window.clarity('event', `generic error ${error?.message ?? 'unknown'}`);
+    window.clarity('set', 'generic error');
   }, []);
 
   return (
