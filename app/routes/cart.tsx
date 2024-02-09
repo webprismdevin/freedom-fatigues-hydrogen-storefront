@@ -67,7 +67,9 @@ export async function action({request, context}: ActionArgs) {
         });
       }
 
-      cartId = result.cart.id;
+      cartId = result.cart?.id;
+
+      console.log(result);
 
       break;
     case CartAction.REMOVE_FROM_CART:
@@ -82,7 +84,7 @@ export async function action({request, context}: ActionArgs) {
         storefront,
       });
 
-      cartId = result.cart.id;
+      cartId = result.cart?.id;
 
       break;
     case CartAction.UPDATE_CART:
@@ -97,7 +99,7 @@ export async function action({request, context}: ActionArgs) {
         storefront,
       });
 
-      cartId = result.cart.id;
+      cartId = result.cart?.id;
 
       break;
     case CartAction.UPDATE_DISCOUNT:
@@ -112,7 +114,7 @@ export async function action({request, context}: ActionArgs) {
         storefront,
       });
 
-      cartId = result.cart.id;
+      cartId = result.cart?.id;
 
       break;
     case CartAction.UPDATE_BUYER_IDENTITY:
@@ -177,7 +179,7 @@ export default function CartRoute() {
   const [root] = useMatches();
   // @todo: finish on a separate PR
   return (
-    <div className="grid w-full gap-8 p-6 py-8 md:p-8 lg:p-12 justify-items-start">
+    <div className="grid w-full justify-items-start gap-8 p-6 py-8 md:p-8 lg:p-12">
       <Suspense fallback={<CartLoading />}>
         <Await resolve={root.data?.cart}>
           {(cart) => <Cart layout="page" cart={cart} />}

@@ -49,7 +49,7 @@ export default function QuickAdd({
     ? []
     : [
         {
-          merchandiseId: 'gid://shopify/ProductVariant/40053085339766',
+          merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
           quantity: 1,
         },
       ];
