@@ -38,7 +38,7 @@ import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics'
 import {useEffect, useState} from 'react';
 import {useLocation} from 'react-use';
 import useFbCookies from './hooks/useFbCookies';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 
 declare global {
   interface Window {
@@ -47,6 +47,7 @@ declare global {
     TriplePixel: any;
     _learnq: any;
     plausible: any;
+    clarity: any;
   }
 }
 
@@ -197,6 +198,11 @@ export function CatchBoundary() {
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
 
+  useEffect(() => {
+    window.clarity('event', '404');
+    window.clarity('set', '404');
+  }, []);
+
   return (
     <html lang={locale.language}>
       <head>
@@ -218,8 +224,8 @@ export function CatchBoundary() {
             />
           )}
         </Layout>
-        {/* <Scripts /> */}
-        {/* <CustomScriptsAndAnalytics /> */}
+        <Scripts />
+        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );
@@ -228,6 +234,11 @@ export function CatchBoundary() {
 export function ErrorBoundary({error}: {error: Error}) {
   const [root] = useMatches();
   const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
+
+  useEffect(() => {
+    window.clarity('event', `generic error ${error?.message ?? 'unknown'}`);
+    window.clarity('set', 'generic error');
+  }, []);
 
   return (
     <html lang={locale.language}>
