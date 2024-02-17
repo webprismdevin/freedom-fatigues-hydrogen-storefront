@@ -45,15 +45,6 @@ export default function QuickAdd({
     }
   }, [addToCartFetchers]);
 
-  const redoLine = isRedoInCart
-    ? []
-    : [
-        // {
-        //   merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
-        //   quantity: 1,
-        // },
-      ];
-
   function fireAnalytics() {
     const ff_id = window.sessionStorage.getItem('ff_id');
 
@@ -246,7 +237,6 @@ export default function QuickAdd({
                           onClick={() => fireAnalytics()}
                           className={!selectedVariant ? 'opacity-50' : ''}
                           lines={[
-                            ...redoLine,
                             {
                               merchandiseId: selectedVariant
                                 ? selectedVariant.id
