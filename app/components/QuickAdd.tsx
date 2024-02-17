@@ -105,7 +105,6 @@ export default function QuickAdd({
           className={className + ' cursor-pointer'}
           onClick={() => fireAnalytics()}
           lines={[
-            ...redoLine,
             {
               merchandiseId:
                 product.variants[0]?.admin_graphql_api_id ??
