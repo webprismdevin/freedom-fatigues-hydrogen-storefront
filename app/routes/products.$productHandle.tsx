@@ -690,8 +690,12 @@ export function ProductForm() {
 
   const addRedo = redo && !isRedoInCart;
 
+  console.log({addRedo})
+
   const isClearance = useTags(product.tags, 'Clearance');
-  const isExcludeRebuy = useTags(product.tags, 'exclude_redo');
+  const isExcludeRedo = useTags(product.tags, 'exclude_redo');
+
+  console.log({ isClearance, isExcludeRedo })
 
   return (
     <div className="grid gap-10">
@@ -716,7 +720,7 @@ export function ProductForm() {
             {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
-              !isExcludeRebuy && (
+              !isExcludeRedo && (
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -727,8 +731,6 @@ export function ProductForm() {
                   <div className="flex flex-wrap items-center gap-1">
                     <span className="text-[11px]">
                       {defaults.product.redoCopy}
-                      {/* Free Return for Store Credit or Exchange + Package
-                      Protection (US only) for $2.98 via re:do */}
                     </span>
                   </div>
                 </div>
@@ -748,12 +750,11 @@ export function ProductForm() {
                           merchandiseId: selectedVariant.id,
                           quantity: 1,
                         },
-                        //redo hack
-                        {
-                          merchandiseId:
-                            'gid://shopify/ProductVariant/40476097871990',
-                          quantity: 1,
-                        },
+                        // //redo hack
+                        // {
+                        //   merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
+                        //   quantity: 1,
+                        // },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}

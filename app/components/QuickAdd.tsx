@@ -48,10 +48,10 @@ export default function QuickAdd({
   const redoLine = isRedoInCart
     ? []
     : [
-        {
-          merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
-          quantity: 1,
-        },
+        // {
+        //   merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
+        //   quantity: 1,
+        // },
       ];
 
   function fireAnalytics() {

@@ -115,9 +115,9 @@ export function CartDetails({
   const settings = root.data.settings;
 
   useEffect(() => {
-    console.log(checkCartOffer(root.data.settings.cart_offer));
+    // console.log(checkCartOffer(root.data.settings.cart_offer));
 
-    console.log('fired!');
+    // console.log('fired!');
 
     if (cart) {
       const isValid = checkCartOffer(settings.cart_offer);

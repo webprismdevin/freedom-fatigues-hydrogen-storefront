@@ -51,6 +51,8 @@ export async function action({request, context}: ActionArgs) {
         : ([] as CartLineInput[]);
       invariant(lines.length, 'No lines to add');
 
+      console.log({lines});
+
       /**
        * If no previous cart exists, create one with the lines.
        */
@@ -69,7 +71,7 @@ export async function action({request, context}: ActionArgs) {
 
       cartId = result.cart?.id;
 
-      console.log(result);
+      console.log({result});
 
       break;
     case CartAction.REMOVE_FROM_CART:
