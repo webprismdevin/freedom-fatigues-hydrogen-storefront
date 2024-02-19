@@ -287,6 +287,8 @@ export async function cartAdd({
   lines: CartLineInput[];
   storefront: AppLoadContext['storefront'];
 }) {
+  console.log({lines});
+
   const {cartLinesAdd} = await storefront.mutate<{
     cartLinesAdd: {
       cart: CartType;

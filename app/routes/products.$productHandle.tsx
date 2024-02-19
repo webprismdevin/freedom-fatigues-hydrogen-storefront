@@ -750,8 +750,7 @@ export function ProductForm() {
                         },
                         //redo hack
                         {
-                          merchandiseId:
-                            'gid://shopify/ProductVariant/40476097871990',
+                          merchandiseId: 'gid://shopify/ProductVariant/40494395195510',
                           quantity: 1,
                         },
                       ]
