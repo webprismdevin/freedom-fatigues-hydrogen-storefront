@@ -1,6 +1,6 @@
 import {useMatches} from '@remix-run/react';
 import {useEffect, useState} from 'react';
-import {cartAdd} from '~/routes/cart';
+// import {cartAdd} from '~/routes/cart';
 
 export default function useRedo() {
   const [root] = useMatches();

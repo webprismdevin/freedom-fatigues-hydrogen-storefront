@@ -750,11 +750,11 @@ export function ProductForm() {
                           merchandiseId: selectedVariant.id,
                           quantity: 1,
                         },
-                        // //redo hack
-                        // {
-                        //   merchandiseId: 'gid://shopify/ProductVariant/40476097871990',
-                        //   quantity: 1,
-                        // },
+                        //redo hack
+                        {
+                          merchandiseId: 'gid://shopify/ProductVariant/40494395195510',
+                          quantity: 1,
+                        },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}

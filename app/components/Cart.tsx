@@ -108,7 +108,7 @@ export function CartDetails({
   layout: Layouts;
   cart: CartType | null;
 }) {
-  const [ root ] = useMatches();
+  const [root] = useMatches();
   const [offerUnlocked, setOfferUnlocked] = useState(false);
   const [offerValid, setOfferValid] = useState(false);
 
@@ -163,16 +163,15 @@ export function CartDetails({
           {cart && layout == 'drawer' && <FreeShippingProgress cart={cart} />}
           {/* flex container for all content between header & cart summary */}
           {offerValid &&
-            cart.cost.totalAmount.amount <=
-              settings?.cart_offer.threshold && (
-                <div className="bg-primary px-6 py-3 text-contrast md:px-12">
-                  <p className="text-center font-heading">
-                    {settings.cart_offer.copy}
-                  </p>
-                </div>
-              )}
+            cart.cost.totalAmount.amount <= settings?.cart_offer.threshold && (
+              <div className="bg-primary px-6 py-3 text-contrast md:px-12">
+                <p className="text-center font-heading">
+                  {settings.cart_offer.copy}
+                </p>
+              </div>
+            )}
           <div className="flex-1 overflow-auto">
-            {offerUnlocked ?  (
+            {offerUnlocked ? (
               <div className="px-6 pb-6 md:px-12">
                 <div className="flex gap-3">
                   <div>
@@ -290,7 +289,6 @@ function CartDiscounts({
           </div>
         </div>
       </dl>
-
       {/* No discounts, show an input to apply a discount */}
       <UpdateDiscountForm>
         <div
@@ -371,33 +369,6 @@ function CartCheckoutActions({
 }) {
   if (!checkoutUrl) return null;
 
-  const handleCheckout = () => {
-    if (window.dataLayer) {
-      window.dataLayer.push({ecommerce: null});
-      window.dataLayer.push({
-        event: 'begin_checkout',
-        currency: 'USD',
-        value: cart.cost.totalAmount.amount,
-        coupon: cart.discountCodes?.map(({code}) => code).join(', ') || null,
-        ecommerce: {
-          items: cart.lines.edges.map(({node}) => ({
-            item_name: node.merchandise.product.title,
-            item_id: fromGID(node.merchandise.product.id),
-            item_variant: node.merchandise.title,
-            brand: 'Freedom Fatigues',
-            price: node.merchandise.price.amount,
-          })),
-        },
-        eventCallback: () => {
-          window.location.href = checkoutUrl;
-        },
-        eventTimeout: 2000,
-      });
-    } else {
-      window.location.href = checkoutUrl;
-    }
-  };
-
   return (
     <div className="mt-2 flex flex-col">
       <a
@@ -405,16 +376,8 @@ function CartCheckoutActions({
         target="_self"
         className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
       >
-        {/* <Button
-        className="cursor-pointer hover:opacity-80"
-        onClick={handleCheckout}
-        as="span"
-        width="full"
-      > */}
         Continue to Checkout
-        {/* </Button> */}
       </a>
-      {/* @todo: <CartShopPayButton cart={cart} /> */}
     </div>
   );
 }
