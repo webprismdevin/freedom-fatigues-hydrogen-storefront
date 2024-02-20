@@ -717,7 +717,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant &&
+            {/* {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
@@ -734,7 +734,7 @@ export function ProductForm() {
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
@@ -751,10 +751,10 @@ export function ProductForm() {
                           quantity: 1,
                         },
                         //redo hack
-                        {
-                          merchandiseId: 'gid://shopify/ProductVariant/40494395195510',
-                          quantity: 1,
-                        },
+                        // {
+                        //   merchandiseId: 'gid://shopify/ProductVariant/40494395195510',
+                        //   quantity: 1,
+                        // },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}
