@@ -137,7 +137,6 @@ export async function loader({params, request, context}: LoaderArgs) {
       selectedOptions.push({name, value});
   });
 
-
   const {shop, product} = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
     {
@@ -487,7 +486,6 @@ export function ProductForm() {
 
     if (clonedParams.has('lid')) {
       clonedParams.delete('lid');
-
     }
 
     return clonedParams;
@@ -689,7 +687,6 @@ export function ProductForm() {
   const isClearance = useTags(product.tags, 'Clearance');
   const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
-
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -713,7 +710,7 @@ export function ProductForm() {
             {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
-              !isExcludeRebuy && (
+              !isExcludeRedo && (
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
