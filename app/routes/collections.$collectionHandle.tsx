@@ -337,7 +337,7 @@ function getSortValuesFromParam(sortParam: SortParam | null) {
       };
     default:
       return {
-        sortKey: 'RELEVANCE',
+        sortKey: 'COLLECTION_DEFAULT',
         reverse: false,
       };
   }

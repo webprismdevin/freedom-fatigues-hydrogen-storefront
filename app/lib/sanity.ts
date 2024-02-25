@@ -18,6 +18,7 @@ export const urlFor = (source: any) => {
 
 export async function getSiteSettings() {
   const query = `*[_type == "settings"][0]{
+    "redoCopy": product.redoCopy,
     "menu": menu.links[] {
       (_type == 'collectionGroup') => {
         ${COLLECTION_GROUP}
