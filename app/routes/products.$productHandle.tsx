@@ -137,8 +137,6 @@ export async function loader({params, request, context}: LoaderArgs) {
       selectedOptions.push({name, value});
   });
 
-  console.log(selectedOptions);
-
   const {shop, product} = await context.storefront.query<ProductQueryType>(
     PRODUCT_QUERY,
     {
@@ -447,9 +445,9 @@ export function ProductForm() {
   const {location} = useNavigation();
 
   const redoBox = useRef(null);
-  const [redo, setRedo] = useState(true);
+  // const [redo, setRedo] = useState(true);
 
-  const [isRedoInCart] = useRedo();
+  const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
 
   const [fbp, fbc] = useFbCookies();
 
@@ -488,8 +486,6 @@ export function ProductForm() {
 
     if (clonedParams.has('lid')) {
       clonedParams.delete('lid');
-
-      console.log(clonedParams);
     }
 
     return clonedParams;
@@ -688,14 +684,8 @@ export function ProductForm() {
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
 
-  const addRedo = redo && !isRedoInCart;
-
-  console.log({addRedo})
-
   const isClearance = useTags(product.tags, 'Clearance');
   const isExcludeRedo = useTags(product.tags, 'exclude_redo');
-
-  console.log({ isClearance, isExcludeRedo })
 
   return (
     <div className="grid gap-10">
@@ -725,8 +715,8 @@ export function ProductForm() {
                   <input
                     type="checkbox"
                     ref={redoBox}
-                    onChange={(e) => setRedo(e.target.checked)}
-                    checked={redo}
+                    onChange={(e) => setAddRedo(e.target.checked)}
+                    checked={addRedo}
                   />
                   <div className="flex flex-wrap items-center gap-1">
                     <span className="text-[11px]">
@@ -751,10 +741,10 @@ export function ProductForm() {
                           quantity: 1,
                         },
                         //redo hack
-                        // {
-                        //   merchandiseId: 'gid://shopify/ProductVariant/40494395195510',
-                        //   quantity: 1,
-                        // },
+                        {
+                          merchandiseId: redoResponse?.id,
+                          quantity: 1,
+                        },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}

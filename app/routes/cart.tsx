@@ -71,7 +71,6 @@ export async function action({request, context}: ActionArgs) {
 
       cartId = result.cart?.id;
 
-      console.log({result});
 
       break;
     case CartAction.REMOVE_FROM_CART:
@@ -289,7 +288,6 @@ export async function cartAdd({
   lines: CartLineInput[];
   storefront: AppLoadContext['storefront'];
 }) {
-  console.log({lines});
 
   const {cartLinesAdd} = await storefront.mutate<{
     cartLinesAdd: {

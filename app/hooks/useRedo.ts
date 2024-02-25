@@ -1,26 +1,59 @@
-import {useMatches} from '@remix-run/react';
+import {useFetcher, useMatches} from '@remix-run/react';
+import {flattenConnection} from '@shopify/hydrogen';
 import {useEffect, useState} from 'react';
-// import {cartAdd} from '~/routes/cart';
+import {set} from 'zod';
+import {CartAction} from '~/lib/type';
 
 export default function useRedo() {
   const [root] = useMatches();
   const [isInCart, setInCart] = useState(false);
+  const [addRedo, setAddRedo] = useState(true);
+  const [redoResponse, setRedoResponse] = useState<any>(null);
+  const fetcher = useFetcher();
 
   const findRedo = async () => {
     const cart = await root.data?.cart;
 
-    return cart?.lines?.edges.some(
-      (line: any) => line.node.merchandise.sku === 'x-redo',
-    ) ?? null;
+    const line =
+      cart?.lines?.edges.find(
+        (line: any) => line.node.merchandise.sku === 'x-redo',
+      ) ?? null;
+
+
+    return line;
+  };
+
+  const getRedo = async () => {
+    const response = await fetch('/get-redo');
+    const data = await response.json();
+
+    const products = flattenConnection(data.products);
+    const variants = flattenConnection(products[0].variants);
+
+    const mutated_response = {
+      title: products[0].title,
+      id: variants[0].id,
+      price: variants[0].price.amount,
+    };
+
+    return mutated_response;
   };
 
   useEffect(() => {
+    if (isInCart) setAddRedo(false);
+  }, [isInCart]);
+
+  useEffect(() => {
     async function run() {
-      setInCart(await findRedo());
+      const isInCart = (await findRedo()) ? true : false;
+
+      setInCart(isInCart);
+      const data = await getRedo();
+      setRedoResponse(data);
     }
 
     run();
   }, [root.data?.cart]);
 
-  return [isInCart];
+  return [isInCart, redoResponse, addRedo, setAddRedo];
 }

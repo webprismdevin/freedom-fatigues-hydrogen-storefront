@@ -8,7 +8,6 @@ import {
   IconRemove,
   Text,
   Link,
-  FeaturedProducts,
   AddToCartButton,
 } from '~/components';
 import {getInputStyleClasses} from '~/lib/utils';
@@ -18,12 +17,12 @@ import type {
   CartLine,
   CartLineUpdateInput,
 } from '@shopify/hydrogen/storefront-api-types';
-import {useFetcher, useLoaderData, useMatches} from '@remix-run/react';
+import {useFetcher, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
-import {cartRemove} from '~/routes/cart';
 import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
+import {Switch} from '@headlessui/react';
 
 type Layouts = 'page' | 'drawer';
 
@@ -50,6 +49,7 @@ export function Cart({
 
 import {useState, useEffect} from 'react';
 import {Rebuy_MiniProductCard} from './ProductCard';
+import useRedo from '~/hooks/useRedo';
 
 function ProgressBar({value}: {value: number}) {
   const [width, setWidth] = useState(0);
@@ -229,6 +229,7 @@ export function CartDetails({
           <CartSummary cost={cart.cost} layout={layout}>
             {cart && layout == 'page' && <FreeShippingProgress cart={cart} />}
             <CartDiscounts discountCodes={cart.discountCodes} />
+            {/* <RedoToggle /> */}
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
           </CartSummary>
@@ -256,6 +257,40 @@ export function CartDetails({
       </div>
     );
   }
+}
+
+function RedoToggle() {
+  const [enabled, setEnabled] = useState(true);
+  const [isInCart, redoResponse, addRedo, setAddRedo] = useRedo();
+  const [root] = useMatches();
+
+  useEffect(() => {
+    setAddRedo(enabled);
+  }, [enabled]);
+
+  const redoCopy = root?.data?.settings.redoCopy;
+
+  if (!redoResponse) return null;
+
+  return (
+    <div className="flex items-center justify-start gap-3">
+      <span className="text-xs">{redoCopy}</span>
+      <Switch
+        checked={enabled}
+        onChange={setEnabled}
+        className={`${
+          enabled ? 'bg-blue-600' : 'bg-gray-200'
+        } relative inline-flex h-5 w-10 shrink-0 items-center rounded-full`}
+      >
+        <span className="sr-only">{redoCopy}</span>
+        <span
+          className={`${
+            enabled ? 'translate-x-6' : 'translate-x-1'
+          } inline-block h-3 w-3 transform rounded-full bg-white transition`}
+        />
+      </Switch>
+    </div>
+  );
 }
 
 /**
