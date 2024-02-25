@@ -707,7 +707,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {/* {selectedVariant &&
+            {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
@@ -724,7 +724,7 @@ export function ProductForm() {
                     </span>
                   </div>
                 </div>
-              )} */}
+              )}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={

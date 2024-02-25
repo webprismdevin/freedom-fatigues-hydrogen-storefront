@@ -9,7 +9,6 @@ export default function useRedo() {
   const [isInCart, setInCart] = useState(false);
   const [addRedo, setAddRedo] = useState(true);
   const [redoResponse, setRedoResponse] = useState<any>(null);
-  const fetcher = useFetcher();
 
   const findRedo = async () => {
     const cart = await root.data?.cart;
