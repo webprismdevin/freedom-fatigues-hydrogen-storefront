@@ -26,7 +26,7 @@ import {Switch} from '@headlessui/react';
 
 type Layouts = 'page' | 'drawer';
 
-const freeShippingThreshold = 75;
+const freeShippingThreshold = 99;
 
 export function Cart({
   layout,
@@ -115,9 +115,6 @@ export function CartDetails({
   const settings = root.data.settings;
 
   useEffect(() => {
-    // console.log(checkCartOffer(root.data.settings.cart_offer));
-
-    // console.log('fired!');
 
     if (cart) {
       const isValid = checkCartOffer(settings.cart_offer);
