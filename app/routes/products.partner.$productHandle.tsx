@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import {Disclosure, Listbox} from '@headlessui/react';
-import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
 import {
   useLoaderData,
   Await,
@@ -149,21 +149,15 @@ export async function loader({params, request, context}: LoaderArgs) {
     },
   );
 
-  if(product.tags.some(tag => tag == "Shopify Collective")){
-    return redirect(`/products/partner/${productHandle}`)
-  }
-
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
 
-  const defaults = await sanity.fetch(DEFAULTS_QUERY);
-
   const pageContent =
     await sanity.fetch(`*[_type == 'product' && store.slug.current == '${productHandle}'][0]{
-      redoCopy,
       ${MODULE_FRAGMENT},
-      "badges": badges[]
+      "badges": badges[],
+      collective_accordions
     }
   `);
 
@@ -183,10 +177,6 @@ export async function loader({params, request, context}: LoaderArgs) {
   return defer({
     product,
     shop,
-    defaults,
-    pageContent,
-    modules: pageContent?.modules,
-    badgeOverrides: pageContent?.badges,
     recommended,
     analytics: {
       pageType: AnalyticsPageType.product,
@@ -194,15 +184,15 @@ export async function loader({params, request, context}: LoaderArgs) {
       products: [productAnalytics],
       totalValue: parseFloat(selectedVariant.price.amount),
     },
+    // page content specifically for collective
+    pageContent,
   });
 }
 
 export default function Product() {
-  const {product, shop, recommended, modules, defaults, badgeOverrides} =
-    useLoaderData<typeof loader>();
-  const {lastAccordion, modules: defaultModules} = defaults.product;
+  const {product, recommended, pageContent} = useLoaderData<typeof loader>();
   const {media, title, vendor, descriptionHtml} = product;
-  const {shippingPolicy, refundPolicy} = shop;
+  const {collective_accordions, badges, modules} = pageContent;
 
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
@@ -230,6 +220,14 @@ export default function Product() {
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:min-h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
+                <div className="flex justify-between items-center">
+                  <div className="font-bold uppercase text-slate-600">
+                    {vendor}
+                  </div>
+                  <div className="bg-red-500 px-2 py-0.5 text-white font-heading uppercase text-sm">
+                    Freedom Partner
+                  </div>
+                </div>
                 <Heading
                   as="h1"
                   className="whitespace-normal font-heading text-2xl md:text-3xl lg:text-4xl"
@@ -245,7 +243,7 @@ export default function Product() {
                 />
               </div>
               <ProductForm />
-              <Badges />
+              {badges && badges?.length > 0 && <Badges />}
               <div className="grid gap-4 py-4">
                 <hr />
                 {descriptionHtml && (
@@ -257,40 +255,24 @@ export default function Product() {
                     <hr />
                   </>
                 )}
-                {product.fabric_fit && (
-                  <>
-                    <ProductDetail
-                      title="Fabric + Fit"
-                      content={product.fabric_fit?.value}
-                    />
-                    <hr />
-                  </>
-                )}
-                {shippingPolicy?.body && (
-                  <>
-                    <ProductDetail
-                      title="Shipping"
-                      content={getExcerpt(shippingPolicy.body)}
-                      learnMore={`/policies/${shippingPolicy.handle}`}
-                    />
-                    <hr />
-                  </>
-                )}
-                {refundPolicy?.body && (
-                  <>
-                    <ProductDetail
-                      title="Returns + Exchanges"
-                      content={getExcerpt(refundPolicy.body)}
-                      learnMore={`/policies/${refundPolicy.handle}`}
-                    />
-                    <hr />
-                  </>
-                )}
-                <ProductDetail
-                  title="Supporting Veterans + First Responders"
-                  content={lastAccordion}
-                />
-                <hr />
+                {collective_accordions &&
+                  collective_accordions.map(
+                    (accordion: {
+                      title: string;
+                      content: string;
+                      learn_more: string;
+                    }) => (
+                      <>
+                        {' '}
+                        <ProductDetail
+                          title={accordion.title}
+                          content={accordion.content}
+                          learnMore={accordion.learn_more}
+                        />
+                        <hr />
+                      </>
+                    ),
+                  )}
                 <div className="hidden lg:block">
                   <CompleteTheLook />
                 </div>
@@ -312,7 +294,7 @@ export default function Product() {
           </div>
         </div>
       </Section>
-      <Modules modules={modules?.length > 0 ? modules : defaultModules} />
+      {modules && modules?.length > 0 && <Modules modules={modules} />}
       <Suspense fallback={<Skeleton className="h-32" />}>
         <Await
           errorElement="There was a problem loading related products"
@@ -334,21 +316,8 @@ type Badge = {
 };
 
 const Badges = () => {
-  const {defaults, badgeOverrides} = useLoaderData<typeof loader>();
-
-  const defaultBadges = defaults.product.badges;
-
-  // const badges = badgeOverrides ?? defaultBadges;
-
-  const badges = badgeOverrides
-    ? [
-        ...badgeOverrides,
-        ...defaults.product.badges.slice(
-          badgeOverrides.length,
-          defaultBadges.length,
-        ),
-      ]
-    : defaultBadges;
+  const {pageContent} = useLoaderData<typeof loader>();
+  const {badges} = pageContent;
 
   return (
     <div className="flex flex-wrap justify-between gap-2">
@@ -440,18 +409,12 @@ export function InlineProductCard({
 }
 
 export function ProductForm() {
-  const {product, analytics, defaults} = useLoaderData<typeof loader>();
-  const {belowCartCopy} = defaults.product;
+  const {product, analytics} = useLoaderData<typeof loader>();
 
   const [root] = useMatches();
 
   const [currentSearchParams] = useSearchParams();
   const {location} = useNavigation();
-
-  const redoBox = useRef(null);
-  // const [redo, setRedo] = useState(true);
-
-  const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
 
   const [fbp, fbc] = useFbCookies();
 
@@ -689,7 +652,7 @@ export function ProductForm() {
   }, [root.data?.cart]);
 
   const isClearance = useTags(product.tags, 'Clearance');
-  const isExcludeRedo = useTags(product.tags, 'exclude_redo');
+  // const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
     <div className="grid gap-10">
@@ -711,7 +674,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant &&
+            {/* {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
@@ -728,29 +691,15 @@ export function ProductForm() {
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
             {!isOutOfStock ? (
               <AddToCartButton
-                lines={
-                  !addRedo || isClearance
-                    ? [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                      ]
-                    : [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                        //redo hack
-                        {
-                          merchandiseId: redoResponse?.id,
-                          quantity: 1,
-                        },
-                      ]
-                }
+                lines={[
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                  },
+                ]}
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 data-test="add-to-cart"
                 analytics={{
@@ -803,10 +752,10 @@ export function ProductForm() {
             </Button>
           </div>
         )}
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <div className="text-xs">{belowCartCopy.left}</div>
           <div className="text-xs">{belowCartCopy.right}</div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

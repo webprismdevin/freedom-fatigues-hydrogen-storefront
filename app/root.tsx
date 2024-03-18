@@ -368,6 +368,7 @@ const CART_QUERY = `#graphql
                 handle
                 title
                 id
+                tags
               }
               selectedOptions {
                 name

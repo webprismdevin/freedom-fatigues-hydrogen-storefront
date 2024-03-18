@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, {useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -115,7 +115,6 @@ export function CartDetails({
   const settings = root.data.settings;
 
   useEffect(() => {
-
     if (cart) {
       const isValid = checkCartOffer(settings.cart_offer);
 
@@ -149,9 +148,6 @@ export function CartDetails({
     drawer: 'flex h-cart-content flex-col',
     page: 'w-full pb-12 grid md:grid-cols-2 md:items-start gap-8 md:gap-8 lg:gap-12 h-full',
   };
-
-  const isFreeShipping =
-    Number(cart?.cost.subtotalAmount.amount) < freeShippingThreshold;
 
   return (
     <div className={container[layout]}>
@@ -234,26 +230,37 @@ export function CartDetails({
       )}
     </div>
   );
+}
 
-  function FreeShippingProgress({cart}: any) {
+function FreeShippingProgress({cart}: any) {
+  //qualified shipping cart cost
+  const cart_cost = useMemo(() => {
     return (
-      <div className="px-6 py-2 md:px-12">
-        <ProgressBar
-          value={
-            Number(cart.cost.subtotalAmount.amount) / freeShippingThreshold
-          }
-        />
-        <div className="mt-2 text-center text-xs font-bold">
-          {isFreeShipping
-            ? `Add $${Math.floor(
-                freeShippingThreshold - Number(cart.cost.subtotalAmount.amount),
-              )} for free U.S.
-            shipping`
-            : "You've unlocked free U.S. shipping!"}
-        </div>
-      </div>
+      cart.lines.edges.reduce((total, {node}) => {
+        if (
+          !node.merchandise.product.tags.includes('Shopify Collective') &&
+          node.merchandise.sku !== 'x-redo'
+        ) {
+          return total + Number(node.cost.totalAmount.amount);
+        }
+        return total;
+      }, 0)
     );
-  }
+  }, [cart.lines]);
+
+  const isFreeShipping = cart_cost < freeShippingThreshold;
+
+  return (
+    <div className="px-6 py-2 md:px-12">
+      <ProgressBar value={cart_cost  / freeShippingThreshold} />
+      <div className="mt-2 text-center text-xs font-bold">
+        {isFreeShipping
+          ? `Add $${Math.floor(freeShippingThreshold - cart_cost)} for free U.S.
+          shipping`
+          : "You've unlocked free U.S. shipping!"}
+      </div>
+    </div>
+  );
 }
 
 function RedoToggle() {
