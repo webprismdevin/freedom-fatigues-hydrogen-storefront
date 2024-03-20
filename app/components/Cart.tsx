@@ -255,7 +255,7 @@ function FreeShippingProgress({cart}: any) {
       <ProgressBar value={cart_cost  / freeShippingThreshold} />
       <div className="mt-2 text-center text-xs font-bold">
         {isFreeShipping
-          ? `Add $${Math.floor(freeShippingThreshold - cart_cost)} for free U.S.
+          ? `Add $${Math.floor(freeShippingThreshold - cart_cost)} of FF Gear for FREE U.S.
           shipping`
           : "You've unlocked free U.S. shipping!"}
       </div>
