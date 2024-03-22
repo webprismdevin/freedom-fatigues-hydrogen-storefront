@@ -235,30 +235,24 @@ export function CartDetails({
 function FreeShippingProgress({cart}: any) {
   //qualified shipping cart cost
   const cart_cost = useMemo(() => {
-    return (
-      cart.lines.edges.reduce((total, {node}) => {
-        if (
-          !node.merchandise.product.tags.includes('Shopify Collective') &&
-          node.merchandise.sku !== 'x-redo'
-        ) {
-          return total + Number(node.cost.totalAmount.amount);
-        }
-        return total;
-      }, 0)
-    );
+    return cart.lines.edges.reduce((total, {node}) => {
+      return total + Number(node.cost.totalAmount.amount);
+    }, 0);
   }, [cart.lines]);
 
   const isFreeShipping = cart_cost < freeShippingThreshold;
 
   return (
     <div className="px-6 py-2 md:px-12">
-      <ProgressBar value={cart_cost  / freeShippingThreshold} />
+      <ProgressBar value={cart_cost / freeShippingThreshold} />
       <div className="mt-2 text-center text-xs font-bold">
         {isFreeShipping
-          ? `Add $${Math.floor(freeShippingThreshold - cart_cost)} of FF Gear for FREE U.S.
-          shipping`
+          ? `Add $${Math.floor(
+              freeShippingThreshold - cart_cost,
+            )} for FREE U.S. shipping`
           : "You've unlocked free U.S. shipping!"}
       </div>
+      <div className="text-xs text-center">(Free shipping only applicable to FF gear)</div>
     </div>
   );
 }
