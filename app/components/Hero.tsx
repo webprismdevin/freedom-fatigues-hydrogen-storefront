@@ -52,22 +52,28 @@ export function Hero({data}: {data: Hero}) {
       }`}
       ref={ref}
     >
+      {/* <motion.div
+        // style={{y}}
+        className="absolute left-0 top-0 bottom-0 right-0 z-0 h-full w-full"
+      > */}
+      <Image
+        src={urlFor(image).quality(100).format('webp').url()}
+        sizes={'100vw'}
+        className="absolute bottom-0 left-0 right-0 top-0 z-0 h-full w-full object-cover"
+        style={{
+          objectPosition: 'top center'
+        }}
+        alt={image.alt}
+        loading={image.loading ? image.loading : 'lazy'}
+      />
+      {/* </motion.div> */}
       <div
-        style={{background: 'black', opacity: image?.overlay ? image.overlay/100 : 0}}
+        style={{
+          background: 'black',
+          opacity: image?.overlay ? image.overlay / 100 : 0,
+        }}
         className="absolute bottom-0 left-0 right-0 top-0 z-10"
       />
-      <motion.div
-        style={{y}}
-        className="absolute left-0 top-0 z-0 h-full w-full"
-      >
-        <Image
-          src={urlFor(image).format('webp').quality(100).url()}
-          sizes={'100vw'}
-          className="mx-auto mt-0 min-h-full w-auto object-cover"
-          alt={image.alt}
-          loading={image.loading ? image.loading : 'lazy'}
-        />
-      </motion.div>
       <div
         className={`${
           layout === 'right' && 'text-right'

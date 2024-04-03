@@ -98,7 +98,7 @@ export default function Homepage() {
   // });
 
   return (
-    <div className="mt-[-3rem] bg-primary text-contrast md:mt-[-96px]">
+    <div className="bg-primary text-contrast">
       <Hero data={hero.hero} />
 
       <Suspense>
