@@ -254,7 +254,7 @@ function MobileHeader({
         isHome
           ? 'bg-primary/90 text-contrast shadow-darkHeader'
           : 'bg-contrast/90 text-primary'
-      } sticky top-0 z-40 flex h-nav w-full items-center justify-between gap-4 px-4 leading-none backdrop-blur-md md:px-8 lg:hidden`}
+      } sticky top-12 z-40 flex h-nav w-full items-center justify-between gap-4 px-4 leading-none backdrop-blur-md md:px-8 lg:hidden`}
     >
       <div className="flex w-full items-center justify-start gap-4">
         <button
@@ -372,7 +372,7 @@ function DesktopHeader({
           : 'bg-contrast/95 text-primary'
       } ${
         !isHome && y > 50 && ' shadow-lightHeader'
-      } sticky top-0 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
+      } sticky top-12 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
       <div className="flex items-center gap-12 font-heading tracking-wider">
         <Link to="/" prefetch="intent" className="shrink-0">

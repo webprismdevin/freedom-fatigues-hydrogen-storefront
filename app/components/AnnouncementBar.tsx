@@ -28,7 +28,7 @@ export default function AnnouncementBar({data}: any) {
 
   return (
     <div
-      className={`h-12 overflow-hidden ${
+      className={`h-12 overflow-hidden sticky top-0 z-50 ${
         isHome ? 'bg-contrast' : 'bg-primary'
       }`}
     >
