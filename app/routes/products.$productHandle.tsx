@@ -5,8 +5,9 @@ import {
   useMemo,
   useEffect,
   useState,
+  Fragment,
 } from 'react';
-import {Disclosure, Listbox} from '@headlessui/react';
+import {Dialog, Disclosure, Listbox, Transition} from '@headlessui/react';
 import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import {
   useLoaderData,
@@ -149,8 +150,8 @@ export async function loader({params, request, context}: LoaderArgs) {
     },
   );
 
-  if(product.tags.some(tag => tag == "Shopify Collective")){
-    return redirect(`/products/partner/${productHandle}`)
+  if (product.tags.some((tag) => tag == 'Shopify Collective')) {
+    return redirect(`/products/partner/${productHandle}`);
   }
 
   if (!product?.id) {
@@ -244,6 +245,7 @@ export default function Product() {
                   count={Number(product.num_reviews?.value)}
                 />
               </div>
+
               <ProductForm />
               <Badges />
               <div className="grid gap-4 py-4">
@@ -450,6 +452,7 @@ export function ProductForm() {
 
   const redoBox = useRef(null);
   // const [redo, setRedo] = useState(true);
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
 
@@ -692,9 +695,70 @@ export function ProductForm() {
   const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
-    <div className="grid gap-10">
-      <div className="grid gap-4">
+    <div className="grid gap-10"> 
+      <div className="grid gap-4 relative">
+        {product?.size_chart && (
+          <>
+            <button className="absolute top-0 right-0 w-auto text-sm underline" onClick={() => setSizeChartOpen(true)}>
+              Size Chart
+            </button>
+            <Transition appear show={sizeChartOpen} as={Fragment}>
+              <Dialog
+                as="div"
+                className="fixed inset-0 z-10"
+                onClose={() => setSizeChartOpen(false)}
+              >
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="fixed inset-0 bg-black/25" />
+                </Transition.Child>
+                <div className="fixed inset-0 overflow-y-auto">
+                  <div className="flex min-h-full items-center justify-center p-4 text-center">
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0 scale-95"
+                      enterTo="opacity-100 scale-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100 scale-100"
+                      leaveTo="opacity-0 scale-95"
+                    >
+                      <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                        <Dialog.Title
+                          as="h3"
+                          className="text-lg font-medium leading-6 text-gray-900"
+                        >
+                          Size Chart
+                        </Dialog.Title>
+                        <div className="mt-2">
+                          <img src={product.size_chart.reference.image.url} />
+                        </div>
+                        <div className="mt-4">
+                          <button
+                            type="button"
+                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                            onClick={() => setSizeChartOpen(false)}
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </Dialog.Panel>
+                    </Transition.Child>
+                  </div>
+                </div>
+              </Dialog>
+            </Transition>
+          </>
+        )}
         <ProductOptions
+          variants={product.variants}
           options={product.options}
           searchParamsWithDefaults={searchParamsWithDefaults}
         />
@@ -847,9 +911,11 @@ function BackInStock({variant}: {variant: any}) {
 }
 
 export function ProductOptions({
+  variants,
   options,
   searchParamsWithDefaults,
 }: {
+  variants: any;
   options: ProductType['options'];
   searchParamsWithDefaults: URLSearchParams;
 }) {
@@ -1138,6 +1204,23 @@ const PRODUCT_QUERY = `#graphql
       fabric_fit: metafield(namespace: "page", key: "fabric_fit") {
         value
       }
+      size_chart: metafield(namespace: "product", key: "size_chart"){
+        type
+        value
+        reference {
+          __typename
+          ... on MediaImage {
+            id
+            image {
+              url
+            }
+          }
+          ... on GenericFile {
+            id
+            url
+          }
+        }
+      }
       complete_the_look: metafield(namespace: "custom", key: "complete_the_look") {
         references(first:10) {
           nodes {
@@ -1151,7 +1234,7 @@ const PRODUCT_QUERY = `#graphql
           ...Media
         }
       }
-      variants(first: 1) {
+      variants(first: 10) {
         nodes {
           ...ProductVariantFragment
         }

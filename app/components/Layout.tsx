@@ -387,7 +387,7 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex select-none items-start gap-4">
+        <nav className="flex select-none items-start gap-x-4 flex-wrap">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
             if (item._type === 'collectionGroup') {
