@@ -374,7 +374,7 @@ function DesktopHeader({
         !isHome && y > 50 && ' shadow-lightHeader'
       } sticky top-12 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
-      <div className="flex items-center gap-12 font-heading tracking-wider">
+      <div className="flex items-center gap-6 font-heading tracking-wider">
         <Link to="/" prefetch="intent" className="shrink-0">
           <div>
             <img
@@ -458,7 +458,7 @@ function DesktopHeader({
 }
 
 function LinkTitle({text}: {text: string}) {
-  return <span className="text-lg uppercase">{text}</span>;
+  return <span className="text-base uppercase">{text}</span>;
 }
 
 function MegaMenuLink({
