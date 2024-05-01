@@ -387,7 +387,7 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex select-none items-start gap-x-4 flex-wrap">
+        <nav className="flex select-none items-start gap-x-4 flex-wrap h-[30px]">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
             if (item._type === 'collectionGroup') {
@@ -409,8 +409,8 @@ function DesktopHeader({
                   prefetch="intent"
                   className={({isActive}) =>
                     isActive
-                      ? '-mb-px border-b-2 border-red-500 pb-1'
-                      : 'pb-1 hover:border-b-2 hover:border-b-red-500'
+                      ? '-mb-px border-b-2 border-red-500'
+                      : 'hover:border-b-2 hover:border-b-red-500'
                   }
                 >
                   <LinkTitle text={item.title} />
@@ -458,7 +458,7 @@ function DesktopHeader({
 }
 
 function LinkTitle({text}: {text: string}) {
-  return <span className="text-base uppercase">{text}</span>;
+  return <span className="text-lg uppercase">{text}</span>;
 }
 
 function MegaMenuLink({
@@ -473,12 +473,14 @@ function MegaMenuLink({
   return (
     <div
       {...props}
-      className="flex cursor-pointer items-center tracking-wider "
+      className="flex cursor-pointer items-start tracking-wider"
     >
       <div className="hover:border-b-2 hover:border-b-red-500">
         <LinkTitle text={menu.title} />
       </div>
-      <IconCaret direction={open ? 'up' : 'down'} />
+      <div className="h-[28px] grid place-content-center">
+        <IconCaret direction={open ? 'up' : 'down'} />
+      </div>
     </div>
   );
 }
