@@ -292,7 +292,7 @@ export default function Product() {
                   title="Supporting Veterans + First Responders"
                   content={lastAccordion}
                 /> */}
-                <hr />
+                {/* <hr /> */}
                 <div className="hidden lg:block">
                   <CompleteTheLook />
                 </div>
