@@ -288,10 +288,10 @@ export default function Product() {
                     <hr />
                   </>
                 )}
-                <ProductDetail
+                {/* <ProductDetail
                   title="Supporting Veterans + First Responders"
                   content={lastAccordion}
-                />
+                /> */}
                 <hr />
                 <div className="hidden lg:block">
                   <CompleteTheLook />
