@@ -187,6 +187,10 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <CustomScriptsAndAnalytics />
+        <script
+          async
+          src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
+        ></script>
       </body>
     </html>
   );
@@ -197,6 +201,8 @@ export function CatchBoundary() {
   const caught = useCatch();
   const isNotFound = caught.status === 404;
   const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
+
+  //
 
   useEffect(() => {
     window.clarity('event', '404');
