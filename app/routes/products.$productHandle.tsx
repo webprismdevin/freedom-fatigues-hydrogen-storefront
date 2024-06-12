@@ -134,7 +134,12 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const selectedOptions: SelectedOptionInput[] = [];
   searchParams.forEach((value, name) => {
-    if (!name.includes('lid') && !name.includes('utm'))
+    if (
+      !name.includes('lid') &&
+      !name.includes('utm') &&
+      !name.includes('tw') &&
+      !name.includes('_kx')
+    )
       selectedOptions.push({name, value});
   });
 
@@ -695,11 +700,14 @@ export function ProductForm() {
   const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
-    <div className="grid gap-10"> 
-      <div className="grid gap-4 relative">
+    <div className="grid gap-10">
+      <div className="relative grid gap-4">
         {product?.size_chart && (
           <>
-            <button className="absolute top-0 right-0 w-auto text-sm underline" onClick={() => setSizeChartOpen(true)}>
+            <button
+              className="absolute right-0 top-0 w-auto text-sm underline"
+              onClick={() => setSizeChartOpen(true)}
+            >
               Size Chart
             </button>
             <Transition appear show={sizeChartOpen} as={Fragment}>
