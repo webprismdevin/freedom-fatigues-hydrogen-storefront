@@ -952,7 +952,7 @@ export function ProductOptions({
                * If there are more than 7 values, we render a dropdown.
                * Otherwise, we just render plain links.
                */}
-              {option.values.length > 7 ? (
+              {option.values.length > 14 ? (
                 <div className="relative w-full">
                   <Listbox>
                     {({open}) => (
