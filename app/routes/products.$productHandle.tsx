@@ -273,16 +273,26 @@ export default function Product() {
                     <hr />
                   </>
                 )}
-                {shippingPolicy?.body && (
-                  <>
-                    <ProductDetail
-                      title="Shipping"
-                      content={getExcerpt(shippingPolicy.body)}
-                      learnMore={`/policies/${shippingPolicy.handle}`}
-                    />
-                    <hr />
-                  </>
-                )}
+                {shippingPolicy?.body &&
+                  !product.shipping_dropdown_override && (
+                    <>
+                      <ProductDetail
+                        title="Shipping"
+                        content={getExcerpt(shippingPolicy.body)}
+                        learnMore={`/policies/${shippingPolicy.handle}`}
+                      />
+                      <hr />
+                    </>
+                  )}
+                {product.shipping_dropdown_override && (
+                    <>
+                      <ProductDetail
+                        title="Shipping"
+                        content={product.shipping_dropdown_override?.value}
+                      />
+                      <hr />
+                    </>
+                  )}
                 {refundPolicy?.body && (
                   <>
                     <ProductDetail
@@ -949,7 +959,7 @@ export function ProductOptions({
                * When the user clicks one of these buttons, it will hit the loader
                * to get the new data.
                *
-               * If there are more than 7 values, we render a dropdown.
+               * If there are more than 14 values, we render a dropdown.
                * Otherwise, we just render plain links.
                */}
               {option.values.length > 14 ? (
@@ -1228,6 +1238,9 @@ const PRODUCT_QUERY = `#graphql
             url
           }
         }
+      }
+      shipping_dropdown_override: metafield(namespace: "custom", key: "shipping_dropdown_override") {
+        value
       }
       complete_the_look: metafield(namespace: "custom", key: "complete_the_look") {
         references(first:10) {

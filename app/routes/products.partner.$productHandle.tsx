@@ -220,11 +220,11 @@ export default function Product() {
           <div className="hiddenScroll sticky md:top-nav md:-mb-nav md:min-h-screen md:-translate-y-nav md:overflow-y-scroll md:pt-nav lg:col-span-2">
             <section className="flex w-full max-w-xl flex-col gap-8 p-6 md:mx-auto md:max-w-md md:px-0">
               <div className="grid gap-2">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <div className="font-bold uppercase text-slate-600">
                     {vendor}
                   </div>
-                  <div className="bg-red-500 px-2 py-0.5 text-white font-heading uppercase text-sm">
+                  <div className="bg-red-500 px-2 py-0.5 font-heading text-sm uppercase text-white">
                     Freedom Partner
                   </div>
                 </div>
@@ -251,6 +251,15 @@ export default function Product() {
                     <ProductDetail
                       title="Product Details"
                       content={descriptionHtml}
+                    />
+                    <hr />
+                  </>
+                )}
+                {product.shipping_dropdown_override && (
+                  <>
+                    <ProductDetail
+                      title="Shipping"
+                      content={product.shipping_dropdown_override?.value}
                     />
                     <hr />
                   </>
@@ -824,7 +833,7 @@ export function ProductOptions({
                * When the user clicks one of these buttons, it will hit the loader
                * to get the new data.
                *
-               * If there are more than 7 values, we render a dropdown.
+               * If there are more than 14 values, we render a dropdown.
                * Otherwise, we just render plain links.
                */}
               {option.values.length > 14 ? (
@@ -1085,6 +1094,9 @@ const PRODUCT_QUERY = `#graphql
         value
       }
       fabric_fit: metafield(namespace: "page", key: "fabric_fit") {
+        value
+      }
+      shipping_dropdown_override: metafield(namespace: "custom", key: "shipping_dropdown_override") {
         value
       }
       complete_the_look: metafield(namespace: "custom", key: "complete_the_look") {

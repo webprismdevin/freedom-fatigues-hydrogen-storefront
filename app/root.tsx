@@ -163,6 +163,7 @@ export default function App() {
     }
   }, [location.href, sessionId]);
 
+
   useAnalytics(hasUserConsent, locale);
 
   return (
@@ -175,6 +176,9 @@ export default function App() {
         />
         <Meta />
         <Links />
+        {process.env.NODE_ENV == 'development' && (
+          <script src="http://localhost:8097"></script>
+        )}
       </head>
       <body>
         <Layout
@@ -215,6 +219,9 @@ export function CatchBoundary() {
         <title>{isNotFound ? 'Not found' : 'Error'}</title>
         <Meta />
         <Links />
+        {process.env.NODE_ENV == 'development' && (
+          <script src="http://localhost:8097"></script>
+        )}
       </head>
       <body>
         <Layout
@@ -252,6 +259,9 @@ export function ErrorBoundary({error}: {error: Error}) {
         <title>Error</title>
         <Meta />
         <Links />
+        {process.env.NODE_ENV == 'development' && (
+          <script src="http://localhost:8097"></script>
+        )}
       </head>
       <body>
         <Layout layout={root?.data?.shop} settings={root?.data.settings}>
