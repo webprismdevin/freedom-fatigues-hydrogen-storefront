@@ -1037,7 +1037,7 @@ export function ProductOptions({
                           searchParams={searchParamsWithDefaults}
                           className={clsx(
                             'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
-                            checked ? 'border-primary/50' : 'border-primary/0',
+                            checked ? '!border-primary/50 selected_option' : '!border-primary/0',
                           )}
                         />
                       </Text>
