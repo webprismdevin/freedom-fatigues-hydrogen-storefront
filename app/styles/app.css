@@ -2442,6 +2442,14 @@ select{
 .border-none{
   border-style: none;
 }
+.\!border-primary\/0{
+  border-color: rgba(20, 20, 20, 0) !important;
+  border-color: rgb(var(--color-primary) / 0) !important;
+}
+.\!border-primary\/50{
+  border-color: rgba(20, 20, 20, 0.5) !important;
+  border-color: rgb(var(--color-primary) / 0.5) !important;
+}
 .border-FF-red{
   --tw-border-opacity: 1;
   border-color: rgba(233, 56, 43, var(--tw-border-opacity));
@@ -2471,10 +2479,6 @@ select{
   border-color: rgba(20, 20, 20, var(--tw-border-opacity));
   border-color: rgb(var(--color-primary) / var(--tw-border-opacity));
 }
-.border-primary\/0{
-  border-color: rgba(20, 20, 20, 0);
-  border-color: rgb(var(--color-primary) / 0);
-}
 .border-primary\/10{
   border-color: rgba(20, 20, 20, 0.1);
   border-color: rgb(var(--color-primary) / 0.1);
@@ -2487,10 +2491,6 @@ select{
   border-color: rgba(20, 20, 20, 0.3);
   border-color: rgb(var(--color-primary) / 0.3);
 }
-.border-primary\/50{
-  border-color: rgba(20, 20, 20, 0.5);
-  border-color: rgb(var(--color-primary) / 0.5);
-}
 .border-red-500{
   --tw-border-opacity: 1;
   border-color: rgba(239, 68, 68, var(--tw-border-opacity));
@@ -2501,14 +2501,6 @@ select{
 .border-white{
   --tw-border-opacity: 1;
   border-color: rgba(255, 255, 255, var(--tw-border-opacity));
-}
-.\!border-primary\/0{
-  border-color: rgba(20, 20, 20, 0) !important;
-  border-color: rgb(var(--color-primary) / 0) !important;
-}
-.\!border-primary\/50{
-  border-color: rgba(20, 20, 20, 0.5) !important;
-  border-color: rgb(var(--color-primary) / 0.5) !important;
 }
 .border-b-black{
   --tw-border-opacity: 1;
@@ -4521,4 +4513,14 @@ button.uploadcare--button_primary {
   .sm-max\:pt-2{
     padding-top: 0.5rem;
   }
+}
+
+.selected_option {
+  border: 1.5px solid #1212128D !important;
+  border-color: #1212128D !important;
+}
+
+.a_class {
+  /* nothing */
+  border: 1px solid black;
 }
