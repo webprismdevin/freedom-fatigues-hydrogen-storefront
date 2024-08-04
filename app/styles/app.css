@@ -4514,13 +4514,3 @@ button.uploadcare--button_primary {
     padding-top: 0.5rem;
   }
 }
-
-.selected_option {
-  border: 1.5px solid #1212128D !important;
-  border-color: #1212128D !important;
-}
-
-.a_class {
-  /* nothing */
-  border: 1px solid black;
-}

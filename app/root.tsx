@@ -163,7 +163,6 @@ export default function App() {
     }
   }, [location.href, sessionId]);
 
-
   useAnalytics(hasUserConsent, locale);
 
   return (
@@ -174,6 +173,10 @@ export default function App() {
           name="theme-color"
           content={`${isHome ? '#141414' : '#FFFFFF'}`}
         />
+        {/* <script
+          async
+          src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
+        ></script> */}
         <Meta />
         <Links />
         {process.env.NODE_ENV == 'development' && (
@@ -191,10 +194,6 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <CustomScriptsAndAnalytics />
-        <script
-          async
-          src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
-        ></script>
       </body>
     </html>
   );
