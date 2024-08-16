@@ -793,7 +793,7 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant &&
+            {/* {selectedVariant &&
               !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
@@ -810,7 +810,7 @@ export function ProductForm() {
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
@@ -827,10 +827,10 @@ export function ProductForm() {
                           quantity: 1,
                         },
                         //redo hack
-                        {
-                          merchandiseId: redoResponse?.id,
-                          quantity: 1,
-                        },
+                        // {
+                        //   merchandiseId: redoResponse?.id,
+                        //   quantity: 1,
+                        // },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}

@@ -26,6 +26,8 @@ export default function useRedo() {
     const response = await fetch('/get-redo');
     const data = await response.json();
 
+    console.log(data);
+
     const products = flattenConnection(data.products);
     const variants = flattenConnection(products[0].variants);
 
@@ -34,6 +36,8 @@ export default function useRedo() {
       id: variants[0].id,
       price: variants[0].price.amount,
     };
+
+    console.log(mutated_response);
 
     return mutated_response;
   };
