@@ -466,7 +466,7 @@ export function ProductForm() {
   const {location} = useNavigation();
 
   const redoBox = useRef(null);
-  // const [redo, setRedo] = useState(true);
+  const [redo, setRedo] = useState(true);
   const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
@@ -793,7 +793,8 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {/* {selectedVariant &&
+            {selectedVariant &&
+              redoResponse &&
               !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
@@ -810,7 +811,7 @@ export function ProductForm() {
                     </span>
                   </div>
                 </div>
-              )} */}
+              )}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
@@ -826,11 +827,11 @@ export function ProductForm() {
                           merchandiseId: selectedVariant.id,
                           quantity: 1,
                         },
-                        //redo hack
-                        // {
-                        //   merchandiseId: redoResponse?.id,
-                        //   quantity: 1,
-                        // },
+                        // redo hack
+                        {
+                          merchandiseId: redoResponse?.id,
+                          quantity: 1,
+                        },
                       ]
                 }
                 variant={isOutOfStock ? 'secondary' : 'primary'}

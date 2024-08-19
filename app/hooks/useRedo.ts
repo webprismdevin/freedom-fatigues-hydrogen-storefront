@@ -26,7 +26,9 @@ export default function useRedo() {
     const response = await fetch('/get-redo');
     const data = await response.json();
 
-    console.log(data);
+    if(data?.products?.edges?.length === 0){
+      return null;
+    }
 
     const products = flattenConnection(data.products);
     const variants = flattenConnection(products[0].variants);
@@ -43,7 +45,7 @@ export default function useRedo() {
   };
 
   useEffect(() => {
-    if (isInCart) setAddRedo(false);
+    if (isInCart || !redoResponse) setAddRedo(false);
   }, [isInCart]);
 
   useEffect(() => {

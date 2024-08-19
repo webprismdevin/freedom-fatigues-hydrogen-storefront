@@ -14,7 +14,7 @@ export async function getRedo(storefront: LoaderArgs['context']['storefront']) {
 }
 
 const REDO_QUERY = `query {
-    products(first: 10, query: "vendor:re:do") {
+    products(first: 10, query: "vendor:'re:do'") {
       edges {
         node {
           id
@@ -25,7 +25,7 @@ const REDO_QUERY = `query {
                 node {
                 id
                 title
-                price{
+                price {
                     amount
                 } 
               }

@@ -660,7 +660,7 @@ export function ProductForm() {
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
 
-  const isClearance = useTags(product.tags, 'Clearance');
+  // const isClearance = useTags(product.tags, 'Clearance');
   // const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
@@ -684,7 +684,7 @@ export function ProductForm() {
                 </div>
               )}
             {/* {selectedVariant &&
-              !isRedoInCart &&
+              // !isRedoInCart &&
               !isClearance &&
               !isExcludeRedo && (
                 <div className="flex items-center gap-2">
