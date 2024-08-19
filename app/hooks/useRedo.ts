@@ -1,8 +1,6 @@
-import {useFetcher, useMatches} from '@remix-run/react';
+import {useMatches} from '@remix-run/react';
 import {flattenConnection} from '@shopify/hydrogen';
 import {useEffect, useState} from 'react';
-import {set} from 'zod';
-import {CartAction} from '~/lib/type';
 
 export default function useRedo() {
   const [root] = useMatches();
