@@ -39,8 +39,6 @@ export default function useRedo() {
       price: variants[0].price.amount,
     };
 
-    console.log(mutated_response);
-
     return mutated_response;
   };
 
