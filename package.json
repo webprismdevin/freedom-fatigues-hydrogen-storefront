@@ -83,6 +83,9 @@
   "overrides": {
     "@tanstack/react-virtual": "3.9.0"
   },
+  "resolutions": {
+    "@tanstack/react-virtual": "3.9.0"
+  },
   "engines": {
     "node": ">=18"
   }
