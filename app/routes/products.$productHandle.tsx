@@ -812,7 +812,6 @@ export function ProductForm() {
                   </div>
                 </div>
               )}
-              )}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
