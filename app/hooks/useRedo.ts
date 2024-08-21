@@ -22,6 +22,10 @@ export default function useRedo() {
     return line;
   };
 
+  useEffect(() => {
+    console.log(redoResponse);
+  }, [redoResponse]);
+
   const getRedo = async () => {
     const response = await fetch('/get-redo');
     const data = await response.json();
@@ -43,7 +47,7 @@ export default function useRedo() {
   };
 
   useEffect(() => {
-    if (isInCart || !redoResponse) setAddRedo(false);
+    if (isInCart) setAddRedo(false);
   }, [isInCart]);
 
   useEffect(() => {

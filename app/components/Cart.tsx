@@ -347,6 +347,11 @@ function CartDiscounts({
 
 function UpdateDiscountForm({children}: {children: React.ReactNode}) {
   const fetcher = useFetcher();
+
+  useEffect(() => {
+    console.log(fetcher.data);
+  }, [fetcher]);
+
   return (
     <fetcher.Form action="/cart" method="post">
       <input
