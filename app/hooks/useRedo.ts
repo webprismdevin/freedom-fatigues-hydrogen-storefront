@@ -2,8 +2,6 @@ import {useMatches} from '@remix-run/react';
 import {flattenConnection} from '@shopify/hydrogen';
 import {useEffect, useState} from 'react';
 
-// trigger redeploy
-
 export default function useRedo() {
   const [root] = useMatches();
   const [isInCart, setInCart] = useState(false);
