@@ -8,6 +8,7 @@ import {
 import {
   Await,
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -193,6 +194,7 @@ export default function App() {
         </Layout>
         <ScrollRestoration />
         <Scripts />
+        <LiveReload />
         <CustomScriptsAndAnalytics />
       </body>
     </html>
@@ -267,6 +269,7 @@ export function ErrorBoundary({error}: {error: Error}) {
           <GenericError error={error} />
         </Layout>
         <Scripts />
+        <LiveReload />
         <CustomScriptsAndAnalytics />
       </body>
     </html>

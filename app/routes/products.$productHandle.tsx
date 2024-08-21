@@ -815,7 +815,7 @@ export function ProductForm() {
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={
-                  !addRedo || isClearance
+                  !addRedo || isClearance || !redoResponse
                     ? [
                         {
                           merchandiseId: selectedVariant.id,

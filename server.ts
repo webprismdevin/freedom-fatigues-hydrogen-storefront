@@ -51,7 +51,7 @@ export default {
       const handleRequest = createRequestHandler({
         build: remixBuild,
         mode: process.env.NODE_ENV,
-        getLoadContext: () => ({cache, session, waitUntil, storefront, env}),
+        getLoadContext: () => ({session, storefront, env, waitUntil}),
       });
 
       const response = await handleRequest(request);

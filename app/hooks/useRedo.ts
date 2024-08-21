@@ -2,6 +2,8 @@ import {useMatches} from '@remix-run/react';
 import {flattenConnection} from '@shopify/hydrogen';
 import {useEffect, useState} from 'react';
 
+// trigger redeploy
+
 export default function useRedo() {
   const [root] = useMatches();
   const [isInCart, setInCart] = useState(false);
@@ -20,6 +22,10 @@ export default function useRedo() {
     return line;
   };
 
+  useEffect(() => {
+    console.log(redoResponse);
+  }, [redoResponse]);
+
   const getRedo = async () => {
     const response = await fetch('/get-redo');
     const data = await response.json();
@@ -37,13 +43,11 @@ export default function useRedo() {
       price: variants[0].price.amount,
     };
 
-    console.log(mutated_response);
-
     return mutated_response;
   };
 
   useEffect(() => {
-    if (isInCart || !redoResponse) setAddRedo(false);
+    if (isInCart) setAddRedo(false);
   }, [isInCart]);
 
   useEffect(() => {
