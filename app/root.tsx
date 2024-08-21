@@ -174,10 +174,10 @@ export default function App() {
           name="theme-color"
           content={`${isHome ? '#141414' : '#FFFFFF'}`}
         />
-        {/* <script
+        <script
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
-        ></script> */}
+        ></script>
         <Meta />
         <Links />
         {process.env.NODE_ENV == 'development' && (
