@@ -82,14 +82,12 @@
   "overrides": {
     "@tanstack/react-virtual": "3.9.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@shopify/hydrogen": "^2023.7.13"
+    "react-dom": "^18.2.0"
   },
   "resolutions": {
     "@tanstack/react-virtual": "3.9.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@shopify/hydrogen": "^2023.7.13"
+    "react-dom": "^18.2.0"
   },
   "engines": {
     "node": ">=18"
