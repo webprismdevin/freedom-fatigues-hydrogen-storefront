@@ -69,9 +69,12 @@ export async function loader({params, context}: LoaderArgs) {
     shop,
     hero,
     modules,
-    featuredProducts: context.storefront.query<{
-      products: ProductConnection;
-    }>(HOMEPAGE_FEATURED_PRODUCTS_QUERY),
+    featuredProducts: context.storefront.query<{collection: CollectionConnection;}>(
+      HOMEPAGE_FEATURED_PRODUCTS_QUERY,
+      {
+        variables: {handle: 'best-sellers'},
+      },
+    ),
     newlyReleased: context.storefront.query<{collection: CollectionConnection}>(
       HOMEPAGE_SALE_PRODUCTS_QUERY,
       {
@@ -103,11 +106,11 @@ export default function Homepage() {
 
       <Suspense>
         <Await resolve={featuredProducts}>
-          {({products}) => {
-            if (!products?.nodes) return <></>;
+          {({collection}) => {
+            if (!collection?.products?.nodes) return <></>;
             return (
               <ProductSwimlane
-                products={products.nodes}
+                products={collection?.products.nodes}
                 title="Best Sellers"
                 count={4}
               />
@@ -202,11 +205,13 @@ const COLLECTION_HERO_QUERY = `#graphql
 // @see: https://shopify.dev/api/storefront/latest/queries/products
 export const HOMEPAGE_FEATURED_PRODUCTS_QUERY = `#graphql
   ${PRODUCT_CARD_FRAGMENT}
-  query homepageFeaturedProducts($country: CountryCode, $language: LanguageCode)
+  query homepageFeaturedProducts($handle: String, $country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
-    products(first: 8, sortKey: BEST_SELLING) {
-      nodes {
-        ...ProductCard
+    collection(handle: $handle) {
+      products(first: 8) {
+        nodes {
+          ...ProductCard
+        }
       }
     }
   }
