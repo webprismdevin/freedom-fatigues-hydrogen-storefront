@@ -55,7 +55,7 @@ export function ProductCard({
     cardLabel = label;
   } else if (isDiscounted(price as MoneyV2, compareAtPrice as MoneyV2)) {
     cardLabel = 'Sale';
-  } else if (isNewArrival(product.publishedAt)) {
+  } else if (isNewArrival(product.tags)) {
     cardLabel = 'New';
   }
 

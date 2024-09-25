@@ -51,10 +51,9 @@ export function getExcerpt(text: string) {
   return match?.length ? match[0] : text;
 }
 
-export function isNewArrival(date: string, daysOld = 30) {
+export function isNewArrival(tags: string[]) {
   return (
-    new Date(date).valueOf() >
-    new Date().setDate(new Date().getDate() - daysOld).valueOf()
+    tags.includes('New')
   );
 }
 
