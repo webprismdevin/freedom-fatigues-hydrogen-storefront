@@ -2116,6 +2116,9 @@ select{
 .mt-\[2px\]{
   margin-top: 2px;
 }
+.mb-8{
+  margin-bottom: 2rem;
+}
 .line-clamp-2{
   overflow: hidden;
   display: -webkit-box;
@@ -2384,6 +2387,9 @@ select{
 }
 .max-w-xl{
   max-width: 36rem;
+}
+.max-w-screen-lg{
+  max-width: 64em;
 }
 .flex-1{
   flex: 1 1 0%;
@@ -3053,6 +3059,10 @@ select{
 .py-8{
   padding-top: 2rem;
   padding-bottom: 2rem;
+}
+.py-16{
+  padding-top: 4rem;
+  padding-bottom: 4rem;
 }
 .pb-0{
   padding-bottom: 0px;
@@ -4284,6 +4294,11 @@ button.uploadcare--button_primary {
   .md\:text-lg{
     font-size: 1.125rem;
     line-height: 1.75rem;
+  }
+
+  .md\:text-4xl{
+    font-size: 2.25rem;
+    line-height: 2.5rem;
   }
 
   .md\:leading-\[4rem\]{
