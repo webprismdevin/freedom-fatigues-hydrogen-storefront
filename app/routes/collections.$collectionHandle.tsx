@@ -14,7 +14,7 @@ import invariant from 'tiny-invariant';
 import {PageHeader, Section, Text, SortFilter, Heading} from '~/components';
 import {ProductGrid} from '~/components/ProductGrid';
 import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {sanity} from '~/lib/sanity';
+import {MODULE_FRAGMENT, sanity} from '~/lib/sanity';
 import Modules from '~/components/Modules';
 import {useState} from 'react';
 
@@ -137,15 +137,7 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const modules =
     await sanity.fetch(`*[_type == 'collection' && store.slug.current == '${collectionHandle}'][0]{
-    modules[]{
-      (_type == 'component.collectionGrid') => {
-        ...,
-        collections[]{
-          ...,
-          "to":'/collections/' + collection->store.slug.current
-        }
-      }
-    }
+      ${MODULE_FRAGMENT}
   }`);
 
   const {collection, collections} = await context.storefront.query<{

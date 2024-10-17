@@ -1,6 +1,6 @@
 import {useMatches} from '@remix-run/react';
 import {flattenConnection} from '@shopify/hydrogen';
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo, useCallback} from 'react';
 
 export default function useRedo() {
   const [root] = useMatches();
@@ -8,7 +8,7 @@ export default function useRedo() {
   const [addRedo, setAddRedo] = useState(true);
   const [redoResponse, setRedoResponse] = useState<any>(null);
 
-  const findRedo = async () => {
+  const findRedo = useCallback(async () => {
     const cart = await root.data?.cart;
 
     const line =
@@ -16,19 +16,14 @@ export default function useRedo() {
         (line: any) => line.node.merchandise.sku === 'x-redo',
       ) ?? null;
 
-
     return line;
-  };
+  }, [root.data?.cart]);
 
-  useEffect(() => {
-    console.log(redoResponse);
-  }, [redoResponse]);
-
-  const getRedo = async () => {
+  const getRedo = useCallback(async () => {
     const response = await fetch('/get-redo');
-    const data = await response.json();
+    const data = await response.json() as {products?: {edges: any[]}};
 
-    if(data?.products?.edges?.length === 0){
+    if (data?.products?.edges?.length === 0) {
       return null;
     }
 
@@ -42,7 +37,7 @@ export default function useRedo() {
     };
 
     return mutated_response;
-  };
+  }, []);
 
   useEffect(() => {
     if (isInCart) setAddRedo(false);
@@ -50,15 +45,20 @@ export default function useRedo() {
 
   useEffect(() => {
     async function run() {
-      const isInCart = (await findRedo()) ? true : false;
-
-      setInCart(isInCart);
+      const cartHasRedo = await findRedo();
+      setInCart(!!cartHasRedo);
       const data = await getRedo();
       setRedoResponse(data);
     }
 
     run();
-  }, [root.data?.cart]);
+  }, [findRedo, getRedo]);
 
-  return [isInCart, redoResponse, addRedo, setAddRedo];
+  const memoizedResult = useMemo(() => [isInCart, redoResponse, addRedo, setAddRedo], [
+    isInCart,
+    redoResponse,
+    addRedo,
+  ]);
+
+  return memoizedResult;
 }
