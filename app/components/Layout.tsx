@@ -690,13 +690,13 @@ const Footer = ({text, footer}: any) => {
     <div className="bg-primary text-contrast">
       <div className={`grid w-screen grid-cols-1 lg:grid-cols-${sectionCount}`}>
         <div className={`p-12 ${outlineStyle}`}>
-          <LinkListTitle title={email.title} />
-          <div className="my-2 leading-loose">
+          {/* <LinkListTitle title={email.title} /> */}
+          {/* <div className="my-2 leading-loose">
             {email.text && <p>{email.text}</p>}
-          </div>
-          <div className="flex ">
+          </div> */}
+          {/* <div className="flex ">
             <SignUpForm variant="dark" source={'footer'} />
-          </div>
+          </div> */}
           <div className="my-4 flex gap-2">
             <a href="https://www.instagram.com/freedomfatigues/">
               <IconInstagram />
