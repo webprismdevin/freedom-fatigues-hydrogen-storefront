@@ -72,13 +72,13 @@ export default function QuickAdd({
         },
       );
 
-    fetch(
-      `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${
-        selectedVariant?.price
-      }&currency=${currency}${fbp ? `&fbp=${fbp}` : ''}${
-        fbc !== null ? `&fbc=${fbc}` : ''
-      }`,
-    );
+    // fetch(
+    //   `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${
+    //     selectedVariant?.price
+    //   }&currency=${currency}${fbp ? `&fbp=${fbp}` : ''}${
+    //     fbc !== null ? `&fbc=${fbc}` : ''
+    //   }`,
+    // );
   }
 
   if (product.variants.nodes?.length === 1 || product.variants.length === 1) {

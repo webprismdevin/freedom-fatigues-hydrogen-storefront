@@ -542,15 +542,15 @@ export function ProductForm() {
         },
       );
 
-    fetch(
-      `/server/AddToCart?event_id=${event_id}&content_ids=${fromGID(
-        product.id,
-      )}&content_name=${product.title}&content_type=product&value=${
-        selectedVariant?.price!.amount
-      }${fbp ? `&fbp=${fbp}` : ''}${
-        fbc !== null ? `&fbc=${fbc}` : ''
-      }&currency=USD&event_source_url=${window.location.href}`,
-    );
+    // fetch(
+    //   `/server/AddToCart?event_id=${event_id}&content_ids=${fromGID(
+    //     product.id,
+    //   )}&content_name=${product.title}&content_type=product&value=${
+    //     selectedVariant?.price!.amount
+    //   }${fbp ? `&fbp=${fbp}` : ''}${
+    //     fbc !== null ? `&fbc=${fbc}` : ''
+    //   }&currency=USD&event_source_url=${window.location.href}`,
+    // );
   }
 
   // klaviyo 'viewed product' snippet
@@ -610,15 +610,15 @@ export function ProductForm() {
       currency: 'USD',
     };
 
-    fetch(
-      `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${
-        product.title
-      }${fbp ? `&fbp=${fbp}` : ''}${
-        fbc !== null ? `&fbc=${fbc}` : ''
-      }&content_type=product&value=${value}&currency=USD&event_source_url=${
-        window.location.href
-      }`,
-    );
+    // fetch(
+    //   `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${
+    //     product.title
+    //   }${fbp ? `&fbp=${fbp}` : ''}${
+    //     fbc !== null ? `&fbc=${fbc}` : ''
+    //   }&content_type=product&value=${value}&currency=USD&event_source_url=${
+    //     window.location.href
+    //   }`,
+    // );
 
     const trackViewContent = () => {
       // facebook pixel
