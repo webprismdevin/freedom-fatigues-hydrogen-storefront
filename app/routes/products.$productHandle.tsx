@@ -216,6 +216,11 @@ export default function Product() {
 
   useRebuyEvent({handle: product.handle, event: 'viewed'});
 
+  useEffect(() => {
+    window._aimTrack = window._aimTrack || [];
+    window._aimTrack.push(['aim_view_item', product]);
+  }, []);
+
   return (
     <>
       <Section className="px-0">
@@ -567,8 +572,11 @@ export function ProductForm() {
         },
       });
     }
-    // if (window.TriplePixel)
-    //   window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
+
+    if (window._aimTrack) {
+      window._aimTrack = window._aimTrack || [];
+      window._aimTrack.push(['aim_add_to_cart', product]);
+    }
 
     const ff_id = window.sessionStorage.getItem('ff_id');
     const event_id = `atc__${ff_id}__${uuidv4()}`;

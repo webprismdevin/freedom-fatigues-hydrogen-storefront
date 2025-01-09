@@ -21,6 +21,7 @@ import {
   ShopifySalesChannel,
   Seo,
   type SeoHandleFunction,
+  Script,
 } from '@shopify/hydrogen';
 import {Layout} from '~/components';
 import {GenericError} from './components/GenericError';
@@ -36,10 +37,7 @@ import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import {useEffect, useState} from 'react';
-import {useLocation} from 'react-use';
-import useFbCookies from './hooks/useFbCookies';
-import {v4 as uuidv4} from 'uuid';
+import {useEffect} from 'react';
 
 declare global {
   interface Window {
@@ -49,6 +47,7 @@ declare global {
     _learnq: any;
     plausible: any;
     clarity: any;
+    _aimTrack: any;
   }
 }
 
@@ -134,35 +133,35 @@ export default function App() {
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
-  const location = useLocation();
-  const [fbp, fbc] = useFbCookies();
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  // const location = useLocation();
+  // const [fbp, fbc] = useFbCookies();
+  // const [sessionId, setSessionId] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Generate a unique identifier
-    const sessionId = uuidv4();
-    // Store the unique identifier in sessionStorage
-    sessionStorage.setItem('ff_id', sessionId);
-    // Set the state variable
-    setSessionId(sessionId);
-  }, []);
+  // useEffect(() => {
+  //   // Generate a unique identifier
+  //   const sessionId = uuidv4();
+  //   // Store the unique identifier in sessionStorage
+  //   sessionStorage.setItem('ff_id', sessionId);
+  //   // Set the state variable
+  //   setSessionId(sessionId);
+  // }, []);
 
-  useEffect(() => {
-    if (sessionId) {
-      const event_id = `pv__${sessionId}__${uuidv4()}`;
+  // useEffect(() => {
+  //   if (sessionId) {
+  //     const event_id = `pv__${sessionId}__${uuidv4()}`;
 
-      const customData = {
-        eventID: event_id,
-      };
-      window.fbq('track', 'PageView', {}, customData);
+  //     const customData = {
+  //       eventID: event_id,
+  //     };
+  //     window.fbq('track', 'PageView', {}, customData);
 
-      fetch(
-        `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
-          fbc !== null ? `&fbc=${fbc}` : ''
-        }&event_source_url=${location.href}`,
-      ).then((res) => res.json());
-    }
-  }, [location.href, sessionId]);
+  //     fetch(
+  //       `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
+  //         fbc !== null ? `&fbc=${fbc}` : ''
+  //       }&event_source_url=${location.href}`,
+  //     ).then((res) => res.json());
+  //   }
+  // }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);
 
@@ -174,10 +173,14 @@ export default function App() {
           name="theme-color"
           content={`${isHome ? '#141414' : '#FFFFFF'}`}
         />
-        <script
+        <Script
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
-        ></script>
+        />
+        <Script
+          async
+          src="https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com"
+        />
         <Meta />
         <Links />
         {process.env.NODE_ENV == 'development' && (
