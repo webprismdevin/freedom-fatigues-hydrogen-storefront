@@ -71,6 +71,28 @@ import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
 import {v4 as uuidv4} from 'uuid';
 
+export type AimerceProduct = {
+  id: string; // shopify product id, for eaxmple: "gid://shopify/Product/1234567890"
+  title: string;
+  handle: string;
+  vendor: string;
+  featuredImage?: {
+    url: string;
+  };
+  selectedVariant?: {
+    id: string; // shopify variant id, for eaxmple: "gid://shopify/ProductVariant/1234567890"
+    title: string;
+    price: {
+      amount: number;
+      currencyCode: string;
+    };
+    compareAtPrice?: number;
+    image: {
+      url: string;
+    };
+  };
+}
+
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
     (media) => media.mediaContentType === 'IMAGE',
@@ -574,8 +596,30 @@ export function ProductForm() {
     }
 
     if (window._aimTrack) {
+
+      const productData: AimerceProduct = {
+        id: fromGID(product.id),
+        title: product.title,
+        handle: product.handle,
+        vendor: product.vendor,
+        featuredImage: {
+          url: firstVariant.image.url,
+        },
+        selectedVariant: {
+          id: fromGID(selectedVariant.id),
+          title: selectedVariant.title,
+          price: selectedVariant.price,
+          compareAtPrice: selectedVariant.compareAtPrice?.amount,
+          image: {
+            url: selectedVariant.image.url,
+          },
+        },
+      };
+
+      console.log('aim track', productData);
+
       window._aimTrack = window._aimTrack || [];
-      window._aimTrack.push(['aim_add_to_cart', product]);
+      window._aimTrack.push(['aim_add_to_cart', productData]);
     }
 
     const ff_id = window.sessionStorage.getItem('ff_id');
