@@ -2271,6 +2271,9 @@ select{
 .max-h-full{
   max-height: 100%;
 }
+.max-h-screen{
+  max-height: 100vh;
+}
 .min-h-48{
   min-height: 12rem;
 }
@@ -3914,6 +3917,11 @@ button.uploadcare--button_primary {
   .sm\:text-sm{
     font-size: 0.875rem;
     line-height: 1.25rem;
+  }
+
+  .sm\:text-base{
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
 @media (min-width: 48em){

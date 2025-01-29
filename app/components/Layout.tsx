@@ -173,43 +173,70 @@ export function MenuDrawer({
 
 function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
   return (
-    <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
+    <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8 max-h-screen overflow-y-auto">
       {/* Top level menu items */}
       {(menu || []).map((item) => (
         <div key={item._key}>
           {item.collectionLinks && (
             <Disclosure>
-              <Disclosure.Button className="pb-1 font-heading text-xl">
-                {item.title}
-              </Disclosure.Button>
-              {/* sublevel menus */}
-              <Disclosure.Panel>
-                <ul className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
-                  {item.megaMenuTitle && (
-                    <li className="font-bold">
-                      <Link to={item.megaMenuTitle.to}>
-                        {item.megaMenuTitle.title}
-                      </Link>
-                    </li>
-                  )}
-                  {item.collectionLinks.map((link) => (
-                    <li key={link.slug}>
-                      <Link
-                        to={link.slug}
-                        target={link.target}
-                        onClick={onClose}
-                        className={({isActive}) =>
-                          isActive ? '-mb-px pb-1' : 'pb-1'
-                        }
+              {({open}) => (
+                <>
+                  <Disclosure.Button className="pb-1 font-heading text-xl flex w-full items-center justify-between">
+                    <span>{item.title}</span>
+                    <span
+                      className={`transform transition-transform ${
+                        open ? 'rotate-180' : ''
+                      }`}
+                    >
+                      <svg 
+                        width="24" 
+                        height="24" 
+                        strokeWidth="1.5" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        color="#000000"
                       >
-                        <Text as="span" size="copy">
-                          {link.title}
-                        </Text>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </Disclosure.Panel>
+                        <path 
+                          d="M6 9L12 15L18 9" 
+                          stroke="#000000" 
+                          strokeWidth="1.5" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </Disclosure.Button>
+                  {/* sublevel menus */}
+                  <Disclosure.Panel>
+                    <ul className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8">
+                      {item.megaMenuTitle && (
+                        <li className="font-bold">
+                          <Link to={item.megaMenuTitle.to}>
+                            {item.megaMenuTitle.title}
+                          </Link>
+                        </li>
+                      )}
+                      {item.collectionLinks.map((link) => (
+                        <li key={link.slug}>
+                          <Link
+                            to={link.slug}
+                            target={link.target}
+                            onClick={onClose}
+                            className={({isActive}) =>
+                              isActive ? '-mb-px pb-1' : 'pb-1'
+                            }
+                          >
+                            <Text as="span" size="copy">
+                              {link.title}
+                            </Text>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </Disclosure.Panel>
+                </>
+              )}
             </Disclosure>
           )}
           {item._type == 'linkInternal' && (
@@ -277,8 +304,8 @@ function MobileHeader({
           <Input
             className={
               isHome
-                ? 'focus:border-contrast/20 dark:focus:border-primary/20'
-                : 'focus:border-primary/20'
+                ? 'focus:border-contrast/20 dark:focus:border-primary/20 border-b border-contrast/20'
+                : 'focus:border-primary/20 border-b border-primary/20'
             }
             type="search"
             variant="minisearch"
@@ -387,7 +414,7 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex select-none items-start gap-x-4 flex-wrap h-[30px]">
+        <nav className="flex select-none items-start gap-x-4 overflow-x-auto h-[30px] scrollbar-none">
           {/* Top level menu items */}
           {(menu || []).map((item: any) => {
             if (item._type === 'collectionGroup') {
@@ -409,8 +436,8 @@ function DesktopHeader({
                   prefetch="intent"
                   className={({isActive}) =>
                     isActive
-                      ? '-mb-px border-b-2 border-red-500'
-                      : 'hover:border-b-2 hover:border-b-red-500'
+                      ? '-mb-px border-b-2 border-red-500 whitespace-nowrap'
+                      : 'hover:border-b-2 hover:border-b-red-500 whitespace-nowrap'
                   }
                 >
                   <LinkTitle text={item.title} />
@@ -429,8 +456,8 @@ function DesktopHeader({
           <Input
             className={
               isHome
-                ? 'focus:border-contrast/20 dark:focus:border-primary/20'
-                : 'focus:border-primary/20'
+                ? 'focus:border-contrast/20 dark:focus:border-primary/20 border-b border-contrast/20'
+                : 'focus:border-primary/20 border-b border-primary/20'
             }
             type="search"
             variant="minisearch"
@@ -458,7 +485,9 @@ function DesktopHeader({
 }
 
 function LinkTitle({text}: {text: string}) {
-  return <span className="text-lg uppercase">{text}</span>;
+  return <span className="text-lg uppercase whitespace-nowrap">
+    {text === 'FREEDOM' ? 'FREEDOM PARTNERS' : text}
+  </span>;
 }
 
 function MegaMenuLink({
@@ -473,12 +502,12 @@ function MegaMenuLink({
   return (
     <div
       {...props}
-      className="flex cursor-pointer items-start tracking-wider"
+      className="flex cursor-pointer items-center whitespace-nowrap tracking-wider"
     >
       <div className="hover:border-b-2 hover:border-b-red-500">
-        <LinkTitle text={menu.title} />
+        <span className="text-lg uppercase">{menu.title}</span>
       </div>
-      <div className="h-[28px] grid place-content-center">
+      <div className="grid place-content-center">
         <IconCaret direction={open ? 'up' : 'down'} />
       </div>
     </div>

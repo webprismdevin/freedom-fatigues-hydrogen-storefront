@@ -198,7 +198,13 @@ export const HERO_FRAGMENT = groq`
     image {
       ...,
       "height": asset-> metadata.dimensions.height,
-      "width": asset-> metadata.dimensions.width
+      "width": asset-> metadata.dimensions.width,
+    },
+    mobileImage {
+      ...,
+      "height": asset-> metadata.dimensions.height,
+      "width": asset-> metadata.dimensions.width,
+      "url": asset-> url
     },
     ${CTA_FRAGMENT}
 `;

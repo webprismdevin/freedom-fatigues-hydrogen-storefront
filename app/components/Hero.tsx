@@ -1,7 +1,6 @@
 import {urlFor} from '~/lib/sanity';
 import {Button} from './Button';
 import {SanityImageAssetDocument} from '@sanity/client';
-import {Image} from '@shopify/hydrogen';
 import {useScroll, useTransform, motion} from 'framer-motion';
 import {useRef} from 'react';
 
@@ -29,10 +28,24 @@ export type Hero = {
   };
   layout?: 'left' | 'right' | 'center';
   size?: 'small' | 'medium' | 'large';
+  mobileImage?: {
+    asset: SanityImageAssetDocument;
+    alt: string;
+    loading?: 'lazy' | 'eager';
+    width: number;
+    height: number;
+    hotspot: {
+      x: number;
+      y: number;
+      height: number;
+      width: number;
+    };
+    overlay: number;
+  };
 };
 
 export function Hero({data}: {data: Hero}) {
-  const {image, title, caption, cta, layout, size} = data;
+  const {image, title, caption, cta, layout, size, mobileImage} = data;
 
   const ref = useRef(null);
 
@@ -52,21 +65,30 @@ export function Hero({data}: {data: Hero}) {
       }`}
       ref={ref}
     >
-      {/* <motion.div
-        // style={{y}}
-        className="absolute left-0 top-0 bottom-0 right-0 z-0 h-full w-full"
-      > */}
-      <Image
-        src={urlFor(image).quality(100).format('webp').url()}
-        sizes={'100vw'}
-        className="absolute bottom-0 left-0 right-0 top-0 z-0 h-full w-full object-cover"
-        style={{
-          objectPosition: 'top center'
-        }}
-        alt={image.alt}
-        loading={image.loading ? image.loading : 'lazy'}
-      />
-      {/* </motion.div> */}
+      <picture
+        className="absolute bottom-0 left-0 right-0 top-0 z-0"
+        style={{width: '100%', height: '100%'}}
+      >
+        <source
+          srcSet={
+            mobileImage
+              ? urlFor(mobileImage).quality(100).format('webp').url()
+              : urlFor(image).quality(100).format('webp').url()
+          }
+          media="(max-width: 549px)"
+        />
+        <source
+          srcSet={urlFor(image).quality(100).format('webp').url()}
+          media="(min-width: 550px)"
+        />
+        <img
+          className="h-full w-full object-cover"
+          style={{objectPosition: 'top center'}}
+          src={urlFor(image).quality(100).format('webp').url()}
+          alt={image.alt}
+          loading={image.loading ? image.loading : 'lazy'}
+        />
+      </picture>
       <div
         style={{
           background: 'black',
