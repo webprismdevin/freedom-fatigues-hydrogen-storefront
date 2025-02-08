@@ -23,6 +23,7 @@ import GovXID from './GovXID';
 import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
 import {Switch} from '@headlessui/react';
+import posthog from 'posthog-js';
 
 type Layouts = 'page' | 'drawer';
 
@@ -207,7 +208,7 @@ export function CartDetails({
                 <h5 className="px-6 font-heading text-lg md:px-12">
                   You might also like
                 </h5>
-                <div className="min-h-48 hiddenScroll relative flex snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
+                <div className="hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
                   <RebuyRecommendations
                     className="w-1/3 shrink-0 grow-0 md:w-1/4"
                     lines={cart?.lines}
@@ -252,7 +253,9 @@ function FreeShippingProgress({cart}: any) {
             )} for FREE U.S. shipping`
           : "You've unlocked free U.S. shipping!"}
       </div>
-      <div className="text-xs text-center">(Free shipping only applicable to FF gear)</div>
+      <div className="text-center text-xs">
+        (Free shipping only applicable to FF gear)
+      </div>
     </div>
   );
 }
@@ -407,10 +410,33 @@ function CartCheckoutActions({
 }) {
   if (!checkoutUrl) return null;
 
+  const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    // Capture checkout event
+    posthog.capture('begin_checkout', {
+      $value: cart.cost.totalAmount.amount,
+      currency: cart.cost.totalAmount.currencyCode,
+      items: cart.lines.edges.map(({node}) => ({
+        product_id: node.merchandise.product.id,
+        variant_id: node.merchandise.id,
+        product_title: node.merchandise.product.title,
+        variant_title: node.merchandise.title,
+        price: parseFloat(node.cost.totalAmount.amount),
+        quantity: node.quantity,
+      })),
+    });
+
+    // Small delay to ensure event is captured
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    window.location.href = checkoutUrl;
+  };
+
   return (
     <div className="mt-2 flex flex-col">
       <a
         href={checkoutUrl}
+        onClick={handleCheckout}
         target="_self"
         className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
       >

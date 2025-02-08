@@ -38,6 +38,7 @@ import {getSiteSettings} from './lib/sanity';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
 import {useEffect} from 'react';
+import posthog from 'posthog-js';
 
 declare global {
   interface Window {
@@ -213,8 +214,13 @@ export function CatchBoundary() {
   //
 
   useEffect(() => {
-    window.clarity('event', '404');
-    window.clarity('set', '404');
+    posthog.capture('error_occurred', {
+      error_message: `${caught.status} ${caught.data}`,
+      error_type: '404',
+      $set: {
+        last_error: `${caught.status} ${caught.data}`
+      }
+    });
   }, []);
 
   return (
@@ -253,9 +259,16 @@ export function ErrorBoundary({error}: {error: Error}) {
   const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
 
   useEffect(() => {
-    window.clarity('event', `generic error ${error?.message ?? 'unknown'}`);
-    window.clarity('set', 'generic error');
+    posthog.capture('error_occurred', {
+      error_message: error?.message ?? 'unknown',
+      error_type: 'generic_error',
+      $set: {
+        last_error: error?.message ?? 'unknown'
+      }
+    });
   }, []);
+
+  
 
   return (
     <html lang={locale.language}>

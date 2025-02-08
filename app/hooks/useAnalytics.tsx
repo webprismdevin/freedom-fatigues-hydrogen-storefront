@@ -9,6 +9,7 @@ import {
 } from '@shopify/hydrogen';
 import {useEffect} from 'react';
 import {CartAction, I18nLocale} from '../lib/type';
+import posthog from 'posthog-js';
 
 export function useAnalytics(hasUserConsent: boolean, locale: I18nLocale) {
   useShopifyCookies({hasUserConsent});
@@ -37,7 +38,12 @@ export function useAnalytics(hasUserConsent: boolean, locale: I18nLocale) {
       eventName: AnalyticsEventName.PAGE_VIEW,
       payload,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // PostHog pageview
+      posthog.capture('$pageview', {
+        $current_url: window.location.href,
+        ...pageAnalytics,
+      });
   }, [location]);
 
   // Add to cart analytics
@@ -46,6 +52,7 @@ export function useAnalytics(hasUserConsent: boolean, locale: I18nLocale) {
     formDataValue: CartAction.ADD_TO_CART,
     dataKey: 'analytics',
   }) as unknown as ShopifyAddToCartPayload;
+
   if (cartData) {
     const addToCartPayload: ShopifyAddToCartPayload = {
       ...getClientBrowserParameters(),
@@ -57,6 +64,14 @@ export function useAnalytics(hasUserConsent: boolean, locale: I18nLocale) {
       eventName: AnalyticsEventName.ADD_TO_CART,
       payload: addToCartPayload,
     });
+
+    // PostHog add to cart event
+    if (cartData.products) {
+      posthog.capture('add_to_cart', {
+        $value: cartData.products[0].price,
+        ...addToCartPayload,
+      });
+    }
   }
 }
 
