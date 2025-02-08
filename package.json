@@ -36,6 +36,7 @@
     "isbot": "^3.6.5",
     "logsnag": "^0.1.6",
     "lozad": "^1.16.0",
+    "posthog-js": "^1.215.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.4.1",
