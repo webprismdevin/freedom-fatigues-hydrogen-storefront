@@ -20,6 +20,7 @@ function PosthogInit() {
       posthog.init('phc_xymVXqqszGW2G9KrgRFCpWNfHz6jdpGZpDAzIb6W9nC', {
         api_host: '/ingest', // Uses existing proxy route
         capture_pageview: false, // We'll handle this in useAnalytics
+        person_profiles: 'always',
       });
     }
   }, []);
