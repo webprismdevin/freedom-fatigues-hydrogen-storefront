@@ -3,7 +3,7 @@
 
 name: Storefront 360566
 on:
-  - push
+- push
 permissions:
   contents: read
   deployments: write
@@ -37,4 +37,4 @@ jobs:
       id: deploy
       run: npx shopify hydrogen deploy
       env:
-        SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: "${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1000005106 }}"
+        SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: "${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_360566 }}"
