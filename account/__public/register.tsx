@@ -89,9 +89,9 @@ export const action: ActionFunction = async ({request, context, params}) => {
 };
 
 export const meta: MetaFunction = () => {
-  return {
+  return [{
     title: 'Register',
-  };
+  }];
 };
 
 export default function Register() {

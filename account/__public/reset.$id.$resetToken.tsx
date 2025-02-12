@@ -98,9 +98,9 @@ export const action: ActionFunction = async ({
 };
 
 export const meta: MetaFunction = () => {
-  return {
+  return [{
     title: 'Reset Password',
-  };
+  }];
 };
 
 export default function Reset() {

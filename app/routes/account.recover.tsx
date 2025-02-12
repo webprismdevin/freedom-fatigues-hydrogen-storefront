@@ -54,7 +54,7 @@ export const action: ActionFunction = async ({request, context}) => {
 };
 
 export const meta: MetaFunction = () => {
-  return {title: 'Recover Password'};
+  return [{title: 'Recover Password'}];
 };
 
 export default function Recover() {

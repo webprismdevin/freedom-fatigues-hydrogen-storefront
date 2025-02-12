@@ -2,7 +2,7 @@ import {
   defer,
   type LinksFunction,
   type MetaFunction,
-  type LoaderArgs,
+  type LoaderFunctionArgs,
   type AppLoadContext,
 } from '@shopify/remix-oxygen';
 import {
@@ -13,9 +13,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch,
   useLoaderData,
   useMatches,
+  useRouteError,
+  isRouteErrorResponse,
 } from '@remix-run/react';
 import {
   ShopifySalesChannel,
@@ -23,7 +24,7 @@ import {
   type SeoHandleFunction,
   Script,
 } from '@shopify/hydrogen';
-import {Layout} from '~/components';
+import {Layout} from '~/components/Layout';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
 
@@ -104,14 +105,17 @@ export const links: LinksFunction = () => {
   ];
 };
 
-export const meta: MetaFunction = () => ({
-  charset: 'utf-8',
-  viewport: 'width=device-width,initial-scale=1',
-});
+export const meta: MetaFunction = () => {
+  return [
+    {charset: 'utf-8'},
+    {name: 'viewport', content: 'width=device-width,initial-scale=1'},
+  ];
+};
 
-export async function loader({context}: LoaderArgs) {
+export async function loader({context}: LoaderFunctionArgs) {
+  const {storefront, session} = context;
   const [cartId, shop] = await Promise.all([
-    context.session.get('cartId'),
+    session.get('cartId'),
     getShopData(context),
   ]);
 
@@ -120,7 +124,7 @@ export async function loader({context}: LoaderArgs) {
   return defer({
     settings,
     shop,
-    selectedLocale: context.storefront.i18n,
+    selectedLocale: storefront.i18n,
     cart: cartId ? getCart(context, cartId) : undefined,
     analytics: {
       shopifySalesChannel: ShopifySalesChannel.hydrogen,
@@ -205,88 +209,37 @@ export default function App() {
   );
 }
 
-export function CatchBoundary() {
+export function ErrorBoundary() {
+  const error = useRouteError();
   const [root] = useMatches();
-  const caught = useCatch();
-  const isNotFound = caught.status === 404;
-  const locale = root.data?.selectedLocale ?? DEFAULT_LOCALE;
+  const data = (root?.data ?? {}) as RootData;
+  const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
 
-  //
+  let errorMessage = 'Unknown error';
+  let errorStatus = 500;
 
-  useEffect(() => {
-    posthog.capture('error_occurred', {
-      error_message: `${caught.status} ${caught.data}`,
-      error_type: '404',
-      $set: {
-        last_error: `${caught.status} ${caught.data}`
-      }
-    });
-  }, []);
+  if (isRouteErrorResponse(error)) {
+    errorMessage = error.data;
+    errorStatus = error.status;
+  } else if (error instanceof Error) {
+    errorMessage = error.message;
+  }
 
   return (
     <html lang={locale.language}>
       <head>
-        <title>{isNotFound ? 'Not found' : 'Error'}</title>
+        <title>{`${errorStatus} ${errorMessage}`}</title>
         <Meta />
         <Links />
-        {process.env.NODE_ENV == 'development' && (
-          <script src="http://localhost:8097"></script>
-        )}
       </head>
       <body>
-        <Layout
-          settings={root?.data.settings}
-          layout={root?.data?.shop}
-          key={`${locale.language}-${locale.country}`}
-        >
-          {isNotFound ? (
-            <NotFound type={caught.data?.pageType} />
-          ) : (
-            <GenericError
-              error={{message: `${caught.status} ${caught.data}`}}
-            />
-          )}
+        <Layout layout={data?.shop} settings={data?.settings}>
+          <div className="route-error">
+            <h1>{errorStatus}</h1>
+            <h2>{errorMessage}</h2>
+          </div>
         </Layout>
         <Scripts />
-        <CustomScriptsAndAnalytics />
-      </body>
-    </html>
-  );
-}
-
-export function ErrorBoundary({error}: {error: Error}) {
-  const [root] = useMatches();
-  const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
-
-  useEffect(() => {
-    posthog.capture('error_occurred', {
-      error_message: error?.message ?? 'unknown',
-      error_type: 'generic_error',
-      $set: {
-        last_error: error?.message ?? 'unknown'
-      }
-    });
-  }, []);
-
-  
-
-  return (
-    <html lang={locale.language}>
-      <head>
-        <title>Error</title>
-        <Meta />
-        <Links />
-        {process.env.NODE_ENV == 'development' && (
-          <script src="http://localhost:8097"></script>
-        )}
-      </head>
-      <body>
-        <Layout layout={root?.data?.shop} settings={root?.data.settings}>
-          <GenericError error={error} />
-        </Layout>
-        <Scripts />
-        <LiveReload />
-        <CustomScriptsAndAnalytics />
       </body>
     </html>
   );
@@ -464,4 +417,10 @@ export async function getCart({storefront}: AppLoadContext, cartId: string) {
   });
 
   return cart;
+}
+
+export interface RootData {
+  selectedLocale: typeof DEFAULT_LOCALE;
+  shop: any;
+  settings: any;
 }

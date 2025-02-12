@@ -85,7 +85,7 @@ export const action: ActionFunction = async ({request, context, params}) => {
 };
 
 export const meta: MetaFunction = () => {
-  return {title: 'Login'};
+  return [{title: 'Login'}];
 };
 
 export default function Login() {

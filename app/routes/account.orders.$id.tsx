@@ -17,7 +17,7 @@ import type {
 import {Link, Heading, PageHeader, Text} from '~/components';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return {title: `Order ${data?.order?.name}`};
+  return [{title: `Order ${data?.order?.name}`}];
 };
 
 export async function loader({request, context, params}: LoaderArgs) {

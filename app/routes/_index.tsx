@@ -1,5 +1,5 @@
 import {Hero} from '../components/Hero';
-import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
 import {ProductSwimlane} from '~/components';
@@ -32,7 +32,7 @@ export interface CollectionHero {
   top?: boolean;
 }
 
-export async function loader({params, context}: LoaderArgs) {
+export async function loader({params, context}: LoaderFunctionArgs) {
   const {language, country} = context.storefront.i18n;
 
   if (

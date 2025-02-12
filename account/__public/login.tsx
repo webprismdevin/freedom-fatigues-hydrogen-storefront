@@ -80,9 +80,11 @@ export const action: ActionFunction = async ({request, context, params}) => {
 };
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'Login',
-  };
+  return [
+    {
+      title: 'Login',
+    },
+  ];
 };
 
 export default function Login() {
@@ -94,19 +96,19 @@ export default function Login() {
   );
 
   return (
-    <div className="flex justify-center my-24 px-4">
-      <div className="max-w-md w-full">
+    <div className="my-24 flex justify-center px-4">
+      <div className="w-full max-w-md">
         <h1 className="text-4xl">Sign in</h1>
         <p>View orders, tracking and manage returns + exchanges.</p>
         {/* TODO: Add onSubmit to validate _before_ submission with native? */}
         <Form
           method="post"
           noValidate
-          className="pt-6 pb-8 mt-4 mb-4 space-y-3"
+          className="mb-4 mt-4 space-y-3 pb-8 pt-6"
         >
           {actionData?.formError && (
-            <div className="flex items-center justify-center mb-6 bg-zinc-500">
-              <p className="m-4 text-s text-contrast">{actionData.formError}</p>
+            <div className="mb-6 flex items-center justify-center bg-zinc-500">
+              <p className="text-s m-4 text-contrast">{actionData.formError}</p>
             </div>
           )}
           <div>
@@ -131,7 +133,7 @@ export default function Login() {
               }}
             />
             {nativeEmailError && (
-              <p className="text-red-500 text-xs">{nativeEmailError} &nbsp;</p>
+              <p className="text-xs text-red-500">{nativeEmailError} &nbsp;</p>
             )}
           </div>
 
@@ -164,7 +166,7 @@ export default function Login() {
               }}
             />
             {nativePasswordError && (
-              <p className="text-red-500 text-xs">
+              <p className="text-xs text-red-500">
                 {' '}
                 {nativePasswordError} &nbsp;
               </p>
@@ -172,14 +174,14 @@ export default function Login() {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-primary text-contrast rounded py-2 px-4 focus:shadow-outline block w-full"
+              className="focus:shadow-outline block w-full rounded bg-primary px-4 py-2 text-contrast"
               type="submit"
             >
               Sign in
             </button>
           </div>
-          <div className="flex justify-between items-center mt-8 border-t border-gray-300">
-            <p className="align-baseline text-sm mt-6">
+          <div className="mt-8 flex items-center justify-between border-t border-gray-300">
+            <p className="mt-6 align-baseline text-sm">
               New to {shopName}? &nbsp;
               <Link className="inline underline" to="/account/register">
                 Create an account

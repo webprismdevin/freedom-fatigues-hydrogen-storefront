@@ -8,7 +8,7 @@ import {
   Fragment,
 } from 'react';
 import {Dialog, Disclosure, Listbox, Transition} from '@headlessui/react';
-import {defer, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {
   useLoaderData,
   Await,
@@ -148,7 +148,7 @@ type ProductQueryType = {
   shop: Shop;
 };
 
-export async function loader({params, request, context}: LoaderArgs) {
+export async function loader({params, request, context}: LoaderFunctionArgs) {
   const {productHandle} = params;
   invariant(productHandle, 'Missing productHandle param, check route filename');
 

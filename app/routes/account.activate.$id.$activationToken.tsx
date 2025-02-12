@@ -101,7 +101,7 @@ export const action: ActionFunction = async ({
 };
 
 export const meta: MetaFunction = () => {
-  return {title: 'Activate Account'};
+  return [{title: 'Activate Account'}];
 };
 
 export default function Activate() {

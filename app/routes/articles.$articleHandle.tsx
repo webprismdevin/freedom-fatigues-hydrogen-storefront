@@ -68,11 +68,14 @@ export const meta: MetaFunction = ({
 }: {
   data: SerializeFrom<typeof loader> | undefined;
 }) => {
-
-  return {
-    title: data?.article?.seo?.title ?? data?.article?.title,
-    description: data?.article?.seo?.description ?? data?.article?.excerpt,
-  };
+  return [
+    {
+      title: data?.article?.seo?.title ?? data?.article?.title,
+    },
+    {
+      description: data?.article?.seo?.description ?? data?.article?.excerpt,
+    },
+  ];
 };
 
 // export const links: LinksFunction = () => {

@@ -1,4 +1,4 @@
-import {defer, json, type LoaderArgs} from '@shopify/remix-oxygen';
+import {defer, json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import type {
   Collection as CollectionType,
@@ -75,7 +75,7 @@ export type SortParam =
   | 'newest'
   | 'featured';
 
-export async function loader({params, request, context}: LoaderArgs) {
+export async function loader({params, request, context}: LoaderFunctionArgs) {
   const {collectionHandle} = params;
 
   invariant(collectionHandle, 'Missing collectionHandle param');

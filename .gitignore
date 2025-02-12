@@ -7,7 +7,6 @@ node_modules
 .env
 /app/styles/app.css
 .vscode
-package-lock.json
 
 .shopify
 **/.DS_Store

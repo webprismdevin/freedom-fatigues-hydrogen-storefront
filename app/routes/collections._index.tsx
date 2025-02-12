@@ -1,4 +1,4 @@
-import {json, type MetaFunction, type LoaderArgs} from '@shopify/remix-oxygen';
+import {json, type MetaFunction, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import type {
   Collection,
@@ -24,7 +24,7 @@ export const handle = {
   },
 };
 
-export const loader = async ({request, context: {storefront}}: LoaderArgs) => {
+export const loader = async ({request, context: {storefront}}: LoaderFunctionArgs) => {
   const variables = getPaginationVariables(request, PAGINATION_SIZE);
   const {collections} = await storefront.query<{
     collections: CollectionConnection;
@@ -40,9 +40,7 @@ export const loader = async ({request, context: {storefront}}: LoaderArgs) => {
 };
 
 export const meta: MetaFunction = () => {
-  return {
-    title: 'All Collections',
-  };
+  return [{ title: 'All Collections' }];
 };
 
 export default function Collections() {
