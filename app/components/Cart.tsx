@@ -61,7 +61,8 @@ function ProgressBar({value}: {value: number}) {
   useEffect(() => {
     // Check sessionStorage only after hydration
     if (isHydrated) {
-      setConfettiFired(window.sessionStorage.getItem('confettiFired') === 'true');
+      const hasConfettiFired = window.sessionStorage.getItem('confettiFired') === 'true';
+      setConfettiFired(hasConfettiFired);
     }
   }, [isHydrated]);
 
@@ -69,14 +70,17 @@ function ProgressBar({value}: {value: number}) {
     if (value >= 1) {
       setWidth(100);
       if (!confettiFired && isHydrated) {
-        confetti({
-          colors: ['#B31942', '#0A3161', '#FFFFFF'],
-          particleCount: 100,
-          spread: 70,
-          origin: {y: 0.6, x: 0.8},
-        });
-        setConfettiFired(true);
-        window.sessionStorage.setItem('confettiFired', 'true');
+        const hasConfettiFired = window.sessionStorage.getItem('confettiFired') === 'true';
+        if (!hasConfettiFired) {
+          confetti({
+            colors: ['#B31942', '#0A3161', '#FFFFFF'],
+            particleCount: 100,
+            spread: 70,
+            origin: {y: 0.6, x: 0.8},
+          });
+          window.sessionStorage.setItem('confettiFired', 'true');
+          setConfettiFired(true);
+        }
       }
       return;
     }
