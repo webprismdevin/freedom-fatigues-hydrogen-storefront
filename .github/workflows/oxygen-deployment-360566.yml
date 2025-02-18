@@ -19,19 +19,22 @@ jobs:
       with:
         node-version: lts/*
         check-latest: true
-    - name: Get yarn cache directory
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-    - uses: actions/cache@v3
+    - name: Cache node modules
+      id: cache-npm
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-node-modules
       with:
-        path: "${{ steps.yarn-cache-dir-path.outputs.dir }}"
-        key: "${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}"
-        restore-keys: "${{ runner.os }}-yarn-\n"
+        path: "~/.npm"
+        key: "${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}"
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
     - name: Install dependencies
-      id: install-dependencies
-      run: yarn
+      run: npm install
     - name: Build and Publish to Oxygen
       id: deploy
-      run: npx shopify hydrogen deploy --build-command "yarn build"
+      run: npx shopify hydrogen deploy
       env:
         SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: "${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_360566 }}"
