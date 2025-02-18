@@ -20,12 +20,13 @@ import {
   CartLoading,
   Link,
 } from '~/components';
-import {useParams, Form, Await, useMatches} from '@remix-run/react';
+import {useParams, Form, Await, useMatches, useFetcher} from '@remix-run/react';
 import {useLocalStorage, useLocation, useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
+import {useDrawerCart} from '~/hooks/useDrawerCart';
 import {AnimatePresence, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
@@ -90,6 +91,7 @@ export function Layout({
 
 function Header({title, menu}: {title: string; menu?: any}) {
   const isHome = useIsHomePath();
+  const fetcher = useFetcher<{cart: CartType}>();
 
   const {
     isOpen: isCartOpen,
@@ -103,19 +105,18 @@ function Header({title, menu}: {title: string; menu?: any}) {
     closeDrawer: closeMenu,
   } = useDrawer();
 
-  const addToCartFetchers = useCartFetchers('ADD_TO_CART');
-  const location = useLocation();
+  // Use the drawer cart hook to handle cart additions
+  useDrawerCart({
+    isOpen: isCartOpen,
+    openDrawer: openCart,
+  });
 
-  // toggle cart drawer when adding to cart
-  useEffect(() => {
-    if (isCartOpen || !addToCartFetchers.length) return;
-    openCart();
-  }, [addToCartFetchers, isCartOpen, openCart]);
+  const location = useLocation();
 
   useEffect(() => {
     if (!isMenuOpen || !menu) return;
     closeMenu();
-  }, [location]);
+  }, [location, isMenuOpen, menu, closeMenu]);
 
   return (
     <>
@@ -140,8 +141,13 @@ function Header({title, menu}: {title: string; menu?: any}) {
 }
 
 function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
-  const [root] = useMatches();
-  const rootData = root.data as RootData;
+  const fetcher = useFetcher<{cart: CartType}>();
+  
+  useEffect(() => {
+    if (isOpen && !fetcher.data && fetcher.state !== 'loading') {
+      fetcher.load('/cart');
+    }
+  }, [isOpen, fetcher]);
 
   return (
     <Drawer
@@ -151,12 +157,11 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       openFrom="right"
     >
       <Suspense fallback={<CartLoading />}>
-        <Await resolve={rootData?.cart}>
-          {(cart) => {
-            if (!cart) return <CartLoading />;
-            return <Cart layout="drawer" onClose={onClose} cart={cart} />;
-          }}
-        </Await>
+        {fetcher.data?.cart ? (
+          <Cart layout="drawer" onClose={onClose} cart={fetcher.data.cart} />
+        ) : (
+          <CartLoading />
+        )}
       </Suspense>
     </Drawer>
   );
@@ -628,20 +633,21 @@ function CartCount({
   isHome: boolean;
   openCart: () => void;
 }) {
-  const [root] = useMatches();
-  const rootData = root.data as RootData;
+  const fetcher = useFetcher<{cart: CartType}>();
+  
+  useEffect(() => {
+    if (!fetcher.data && fetcher.state !== 'loading') {
+      fetcher.load('/cart');
+    }
+  }, [fetcher]);
 
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
-      <Await resolve={rootData?.cart}>
-        {(cart) => (
-          <Badge
-            dark={isHome}
-            openCart={openCart}
-            count={cart?.totalQuantity || 0}
-          />
-        )}
-      </Await>
+      <Badge
+        dark={isHome}
+        openCart={openCart}
+        count={fetcher.data?.cart?.totalQuantity || 0}
+      />
     </Suspense>
   );
 }
