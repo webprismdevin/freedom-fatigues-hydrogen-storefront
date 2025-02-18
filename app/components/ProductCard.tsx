@@ -12,7 +12,6 @@ import {isDiscounted, isNewArrival, useIsHomePath} from '~/lib/utils';
 import {getProductPlaceholder} from '~/lib/placeholders';
 import type {MoneyV2, Product} from '@shopify/hydrogen/storefront-api-types';
 import StarRating from './StarRating';
-import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import QuickAdd from './QuickAdd';
 
@@ -37,7 +36,6 @@ export function ProductCard({
   quickAdd?: boolean;
 }) {
   let cardLabel;
-  const [isRedoInCart] = useRedo();
   const isClearance = useTags(product.tags, 'Clearance');
   const isHome = useIsHomePath();
 

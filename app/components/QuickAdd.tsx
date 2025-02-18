@@ -3,7 +3,6 @@ import {Dialog, Listbox, Popover, Transition} from '@headlessui/react';
 import {Image} from '@shopify/hydrogen';
 import {AddToCartButton} from './AddToCartButton';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
-import useRedo from '~/hooks/useRedo';
 import StarRating from './StarRating';
 import {IconClose, IconSelect} from './Icon';
 import {Link} from './Link';
@@ -33,8 +32,6 @@ export default function QuickAdd({
     price: string;
   }>(null);
   const [fbp, fbc] = useFbCookies();
-
-  const [isRedoInCart] = useRedo();
 
   // toggle modal when adding to cart
   const addToCartFetchers = useCartFetchers('ADD_TO_CART');

@@ -64,7 +64,6 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/hooks/useScript';
-import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
@@ -91,7 +90,7 @@ export type AimerceProduct = {
       url: string;
     };
   };
-}
+};
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -492,11 +491,7 @@ export function ProductForm() {
   const [currentSearchParams] = useSearchParams();
   const {location} = useNavigation();
 
-  const redoBox = useRef(null);
-  const [redo, setRedo] = useState(true);
   const [sizeChartOpen, setSizeChartOpen] = useState(false);
-
-  const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
 
   const [fbp, fbc] = useFbCookies();
 
@@ -596,7 +591,6 @@ export function ProductForm() {
     }
 
     if (window._aimTrack) {
-
       const productData: AimerceProduct = {
         id: fromGID(product.id),
         title: product.title,
@@ -759,7 +753,6 @@ export function ProductForm() {
   }, [root.data?.cart]);
 
   const isClearance = useTags(product.tags, 'Clearance');
-  const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
     <div className="grid gap-10">
@@ -845,47 +838,14 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant &&
-              redoResponse &&
-              !isRedoInCart &&
-              !isClearance &&
-              !isExcludeRedo && (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    ref={redoBox}
-                    onChange={(e) => setAddRedo(e.target.checked)}
-                    checked={addRedo}
-                  />
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-[11px]">
-                      {defaults.product.redoCopy}
-                    </span>
-                  </div>
-                </div>
-              )}
             {!isOutOfStock ? (
               <AddToCartButton
-                lines={
-                  !addRedo || isClearance || !redoResponse
-                    ? [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                      ]
-                    : [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                        // redo hack
-                        {
-                          merchandiseId: redoResponse?.id,
-                          quantity: 1,
-                        },
-                      ]
-                }
+                lines={[
+                  {
+                    merchandiseId: selectedVariant.id,
+                    quantity: 1,
+                  },
+                ]}
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 data-test="add-to-cart"
                 analytics={{

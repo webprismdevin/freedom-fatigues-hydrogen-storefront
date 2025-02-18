@@ -63,7 +63,6 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/hooks/useScript';
-import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
@@ -660,9 +659,6 @@ export function ProductForm() {
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
 
-  // const isClearance = useTags(product.tags, 'Clearance');
-  // const isExcludeRedo = useTags(product.tags, 'exclude_redo');
-
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -683,24 +679,6 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {/* {selectedVariant &&
-              // !isRedoInCart &&
-              !isClearance &&
-              !isExcludeRedo && (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    ref={redoBox}
-                    onChange={(e) => setAddRedo(e.target.checked)}
-                    checked={addRedo}
-                  />
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-[11px]">
-                      {defaults.product.redoCopy}
-                    </span>
-                  </div>
-                </div>
-              )} */}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={[
@@ -911,7 +889,9 @@ export function ProductOptions({
                           searchParams={searchParamsWithDefaults}
                           className={clsx(
                             'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
-                            checked ? '!border-primary/50 selected_option' : '!border-primary/0',
+                            checked
+                              ? 'selected_option !border-primary/50'
+                              : '!border-primary/0',
                           )}
                         />
                       </Text>
