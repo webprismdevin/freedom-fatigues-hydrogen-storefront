@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npm run build:css && shopify hydrogen build",
     "build:css": "postcss styles --base styles --dir app/styles --env production",
-    "dev": "npm run build:css && concurrently -g --kill-others-on-fail -r npm:dev:css \"shopify hydrogen dev --codegen-unstable\"",
+    "dev": "npm run build:css && concurrently -g --kill-others-on-fail -r npm:dev:css \"shopify hydrogen dev --codegen\"",
     "dev:css": "postcss styles --base styles --dir app/styles -w",
     "preview": "npm run build && shopify hydrogen preview",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
@@ -16,6 +16,7 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
+    "@graphql-codegen/cli": "^5.0.5",
     "@headlessui/react": "^1.7.2",
     "@popmotion/popcorn": "^0.4.4",
     "@portabletext/react": "^2.0.2",
@@ -26,6 +27,8 @@
     "@shopify/cli-hydrogen": "^8.1.0",
     "@shopify/hydrogen": "^2023.10.0",
     "@shopify/hydrogen-cli": "^0.12.1",
+    "@shopify/hydrogen-codegen": "^0.3.2",
+    "@shopify/mini-oxygen": "^3.1.1",
     "@shopify/remix-oxygen": "^2.0.0",
     "canvas-confetti": "^1.6.0",
     "clsx": "^1.2.1",
