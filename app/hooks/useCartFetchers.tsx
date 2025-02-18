@@ -1,7 +1,7 @@
 import {useFetchers} from '@remix-run/react';
 import {CartForm} from '@shopify/hydrogen';
 
-export function useCartFetchers(actionType?: string) {
+export function useCartFetchers(actionType?: string, excludeRedo: boolean = false) {
   const fetchers = useFetchers();
 
   const cartFetchers = [];
@@ -14,6 +14,14 @@ export function useCartFetchers(actionType?: string) {
 
     // If we have an action type, only return fetchers with that action
     if (actionType && actionType !== formInputs.action) continue;
+
+    // If excludeRedo is true, skip Redo cart actions
+    if (excludeRedo && formInputs.action === CartForm.ACTIONS.LinesAdd) {
+      const lines = formInputs.inputs?.lines;
+      if (lines?.some((line: any) => line.merchandiseId.includes('re:do'))) {
+        continue;
+      }
+    }
 
     cartFetchers.push(fetcher);
   }

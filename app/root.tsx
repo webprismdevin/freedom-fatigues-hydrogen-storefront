@@ -29,6 +29,8 @@ import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {Layout} from '~/components/Layout';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
+import {RedoProvider} from '@redotech/redo-hydrogen';
+import {Suspense} from 'react';
 
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
@@ -155,7 +157,7 @@ export async function loader({context}: LoaderFunctionArgs) {
 }
 
 export default function App() {
-  const {settings, shop, selectedLocale} = useLoaderData<typeof loader>();
+  const {settings, shop, selectedLocale, cart} = useLoaderData<typeof loader>();
   const locale = selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();

@@ -841,10 +841,10 @@ export function ProductForm() {
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={[
-                  {
-                    merchandiseId: selectedVariant.id,
-                    quantity: 1,
-                  },
+                        {
+                          merchandiseId: selectedVariant.id,
+                          quantity: 1,
+                        },
                 ]}
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 data-test="add-to-cart"

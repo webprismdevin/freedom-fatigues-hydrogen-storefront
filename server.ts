@@ -10,6 +10,8 @@ import {
 } from '@shopify/hydrogen';
 import {HydrogenSession} from '~/lib/session.server';
 import {getLocaleFromRequest} from '~/lib/utils';
+import {REDO_REQUIRED_HOSTNAMES} from '@redotech/redo-hydrogen';
+import {createContentSecurityPolicy} from '@shopify/hydrogen';
 
 /**
  * Export a fetch handler in module format.
@@ -84,3 +86,19 @@ export default {
     }
   },
 };
+
+// const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+//   defaultSrc: [
+//     "'self'",
+//     'cdn.shopify.com',
+//     'shopify.com',
+//     ...REDO_REQUIRED_HOSTNAMES,
+//   ],
+//   connectSrc: [
+//     "'self'",
+//     'cdn.shopify.com',
+//     'monorail-edge.shopifysvc.com',
+//     ...REDO_REQUIRED_HOSTNAMES,
+//   ],
+//   // ... rest of CSP config ...
+// });

@@ -22,14 +22,16 @@ import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
-import {Switch} from '@headlessui/react';
 import posthog from 'posthog-js';
 import {CartForm} from '@shopify/hydrogen';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
+import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
+import {RedoProvider} from '@redotech/redo-hydrogen';
 
 type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
+const REDO_STORE_ID = "6439e48e41e6bb001f6407a5";
 
 export function Cart({
   layout,
@@ -40,13 +42,49 @@ export function Cart({
   onClose?: () => void;
   cart: CartType | null;
 }) {
-  const linesCount = Boolean(cart?.lines?.edges?.length || 0);
+  if (!cart) return null;
+
+  // Use flattenConnection to handle the cart lines
+  const lines = flattenConnection(cart.lines);
+  const linesCount = lines.length > 0;
+
+  // Transform cart data to match Redo's expected structure
+  const cartForRedo = {
+    ...cart,
+    lines: {
+      nodes: lines
+    }
+  } as unknown as CartType;
+
+  // Debug logging
+  console.log('Cart Data Structure:', {
+    originalLines: cart.lines,
+    transformedLines: cartForRedo.lines,
+    flattenedLines: lines,
+    cost: cart.cost,
+    totalAmount: cart.cost?.totalAmount,
+    attributes: cart.attributes,
+    checkoutUrl: cart.checkoutUrl,
+  });
+
+  // Ensure cart has all required properties
+  if (!cart.cost?.totalAmount) {
+    console.log('Missing required cart properties');
+    return (
+      <CartEmpty hidden={false} onClose={onClose} layout={layout} />
+    );
+  }
 
   return (
-    <>
-      <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
-      <CartDetails cart={cart} layout={layout} />
-    </>
+    <RedoProvider
+      cart={cartForRedo}
+      storeId={REDO_STORE_ID}
+    >
+      <>
+        <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
+        <CartDetails cart={cart} layout={layout} />
+      </>
+    </RedoProvider>
   );
 }
 
@@ -240,11 +278,65 @@ export function CartDetails({
   );
 }
 
-function FreeShippingProgress({cart}: any) {
+function CartCheckoutActions({
+  cart,
+  checkoutUrl,
+}: {
+  cart: CartType;
+  checkoutUrl: string;
+}) {
+  if (!checkoutUrl) return null;
+
+  // Add defensive check for cart data
+  if (!cart.cost?.totalAmount) return null;
+
+  const lines = flattenConnection(cart.lines);
+  if (lines.length === 0) return null;
+
+  const handleAnalytics = (enabled: boolean) => {
+    // Capture checkout event
+    posthog.capture('begin_checkout', {
+      $value: cart.cost.totalAmount.amount,
+      currency: cart.cost.totalAmount.currencyCode,
+      items: lines.map((line) => ({
+        product_id: line.merchandise.product.id,
+        variant_id: line.merchandise.id,
+        product_title: line.merchandise.product.title,
+        variant_title: line.merchandise.title,
+        price: parseFloat(line.cost.totalAmount.amount),
+        quantity: line.quantity,
+      })),
+      redo_coverage: enabled,
+    });
+  };
+
+  return (
+    <div className="mt-2 flex flex-col">
+      <RedoCheckoutButtons
+        onClick={handleAnalytics}
+        cart={cart}
+        storeId={REDO_STORE_ID}
+      >
+        {/* Fallback button shown if Redo is not available */}
+        <a
+          href={checkoutUrl}
+          onClick={() => handleAnalytics(false)}
+          target="_self"
+          className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+        >
+          Continue to Checkout
+        </a>
+      </RedoCheckoutButtons>
+    </div>
+  );
+}
+
+function FreeShippingProgress({cart}: {cart: CartType}) {
   //qualified shipping cart cost
   const cart_cost = useMemo(() => {
-    return cart.lines.edges.reduce((total: number, {node}: {node: CartLine}) => {
-      return total + Number(node.cost.totalAmount.amount);
+    const lines = flattenConnection(cart.lines) as CartLine[];
+    return lines.reduce((total: number, line: CartLine) => {
+      return total + Number(line.cost.totalAmount.amount);
     }, 0);
   }, [cart.lines]);
 
@@ -371,51 +463,6 @@ function CartLines({
         ))}
       </ul>
     </section>
-  );
-}
-
-function CartCheckoutActions({
-  cart,
-  checkoutUrl,
-}: {
-  cart: CartType;
-  checkoutUrl: string;
-}) {
-  if (!checkoutUrl) return null;
-
-  const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-
-    // Capture checkout event
-    posthog.capture('begin_checkout', {
-      $value: cart.cost.totalAmount.amount,
-      currency: cart.cost.totalAmount.currencyCode,
-      items: cart.lines.edges.map(({node}) => ({
-        product_id: node.merchandise.product.id,
-        variant_id: node.merchandise.id,
-        product_title: node.merchandise.product.title,
-        variant_title: node.merchandise.title,
-        price: parseFloat(node.cost.totalAmount.amount),
-        quantity: node.quantity,
-      })),
-    });
-
-    // Small delay to ensure event is captured
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    window.location.href = checkoutUrl;
-  };
-
-  return (
-    <div className="mt-2 flex flex-col">
-      <a
-        href={checkoutUrl}
-        onClick={handleCheckout}
-        target="_self"
-        className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-      >
-        Continue to Checkout
-      </a>
-    </div>
   );
 }
 

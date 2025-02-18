@@ -9,7 +9,8 @@ export function useDrawerCart({
   isOpen: boolean;
   openDrawer: () => void;
 }) {
-  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
+  // Exclude Redo cart actions when checking for cart additions
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd, true);
 
   useEffect(() => {
     if (isOpen || !addToCartFetchers.length) return;

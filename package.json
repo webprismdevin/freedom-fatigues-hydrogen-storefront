@@ -20,6 +20,7 @@
     "@headlessui/react": "^1.7.2",
     "@popmotion/popcorn": "^0.4.4",
     "@portabletext/react": "^2.0.2",
+    "@redotech/redo-hydrogen": "^1.1.0",
     "@remix-run/react": "^2.1.0",
     "@sanity/client": "^5.3.0",
     "@sanity/image-url": "^1.0.2",
