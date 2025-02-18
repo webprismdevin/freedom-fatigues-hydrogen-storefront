@@ -1,7 +1,13 @@
 // Virtual entry point for the app
 import * as remixBuild from '@remix-run/dev/server-build';
 import {createRequestHandler} from '@shopify/remix-oxygen';
-import {createStorefrontClient, storefrontRedirect} from '@shopify/hydrogen';
+import {
+  createStorefrontClient,
+  storefrontRedirect,
+  createCartHandler,
+  cartGetIdDefault,
+  cartSetIdDefault,
+} from '@shopify/hydrogen';
 import {HydrogenSession} from '~/lib/session.server';
 import {getLocaleFromRequest} from '~/lib/utils';
 
@@ -42,14 +48,21 @@ export default {
         storefrontId: env.PUBLIC_STOREFRONT_ID,
       });
 
+      // Create the cart handler and attach it to context
+      const cart = createCartHandler({
+        storefront,
+        getCartId: cartGetIdDefault(request.headers),
+        setCartId: cartSetIdDefault(),
+      });
+
       /**
        * Create a Remix request handler and pass
-       * Hydrogen's Storefront client to the loader context.
+       * Hydrogen's Storefront client and cart handler to the loader context.
        */
       const handleRequest = createRequestHandler({
         build: remixBuild,
         mode: process.env.NODE_ENV,
-        getLoadContext: () => ({session, storefront, env, waitUntil}),
+        getLoadContext: () => ({session, storefront, cart, env, waitUntil}),
       });
 
       const response = await handleRequest(request);

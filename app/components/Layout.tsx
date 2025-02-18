@@ -31,6 +31,18 @@ import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
+import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
+
+type RootData = {
+  cart: Promise<CartType>;
+  settings: any;
+  selectedLocale: any;
+  shop: any;
+  analytics: {
+    shopifySalesChannel: string;
+    shopId: string;
+  };
+};
 
 export function Layout({
   children,
@@ -129,6 +141,7 @@ function Header({title, menu}: {title: string; menu?: any}) {
 
 function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
   const [root] = useMatches();
+  const rootData = root.data as RootData;
 
   return (
     <Drawer
@@ -137,13 +150,14 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       heading="Your Cart"
       openFrom="right"
     >
-      {/* <div className="grid"> */}
       <Suspense fallback={<CartLoading />}>
-        <Await resolve={root.data?.cart}>
-          {(cart) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
+        <Await resolve={rootData?.cart}>
+          {(cart) => {
+            if (!cart) return <CartLoading />;
+            return <Cart layout="drawer" onClose={onClose} cart={cart} />;
+          }}
         </Await>
       </Suspense>
-      {/* </div> */}
     </Drawer>
   );
 }
@@ -615,10 +629,11 @@ function CartCount({
   openCart: () => void;
 }) {
   const [root] = useMatches();
+  const rootData = root.data as RootData;
 
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
-      <Await resolve={root.data?.cart}>
+      <Await resolve={rootData?.cart}>
         {(cart) => (
           <Badge
             dark={isHome}

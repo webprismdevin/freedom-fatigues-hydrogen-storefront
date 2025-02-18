@@ -24,6 +24,8 @@ import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
 import {Switch} from '@headlessui/react';
 import posthog from 'posthog-js';
+import {CartForm} from '@shopify/hydrogen';
+import {useIsHydrated} from '~/hooks/useIsHydrated';
 
 type Layouts = 'page' | 'drawer';
 
@@ -53,18 +55,21 @@ import {Rebuy_MiniProductCard} from './ProductCard';
 import useRedo from '~/hooks/useRedo';
 
 function ProgressBar({value}: {value: number}) {
+  const isHydrated = useIsHydrated();
   const [width, setWidth] = useState(0);
-  const [confettiFired, setConfettiFired] = useState(() => {
-    if (window.sessionStorage.getItem('confettiFired') === 'true') {
-      return true;
+  const [confettiFired, setConfettiFired] = useState(false);
+
+  useEffect(() => {
+    // Check sessionStorage only after hydration
+    if (isHydrated) {
+      setConfettiFired(window.sessionStorage.getItem('confettiFired') === 'true');
     }
-    return false;
-  });
+  }, [isHydrated]);
 
   useEffect(() => {
     if (value >= 1) {
       setWidth(100);
-      if (!confettiFired) {
+      if (!confettiFired && isHydrated) {
         confetti({
           colors: ['#B31942', '#0A3161', '#FFFFFF'],
           particleCount: 100,
@@ -77,7 +82,7 @@ function ProgressBar({value}: {value: number}) {
       return;
     }
     setWidth(value * 100);
-  }, [value]);
+  }, [value, confettiFired, isHydrated]);
 
   return (
     <div className="relative h-2 w-full bg-slate-200">
@@ -113,7 +118,7 @@ export function CartDetails({
   const [offerUnlocked, setOfferUnlocked] = useState(false);
   const [offerValid, setOfferValid] = useState(false);
 
-  const settings = root.data.settings;
+  const settings = (root.data as any).settings;
 
   useEffect(() => {
     if (cart) {
@@ -236,7 +241,7 @@ export function CartDetails({
 function FreeShippingProgress({cart}: any) {
   //qualified shipping cart cost
   const cart_cost = useMemo(() => {
-    return cart.lines.edges.reduce((total, {node}) => {
+    return cart.lines.edges.reduce((total: number, {node}: {node: CartLine}) => {
       return total + Number(node.cost.totalAmount.amount);
     }, 0);
   }, [cart.lines]);
@@ -269,7 +274,7 @@ function RedoToggle() {
     setAddRedo(enabled);
   }, [enabled]);
 
-  const redoCopy = root?.data?.settings.redoCopy;
+  const redoCopy = (root?.data as any)?.settings?.redoCopy;
 
   if (!redoResponse) return null;
 
@@ -543,17 +548,13 @@ function CartLineItem({line}: {line: CartLine}) {
   );
 }
 
-function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
-  const fetcher = useFetcher();
-
+function ItemRemoveButton({ lineIds }: { lineIds: CartLine['id'][] }) {
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input
-        type="hidden"
-        name="cartAction"
-        value={CartAction.REMOVE_FROM_CART}
-      />
-      <input type="hidden" name="linesIds" value={JSON.stringify(lineIds)} />
+    <CartForm
+      route="/cart" 
+      action={CartForm.ACTIONS.LinesRemove}
+      inputs={{ lineIds }}
+    >
       <button
         className="flex h-10 w-10 items-center justify-center rounded border"
         type="submit"
@@ -561,7 +562,7 @@ function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
         <span className="sr-only">Remove</span>
         <IconRemove aria-hidden="true" />
       </button>
-    </fetcher.Form>
+    </CartForm>
   );
 }
 
@@ -615,14 +616,14 @@ function UpdateCartButton({
   children: React.ReactNode;
   lines: CartLineUpdateInput[];
 }) {
-  const fetcher = useFetcher();
-
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input type="hidden" name="cartAction" value={CartAction.UPDATE_CART} />
-      <input type="hidden" name="lines" value={JSON.stringify(lines)} />
+    <CartForm
+      action={CartForm.ACTIONS.LinesUpdate}
+      inputs={{ lines }}
+      route="/cart" // adjust if needed
+    >
       {children}
-    </fetcher.Form>
+    </CartForm>
   );
 }
 
@@ -729,7 +730,7 @@ const RebuyRecommendations = ({
 
   return (
     <>
-      {data.map((product: any) => (
+      {(data as any[]).map((product: any) => (
         <Rebuy_MiniProductCard
           className={className ?? ''}
           product={product}

@@ -1,9 +1,18 @@
-import {redirect, type LoaderArgs} from '@shopify/remix-oxygen';
-import {cartCreate, cartDiscountCodesUpdate} from './cart';
+import {redirect, type LoaderFunctionArgs, type AppLoadContext} from '@shopify/remix-oxygen';
+import type {HydrogenCart} from '@shopify/hydrogen';
+
+type LoaderContext = AppLoadContext & {
+  cart: HydrogenCart;
+  session: {
+    get: (key: string) => Promise<string | undefined>;
+    set: (key: string, value: string) => Promise<void>;
+    commit: () => Promise<string>;
+  };
+};
 
 /**
  * Automatically applies a discount found on the url
- * If a cart exists it's updated with the discount, otherwise a cart is created with the discount already applied
+ * If a cart exists it's updated with the discount, otherwise a cart is created with the cart handler
  * @param ?redirect an optional path to return to otherwise return to the home page
  * @example
  * Example path applying a discount and redirecting
@@ -13,10 +22,8 @@ import {cartCreate, cartDiscountCodesUpdate} from './cart';
  * ```
  * @preserve
  */
-export async function loader({request, context, params}: LoaderArgs) {
-  const {storefront} = context;
-  // N.B. This route will probably be removed in the future.
-  const session = context.session as any;
+export async function loader({request, context, params}: LoaderFunctionArgs) {
+  const {cart, session} = context as unknown as LoaderContext;
   const {code} = params;
 
   const url = new URL(request.url);
@@ -34,27 +41,13 @@ export async function loader({request, context, params}: LoaderArgs) {
 
   //! if no existing cart, create one
   if (!cartId) {
-    const {cart, errors: graphqlCartErrors} = await cartCreate({
-      input: {},
-      storefront,
-    });
-
-    if (graphqlCartErrors?.length) {
-      return redirect(redirectUrl);
-    }
-
-    //! cart created - we only need a Set-Cookie header if we're creating
-    cartId = cart.id;
-    session.set('cartId', cartId);
-    headers.set('Set-Cookie', await session.commit());
+    const result = await cart.create({});
+    cartId = result.cart.id;
+    headers.append('Set-Cookie', await session.commit());
   }
 
   //! apply discount to the cart
-  await cartDiscountCodesUpdate({
-    cartId,
-    discountCodes: [code],
-    storefront,
-  });
+  await cart.updateDiscountCodes([code]);
 
   return redirect(redirectUrl, {headers});
 }
