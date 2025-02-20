@@ -9,12 +9,15 @@ export function useDrawerCart({
   isOpen: boolean;
   openDrawer: () => void;
 }) {
-  // Exclude Redo cart actions when checking for cart additions
-  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd, true);
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
 
   useEffect(() => {
     if (isOpen || !addToCartFetchers.length) return;
 
-    openDrawer();
+    // Only open drawer for non-Redo cart actions
+    const hasNonRedoAction = addToCartFetchers.some(fetcher => !fetcher.isRedoAction);
+    if (hasNonRedoAction) {
+      openDrawer();
+    }
   }, [addToCartFetchers, isOpen, openDrawer]);
 } 

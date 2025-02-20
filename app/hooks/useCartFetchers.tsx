@@ -1,30 +1,32 @@
 import {useFetchers} from '@remix-run/react';
 import {CartForm} from '@shopify/hydrogen';
 
-export function useCartFetchers(actionType?: string, excludeRedo: boolean = false) {
+export function useCartFetchers(actionType?: string) {
   const fetchers = useFetchers();
 
-  const cartFetchers = [];
-  for (const fetcher of fetchers) {
+  return fetchers.filter(fetcher => {
     const formData = fetcher.formData;
-    if (!formData) continue;
+    if (!formData) return false;
 
     const formInputs = CartForm.getFormInput(formData);
-    if (!formInputs.action) continue;
+    if (!formInputs.action) return false;
 
     // If we have an action type, only return fetchers with that action
-    if (actionType && actionType !== formInputs.action) continue;
+    if (actionType && actionType !== formInputs.action) return false;
 
-    // If excludeRedo is true, skip Redo cart actions
-    if (excludeRedo && formInputs.action === CartForm.ACTIONS.LinesAdd) {
-      const lines = formInputs.inputs?.lines;
-      if (lines?.some((line: any) => line.merchandiseId.includes('re:do'))) {
-        continue;
-      }
-    }
+    return true;
+  }).map(fetcher => {
+    const formInputs = CartForm.getFormInput(fetcher.formData!);
+    const isRedoAction = formInputs.action === CartForm.ACTIONS.LinesAdd && 
+      formInputs.inputs?.lines?.some((line: any) => 
+        line.attributes?.some((attr: any) => 
+          attr.key === 'redo_opted_in_from_cart' && attr.value === 'true'
+        )
+      );
 
-    cartFetchers.push(fetcher);
-  }
-
-  return cartFetchers;
+    return {
+      ...fetcher,
+      isRedoAction
+    };
+  });
 }

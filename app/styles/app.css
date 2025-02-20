@@ -2210,9 +2210,6 @@ select{
 .h-\[176px\]{
   height: 176px;
 }
-.h-\[30px\]{
-  height: 30px;
-}
 .h-\[500px\]{
   height: 500px;
 }
@@ -2322,6 +2319,9 @@ select{
 }
 .w-screen{
   width: 100vw;
+}
+.min-w-0{
+  min-width: 0px;
 }
 .min-w-\[0\.75rem\]{
   min-width: 0.75rem;

@@ -31,7 +31,7 @@ import {RedoProvider} from '@redotech/redo-hydrogen';
 type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
-const REDO_STORE_ID = "6439e48e41e6bb001f6407a5";
+const REDO_STORE_ID = '6439e48e41e6bb001f6407a5';
 
 export function Cart({
   layout,
@@ -52,31 +52,20 @@ export function Cart({
   const cartForRedo = {
     ...cart,
     lines: {
-      nodes: lines
-    }
+      nodes: lines,
+      edges: lines.map(node => ({ node })),
+      pageInfo: { hasNextPage: false, hasPreviousPage: false }
+    },
   } as unknown as CartType;
-
-  // Debug logging
-  console.log('Cart Data Structure:', {
-    originalLines: cart.lines,
-    transformedLines: cartForRedo.lines,
-    flattenedLines: lines,
-    cost: cart.cost,
-    totalAmount: cart.cost?.totalAmount,
-    attributes: cart.attributes,
-    checkoutUrl: cart.checkoutUrl,
-  });
 
   // Ensure cart has all required properties
   if (!cart.cost?.totalAmount) {
     console.log('Missing required cart properties');
-    return (
-      <CartEmpty hidden={false} onClose={onClose} layout={layout} />
-    );
+    return <CartEmpty hidden={false} onClose={onClose} layout={layout} />;
   }
 
   return (
-    <RedoProvider
+    <RedoProvider 
       cart={cartForRedo}
       storeId={REDO_STORE_ID}
     >
@@ -99,7 +88,8 @@ function ProgressBar({value}: {value: number}) {
   useEffect(() => {
     // Check sessionStorage only after hydration
     if (isHydrated) {
-      const hasConfettiFired = window.sessionStorage.getItem('confettiFired') === 'true';
+      const hasConfettiFired =
+        window.sessionStorage.getItem('confettiFired') === 'true';
       setConfettiFired(hasConfettiFired);
     }
   }, [isHydrated]);
@@ -108,7 +98,8 @@ function ProgressBar({value}: {value: number}) {
     if (value >= 1) {
       setWidth(100);
       if (!confettiFired && isHydrated) {
-        const hasConfettiFired = window.sessionStorage.getItem('confettiFired') === 'true';
+        const hasConfettiFired =
+          window.sessionStorage.getItem('confettiFired') === 'true';
         if (!hasConfettiFired) {
           confetti({
             colors: ['#B31942', '#0A3161', '#FFFFFF'],
@@ -310,11 +301,20 @@ function CartCheckoutActions({
     });
   };
 
+  const cartForRedo = {
+    ...cart,
+    lines: {
+      nodes: lines,
+      edges: lines.map(node => ({ node })),
+      pageInfo: { hasNextPage: false, hasPreviousPage: false }
+    },
+  } as unknown as CartType;
+
   return (
-    <div className="mt-2 flex flex-col">
+    <div className="mt-2 flex flex-col text-center w-full">
       <RedoCheckoutButtons
         onClick={handleAnalytics}
-        cart={cart}
+        cart={cartForRedo}
         storeId={REDO_STORE_ID}
       >
         {/* Fallback button shown if Redo is not available */}
@@ -563,12 +563,12 @@ function CartLineItem({line}: {line: CartLine}) {
   );
 }
 
-function ItemRemoveButton({ lineIds }: { lineIds: CartLine['id'][] }) {
+function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
   return (
     <CartForm
-      route="/cart" 
+      route="/cart"
       action={CartForm.ACTIONS.LinesRemove}
-      inputs={{ lineIds }}
+      inputs={{lineIds}}
     >
       <button
         className="flex h-10 w-10 items-center justify-center rounded border"
@@ -634,7 +634,7 @@ function UpdateCartButton({
   return (
     <CartForm
       action={CartForm.ACTIONS.LinesUpdate}
-      inputs={{ lines }}
+      inputs={{lines}}
       route="/cart" // adjust if needed
     >
       {children}

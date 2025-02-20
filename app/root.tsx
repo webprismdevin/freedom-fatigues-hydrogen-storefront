@@ -29,7 +29,6 @@ import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {Layout} from '~/components/Layout';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
-import {RedoProvider} from '@redotech/redo-hydrogen';
 import {Suspense} from 'react';
 
 import styles from './styles/app.css';

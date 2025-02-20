@@ -420,7 +420,7 @@ function DesktopHeader({
         !isHome && y > 50 && ' shadow-lightHeader'
       } sticky top-12 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
-      <div className="flex items-center gap-6 font-heading tracking-wider">
+      <div className="flex min-w-0 flex-1 items-center gap-6 font-heading tracking-wider">
         <Link to="/" prefetch="intent" className="shrink-0">
           <div>
             <img
@@ -433,40 +433,42 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex select-none items-start gap-x-4 overflow-x-auto h-[30px] scrollbar-none">
-          {/* Top level menu items */}
-          {(menu || []).map((item: any) => {
-            if (item._type === 'collectionGroup') {
-              return (
-                <MegaMenuLink
-                  menu={item}
-                  key={item._key}
-                  open={item._key === megaMenu.menu?._key && megaMenu.open}
-                  onClick={() => handleMegaMenu(item)}
-                />
-              );
-            }
-            if (item._type === 'linkInternal') {
-              return (
-                <Link
-                  key={item._key}
-                  to={item.slug}
-                  target="_parent"
-                  prefetch="intent"
-                  className={({isActive}) =>
-                    isActive
-                      ? '-mb-px border-b-2 border-red-500 whitespace-nowrap'
-                      : 'hover:border-b-2 hover:border-b-red-500 whitespace-nowrap'
-                  }
-                >
-                  <LinkTitle text={item.title} />
-                </Link>
-              );
-            }
-          })}
+        <nav className="min-w-0 flex-1">
+          <div className="flex select-none items-start gap-x-4 overflow-x-auto pb-1 scrollbar-none">
+            {/* Top level menu items */}
+            {(menu || []).map((item: any) => {
+              if (item._type === 'collectionGroup') {
+                return (
+                  <MegaMenuLink
+                    menu={item}
+                    key={item._key}
+                    open={item._key === megaMenu.menu?._key && megaMenu.open}
+                    onClick={() => handleMegaMenu(item)}
+                  />
+                );
+              }
+              if (item._type === 'linkInternal') {
+                return (
+                  <Link
+                    key={item._key}
+                    to={item.slug}
+                    target="_parent"
+                    prefetch="intent"
+                    className={({isActive}) =>
+                      isActive
+                        ? '-mb-px border-b-2 border-red-500 whitespace-nowrap'
+                        : 'hover:border-b-2 hover:border-b-red-500 whitespace-nowrap'
+                    }
+                  >
+                    <LinkTitle text={item.title} />
+                  </Link>
+                );
+              }
+            })}
+          </div>
         </nav>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1">
         <Form
           method="get"
           action={params.lang ? `/${params.lang}/search` : '/search'}
@@ -512,15 +514,15 @@ function LinkTitle({text}: {text: string}) {
 function MegaMenuLink({
   menu,
   open,
-  ...props
+  onClick,
 }: {
   menu: any;
   open: boolean;
-  props?: any;
+  onClick: () => void;
 }) {
   return (
     <div
-      {...props}
+      onClick={onClick}
       className="flex cursor-pointer items-center whitespace-nowrap tracking-wider"
     >
       <div className="hover:border-b-2 hover:border-b-red-500">

@@ -23,8 +23,6 @@ export function AddToCartButton({
   const [root] = useMatches();
   const selectedLocale = root?.data?.selectedLocale;
 
-  console.log(CartForm.ACTIONS.LinesAdd);
-
   return (
     <CartForm
       action={CartForm.ACTIONS.LinesAdd}
