@@ -178,7 +178,7 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
     },
   );
 
-  if (product.tags.some((tag) => tag == 'Shopify Collective')) {
+  if (product.tags && product.tags.some((tag) => tag == 'Shopify Collective')) {
     return redirect(`/products/partner/${productHandle}`);
   }
 
