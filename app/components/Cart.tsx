@@ -88,22 +88,22 @@ export function Cart({
   );
 
   return (
-    <>
-      <CartEmpty
-        hidden={linesCount}
-        onClose={onClose}
-        layout={layout}
-        cart={cart}
-      />
-      <CartDetails cart={cart} layout={layout} />
-    </>
+    // <>
+    //   <CartEmpty
+    //     hidden={linesCount}
+    //     onClose={onClose}
+    //     layout={layout}
+    //     cart={cart}
+    //   />
+    //   <CartDetails cart={cart} layout={layout} />
+    // </>
     // 🚧 re-add after done upgrading
-    // <RedoProvider
-    //   cart={cartForRedo}
-    //   storeId={REDO_STORE_ID}
-    // >
-    // {cartContent}
-    // </RedoProvider>
+    <RedoProvider
+      cart={cartForRedo}
+      storeId={REDO_STORE_ID}
+    >
+    {cartContent}
+    </RedoProvider>
   );
 }
 
@@ -406,13 +406,13 @@ function CartCheckoutActions({
   return (
     <div className="mt-2 flex w-full flex-col text-center">
       {/* 🚧 re-add after done upgrading */}
-      {/* <RedoCheckoutButtons
+      <RedoCheckoutButtons
         onClick={handleAnalytics}
         cart={cartForRedo}
         storeId={REDO_STORE_ID}
-      > */}
+      >
       {fallbackButton}
-      {/* </RedoCheckoutButtons> */}
+      </RedoCheckoutButtons>
     </div>
   );
 }
