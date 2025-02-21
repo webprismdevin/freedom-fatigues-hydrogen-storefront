@@ -50,36 +50,60 @@ export function Cart({
   const linesCount = lines.length > 0;
 
   // Memoize the cart transformation for Redo
-  const cartForRedo = useMemo(() => ({
-    ...cart,
-    lines: {
-      nodes: lines,
-      edges: lines.map(node => ({ node })),
-      pageInfo: { hasNextPage: false, hasPreviousPage: false }
-    },
-  } as unknown as CartType), [cart, lines]);
+  const cartForRedo = useMemo(
+    () =>
+      ({
+        ...cart,
+        lines: {
+          nodes: lines,
+          edges: lines.map((node) => ({node})),
+          pageInfo: {hasNextPage: false, hasPreviousPage: false},
+        },
+      } as unknown as CartType),
+    [cart, lines],
+  );
 
   // Ensure cart has all required properties
   if (!cart.cost?.totalAmount) {
     console.log('Missing required cart properties');
-    return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />;
+    return (
+      <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
+    );
   }
 
   // Memoize the RedoProvider children
-  const cartContent = useMemo(() => (
-    <>
-      <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} cart={cart} />
-      <CartDetails cart={cart} layout={layout} />
-    </>
-  ), [linesCount, onClose, layout, cart]);
+  const cartContent = useMemo(
+    () => (
+      <>
+        <CartEmpty
+          hidden={linesCount}
+          onClose={onClose}
+          layout={layout}
+          cart={cart}
+        />
+        <CartDetails cart={cart} layout={layout} />
+      </>
+    ),
+    [linesCount, onClose, layout, cart],
+  );
 
   return (
-    <RedoProvider 
-      cart={cartForRedo}
-      storeId={REDO_STORE_ID}
-    >
-      {cartContent}
-    </RedoProvider>
+    <>
+      <CartEmpty
+        hidden={linesCount}
+        onClose={onClose}
+        layout={layout}
+        cart={cart}
+      />
+      <CartDetails cart={cart} layout={layout} />
+    </>
+    // 🚧 re-add after done upgrading
+    // <RedoProvider
+    //   cart={cartForRedo}
+    //   storeId={REDO_STORE_ID}
+    // >
+    // {cartContent}
+    // </RedoProvider>
   );
 }
 
@@ -245,21 +269,26 @@ export function CartDetails({
               </div>
             ) : (
               <div>
-                <h5 className={clsx(
-                  "font-heading text-lg",
-                  layout === 'drawer' ? 'px-6' : 'px-0'
-                )}>
+                <h5
+                  className={clsx(
+                    'font-heading text-lg',
+                    layout === 'drawer' ? 'px-6' : 'px-0',
+                  )}
+                >
                   You might also like
                 </h5>
-                <div className={clsx(
-                  "hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto py-4",
-                  layout === 'drawer' ? 'px-6' : 'px-0'
-                )}>
+                <div
+                  className={clsx(
+                    'hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto py-4',
+                    layout === 'drawer' ? 'px-6' : 'px-0',
+                  )}
+                >
                   {cart?.lines?.edges && cart.lines.edges.length > 0 && (
                     <ShopifyRecommendations
                       containerClassName="w-1/3 shrink-0 grow-0 md:w-1/4"
                       productId={
-                        cart.lines.edges[cart.lines.edges.length - 1].node.merchandise.product.id
+                        cart.lines.edges[cart.lines.edges.length - 1].node
+                          .merchandise.product.id
                       }
                     >
                       {({recommendations, isLoading}) => (
@@ -267,7 +296,10 @@ export function CartDetails({
                           {isLoading ? (
                             <>
                               {Array.from({length: 4}).map((_, i) => (
-                                <div key={i} className="w-1/3 shrink-0 grow-0 md:w-1/4 animate-pulse">
+                                <div
+                                  key={i}
+                                  className="w-1/3 shrink-0 grow-0 animate-pulse md:w-1/4"
+                                >
                                   <div className="h-40 w-full rounded bg-gray-200" />
                                 </div>
                               ))}
@@ -322,54 +354,65 @@ function CartCheckoutActions({
   const lines = flattenConnection(cart.lines);
   if (lines.length === 0) return null;
 
-  const handleAnalytics = useCallback((enabled: boolean) => {
-    // Capture checkout event
-    posthog.capture('begin_checkout', {
-      $value: cart.cost.totalAmount.amount,
-      currency: cart.cost.totalAmount.currencyCode,
-      items: lines.map((line) => ({
-        product_id: line.merchandise.product.id,
-        variant_id: line.merchandise.id,
-        product_title: line.merchandise.product.title,
-        variant_title: line.merchandise.title,
-        price: parseFloat(line.cost.totalAmount.amount),
-        quantity: line.quantity,
-      })),
-      redo_coverage: enabled,
-    });
-  }, [cart.cost.totalAmount, lines]);
+  const handleAnalytics = useCallback(
+    (enabled: boolean) => {
+      // Capture checkout event
+      posthog.capture('begin_checkout', {
+        $value: cart.cost.totalAmount.amount,
+        currency: cart.cost.totalAmount.currencyCode,
+        items: lines.map((line) => ({
+          product_id: line.merchandise.product.id,
+          variant_id: line.merchandise.id,
+          product_title: line.merchandise.product.title,
+          variant_title: line.merchandise.title,
+          price: parseFloat(line.cost.totalAmount.amount),
+          quantity: line.quantity,
+        })),
+        redo_coverage: enabled,
+      });
+    },
+    [cart.cost.totalAmount, lines],
+  );
 
   // Memoize the cart transformation for Redo
-  const cartForRedo = useMemo(() => ({
-    ...cart,
-    lines: {
-      nodes: lines,
-      edges: lines.map(node => ({ node })),
-      pageInfo: { hasNextPage: false, hasPreviousPage: false }
-    },
-  } as unknown as CartType), [cart, lines]);
+  const cartForRedo = useMemo(
+    () =>
+      ({
+        ...cart,
+        lines: {
+          nodes: lines,
+          edges: lines.map((node) => ({node})),
+          pageInfo: {hasNextPage: false, hasPreviousPage: false},
+        },
+      } as unknown as CartType),
+    [cart, lines],
+  );
 
   // Memoize the fallback button
-  const fallbackButton = useMemo(() => (
-    <a
-      href={checkoutUrl}
-      onClick={() => handleAnalytics(false)}
-      target="_self"
-      className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-    >
-      Continue to Checkout
-    </a>
-  ), [checkoutUrl, handleAnalytics]);
+  const fallbackButton = useMemo(
+    () => (
+      <a
+        href={checkoutUrl}
+        onClick={() => handleAnalytics(false)}
+        target="_self"
+        className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+      >
+        Continue to Checkout
+      </a>
+    ),
+    [checkoutUrl, handleAnalytics],
+  );
 
   return (
-    <div className="mt-2 flex flex-col text-center w-full">
-      <RedoCheckoutButtons
+    <div className="mt-2 flex w-full flex-col text-center">
+      {/* 🚧 re-add after done upgrading */}
+      {/* <RedoCheckoutButtons
         onClick={handleAnalytics}
         cart={cartForRedo}
         storeId={REDO_STORE_ID}
-      >
-        {fallbackButton}
-      </RedoCheckoutButtons>
+      > */}
+      {fallbackButton}
+      {/* </RedoCheckoutButtons> */}
     </div>
   );
 }
