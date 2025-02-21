@@ -1,6 +1,4 @@
 import {
-  type EnhancedMenu,
-  type EnhancedMenuItem,
   useIsHomePath,
 } from '~/lib/utils';
 import {
@@ -33,6 +31,7 @@ import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
 import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
+import {useCart} from '~/hooks/useCart';
 
 type RootData = {
   cart: Promise<CartType>;
@@ -141,14 +140,8 @@ function Header({title, menu}: {title: string; menu?: any}) {
 }
 
 function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
-  const fetcher = useFetcher<{cart: CartType}>();
+  const {cart, isLoading} = useCart();
   
-  useEffect(() => {
-    if (isOpen && !fetcher.data && fetcher.state !== 'loading') {
-      fetcher.load('/cart');
-    }
-  }, [isOpen, fetcher]);
-
   return (
     <Drawer
       open={isOpen}
@@ -157,8 +150,8 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       openFrom="right"
     >
       <Suspense fallback={<CartLoading />}>
-        {fetcher.data?.cart ? (
-          <Cart layout="drawer" onClose={onClose} cart={fetcher.data.cart} />
+        {cart ? (
+          <Cart layout="drawer" onClose={onClose} cart={cart} />
         ) : (
           <CartLoading />
         )}
@@ -167,6 +160,24 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
   );
 }
 
+type SanityMenuItem = {
+  _key: string;
+  _type: string;
+  title: string;
+  collectionLinks?: Array<{
+    _key: string;
+    slug: string;
+    title: string;
+    target?: string;
+  }>;
+  megaMenuTitle?: {
+    to: string;
+    title: string;
+  };
+  slug?: string;
+  target?: string;
+};
+
 export function MenuDrawer({
   isOpen,
   onClose,
@@ -174,7 +185,7 @@ export function MenuDrawer({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  menu: EnhancedMenu;
+  menu: SanityMenuItem[];
 }) {
   return (
     <Drawer
@@ -190,11 +201,21 @@ export function MenuDrawer({
   );
 }
 
-function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
+type LinkListItem = {
+  title: string;
+  to: string;
+};
+
+type LinkList = {
+  title: string;
+  links: LinkListItem[];
+};
+
+function MenuMobileNav({menu, onClose}: {menu: SanityMenuItem[]; onClose: () => void}) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8 max-h-screen overflow-y-auto">
       {/* Top level menu items */}
-      {(menu || []).map((item) => (
+      {(menu || []).map((item: SanityMenuItem) => (
         <div key={item._key}>
           {item.collectionLinks && (
             <Disclosure>
@@ -236,8 +257,8 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                           </Link>
                         </li>
                       )}
-                      {item.collectionLinks.map((link) => (
-                        <li key={link.slug}>
+                      {item.collectionLinks?.map((link) => (
+                        <li key={link._key}>
                           <Link
                             to={link.slug}
                             target={link.target}
@@ -258,7 +279,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
               )}
             </Disclosure>
           )}
-          {item._type == 'linkInternal' && (
+          {item._type == 'linkInternal' && item.slug && (
             <span className="block font-heading text-xl">
               <Link
                 to={item.slug}
@@ -434,9 +455,9 @@ function DesktopHeader({
           </div>
         </Link>
         <nav className="min-w-0 flex-1">
-          <div className="flex select-none items-start gap-x-4 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex select-none items-start gap-x-4 overflow-x-auto pb-1 hiddenScroll">
             {/* Top level menu items */}
-            {(menu || []).map((item: any) => {
+            {(menu || []).map((item: SanityMenuItem) => {
               if (item._type === 'collectionGroup') {
                 return (
                   <MegaMenuLink
@@ -447,7 +468,7 @@ function DesktopHeader({
                   />
                 );
               }
-              if (item._type === 'linkInternal') {
+              if (item._type === 'linkInternal' && item.slug) {
                 return (
                   <Link
                     key={item._key}
@@ -464,6 +485,7 @@ function DesktopHeader({
                   </Link>
                 );
               }
+              return null;
             })}
           </div>
         </nav>
@@ -635,20 +657,14 @@ function CartCount({
   isHome: boolean;
   openCart: () => void;
 }) {
-  const fetcher = useFetcher<{cart: CartType}>();
-  
-  useEffect(() => {
-    if (!fetcher.data && fetcher.state !== 'loading') {
-      fetcher.load('/cart');
-    }
-  }, [fetcher]);
+  const {cart} = useCart();
 
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
       <Badge
         dark={isHome}
         openCart={openCart}
-        count={fetcher.data?.cart?.totalQuantity || 0}
+        count={cart?.totalQuantity || 0}
       />
     </Suspense>
   );
@@ -718,12 +734,12 @@ export function GodFamilyCountry({preFooter}: {preFooter: any}) {
   );
 }
 
-const FooterLinkList = ({linkList}) => {
+const FooterLinkList = ({linkList}: {linkList: LinkList}) => {
   return (
     <div>
       <LinkListTitle title={linkList.title} />
       <ul>
-        {linkList.links.map((link) => (
+        {linkList.links.map((link: LinkListItem) => (
           <li key={link.title} className={'my-2'}>
             <Link to={link.to}>{link.title}</Link>
           </li>

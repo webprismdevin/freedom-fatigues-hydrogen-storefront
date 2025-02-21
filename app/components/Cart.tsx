@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, {useMemo, useRef, useEffect, useState} from 'react';
+import React, {useMemo, useRef, useEffect, useState, useCallback} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -49,15 +49,15 @@ export function Cart({
   const lines = flattenConnection(cart.lines);
   const linesCount = lines.length > 0;
 
-  // Transform cart data to match Redo's expected structure
-  const cartForRedo = {
+  // Memoize the cart transformation for Redo
+  const cartForRedo = useMemo(() => ({
     ...cart,
     lines: {
       nodes: lines,
       edges: lines.map(node => ({ node })),
       pageInfo: { hasNextPage: false, hasPreviousPage: false }
     },
-  } as unknown as CartType;
+  } as unknown as CartType), [cart, lines]);
 
   // Ensure cart has all required properties
   if (!cart.cost?.totalAmount) {
@@ -65,15 +65,20 @@ export function Cart({
     return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />;
   }
 
+  // Memoize the RedoProvider children
+  const cartContent = useMemo(() => (
+    <>
+      <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} cart={cart} />
+      <CartDetails cart={cart} layout={layout} />
+    </>
+  ), [linesCount, onClose, layout, cart]);
+
   return (
     <RedoProvider 
       cart={cartForRedo}
       storeId={REDO_STORE_ID}
     >
-      <>
-        <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} cart={cart} />
-        <CartDetails cart={cart} layout={layout} />
-      </>
+      {cartContent}
     </RedoProvider>
   );
 }
@@ -317,7 +322,7 @@ function CartCheckoutActions({
   const lines = flattenConnection(cart.lines);
   if (lines.length === 0) return null;
 
-  const handleAnalytics = (enabled: boolean) => {
+  const handleAnalytics = useCallback((enabled: boolean) => {
     // Capture checkout event
     posthog.capture('begin_checkout', {
       $value: cart.cost.totalAmount.amount,
@@ -332,16 +337,29 @@ function CartCheckoutActions({
       })),
       redo_coverage: enabled,
     });
-  };
+  }, [cart.cost.totalAmount, lines]);
 
-  const cartForRedo = {
+  // Memoize the cart transformation for Redo
+  const cartForRedo = useMemo(() => ({
     ...cart,
     lines: {
       nodes: lines,
       edges: lines.map(node => ({ node })),
       pageInfo: { hasNextPage: false, hasPreviousPage: false }
     },
-  } as unknown as CartType;
+  } as unknown as CartType), [cart, lines]);
+
+  // Memoize the fallback button
+  const fallbackButton = useMemo(() => (
+    <a
+      href={checkoutUrl}
+      onClick={() => handleAnalytics(false)}
+      target="_self"
+      className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+    >
+      Continue to Checkout
+    </a>
+  ), [checkoutUrl, handleAnalytics]);
 
   return (
     <div className="mt-2 flex flex-col text-center w-full">
@@ -350,15 +368,7 @@ function CartCheckoutActions({
         cart={cartForRedo}
         storeId={REDO_STORE_ID}
       >
-        {/* Fallback button shown if Redo is not available */}
-        <a
-          href={checkoutUrl}
-          onClick={() => handleAnalytics(false)}
-          target="_self"
-          className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-        >
-          Continue to Checkout
-        </a>
+        {fallbackButton}
       </RedoCheckoutButtons>
     </div>
   );
