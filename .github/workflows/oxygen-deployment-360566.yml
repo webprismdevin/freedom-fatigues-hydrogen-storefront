@@ -32,7 +32,7 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
     - name: Install dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
     - name: Build and Publish to Oxygen
       id: deploy
       run: npx shopify hydrogen deploy
