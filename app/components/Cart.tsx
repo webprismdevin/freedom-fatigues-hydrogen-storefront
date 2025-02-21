@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, {useMemo, useRef} from 'react';
+import React, {useMemo, useRef, useEffect, useState} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -20,13 +20,14 @@ import type {
 import {useFetcher, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
-import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
 import posthog from 'posthog-js';
 import {CartForm} from '@shopify/hydrogen';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
 import {RedoProvider} from '@redotech/redo-hydrogen';
+import ShopifyRecommendations from './ShopifyRecommendations';
+import ShopifyRecommendationCard from './ShopifyRecommendationCard';
 
 type Layouts = 'page' | 'drawer';
 
@@ -61,7 +62,7 @@ export function Cart({
   // Ensure cart has all required properties
   if (!cart.cost?.totalAmount) {
     console.log('Missing required cart properties');
-    return <CartEmpty hidden={false} onClose={onClose} layout={layout} />;
+    return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />;
   }
 
   return (
@@ -70,15 +71,12 @@ export function Cart({
       storeId={REDO_STORE_ID}
     >
       <>
-        <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
+        <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} cart={cart} />
         <CartDetails cart={cart} layout={layout} />
       </>
     </RedoProvider>
   );
 }
-
-import {useState, useEffect} from 'react';
-import {Rebuy_MiniProductCard} from './ProductCard';
 
 function ProgressBar({value}: {value: number}) {
   const isHydrated = useIsHydrated();
@@ -242,14 +240,49 @@ export function CartDetails({
               </div>
             ) : (
               <div>
-                <h5 className="px-6 font-heading text-lg md:px-12">
+                <h5 className={clsx(
+                  "font-heading text-lg",
+                  layout === 'drawer' ? 'px-6' : 'px-0'
+                )}>
                   You might also like
                 </h5>
-                <div className="hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
-                  <RebuyRecommendations
-                    className="w-1/3 shrink-0 grow-0 md:w-1/4"
-                    lines={cart?.lines}
-                  />
+                <div className={clsx(
+                  "hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto py-4",
+                  layout === 'drawer' ? 'px-6' : 'px-0'
+                )}>
+                  {cart?.lines?.edges && cart.lines.edges.length > 0 && (
+                    <ShopifyRecommendations
+                      containerClassName="w-1/3 shrink-0 grow-0 md:w-1/4"
+                      productId={
+                        cart.lines.edges[cart.lines.edges.length - 1].node.merchandise.product.id
+                      }
+                    >
+                      {({recommendations, isLoading}) => (
+                        <>
+                          {isLoading ? (
+                            <>
+                              {Array.from({length: 4}).map((_, i) => (
+                                <div key={i} className="w-1/3 shrink-0 grow-0 md:w-1/4 animate-pulse">
+                                  <div className="h-40 w-full rounded bg-gray-200" />
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              {recommendations.map((product) => (
+                                <ShopifyRecommendationCard
+                                  key={product.id}
+                                  product={product}
+                                  layout="vertical"
+                                  className="w-1/3 shrink-0 grow-0 md:w-1/4"
+                                />
+                              ))}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ShopifyRecommendations>
+                  )}
                 </div>
               </div>
             )}
@@ -669,10 +702,12 @@ export function CartEmpty({
   hidden = false,
   layout = 'drawer',
   onClose,
+  cart,
 }: {
   hidden: boolean;
-  layout?: Layouts;
+  layout?: 'page' | 'drawer';
   onClose?: () => void;
+  cart?: CartType;
 }) {
   const scrollRef = useRef(null);
   const {y} = useScroll(scrollRef);
@@ -692,8 +727,7 @@ export function CartEmpty({
     <div ref={scrollRef} className={container[layout]} hidden={hidden}>
       <section className="grid gap-6">
         <Text format>
-          Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-          started!
+          Looks like you haven't added anything yet, let's get you started!
         </Text>
         <div>
           <Button onClick={onClose} width="full">
@@ -704,54 +738,6 @@ export function CartEmpty({
       <div className="mt-2">
         <GovXID />
       </div>
-      <section className="grid gap-8 pt-16">
-        <h5 className="font-heading text-lg">You might like</h5>
-        <div className="grid grid-cols-3 gap-4">
-          <RebuyRecommendations className="w-full shrink-0 grow-0" />
-        </div>
-      </section>
     </div>
   );
 }
-
-const RebuyRecommendations = ({
-  className,
-  lines,
-}: {
-  className?: string;
-  lines?: CartType['lines'] | undefined;
-}) => {
-  const {load, data} = useFetcher();
-
-  let string_of_pids = '';
-
-  if (lines) {
-    const pids = lines?.edges.map(({node}) =>
-      fromGID(node.merchandise.product.id),
-    );
-    string_of_pids = pids.join(',');
-  }
-
-  useEffect(() => {
-    load(`/rebuy/recommended?lines=${string_of_pids}`);
-  }, [load]);
-
-  if (!data)
-    return [1, 2, 3].map(() => (
-      <div className={`${className} animate-pulse`}>
-        <div className="h-[176px] w-full rounded bg-primary/5" />
-      </div>
-    ));
-
-  return (
-    <>
-      {(data as any[]).map((product: any) => (
-        <Rebuy_MiniProductCard
-          className={className ?? ''}
-          product={product}
-          key={product.admin_graphql_api_id}
-        />
-      ))}
-    </>
-  );
-};

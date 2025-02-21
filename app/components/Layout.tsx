@@ -64,11 +64,11 @@ export function Layout({
             Skip to content
           </a>
         </div>
-        <Suspense fallback={<div className="h-12"></div>}>
-          <Await resolve={settings}>
+        {/* <Suspense fallback={<div className="h-12"></div>}>
+          <Await resolve={settings}> */}
             <AnnouncementBar data={announcements} />
-          </Await>
-        </Suspense>
+          {/* </Await>
+        </Suspense> */}
         <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}

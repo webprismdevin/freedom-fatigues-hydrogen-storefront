@@ -69,6 +69,8 @@ import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
 import {v4 as uuidv4} from 'uuid';
+import ShopifyRecommendations from '~/components/ShopifyRecommendations';
+import {ShopifyRecommendationCard} from '~/components/ShopifyRecommendationCard';
 
 export type AimerceProduct = {
   id: string; // shopify product id, for eaxmple: "gid://shopify/Product/1234567890"
@@ -335,7 +337,38 @@ export default function Product() {
                 /> */}
                 {/* <hr /> */}
                 <div className="hidden lg:block">
-                  <CompleteTheLook />
+                  <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
+                    Complete The Look
+                  </h3>
+                  <ShopifyRecommendations 
+                    productId={product.id} 
+                    limit={3}
+                  >
+                    {({recommendations, isLoading}) => (
+                      <div className="grid gap-4">
+                        {isLoading ? (
+                          <>
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <div key={i} className="animate-pulse">
+                                <div className="h-40 w-full rounded bg-gray-200" />
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            {recommendations.map((product) => (
+                              <ShopifyRecommendationCard 
+                                key={product.id} 
+                                product={product} 
+                                layout="horizontal"
+                                className="mb-4"
+                              />
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </ShopifyRecommendations>
                 </div>
                 {product.num_reviews?.value && (
                   <ResponsiveBrowserWidget breakpoint={768}>
@@ -348,7 +381,38 @@ export default function Product() {
                   </ResponsiveBrowserWidget>
                 )}
                 <div className="lg:hidden">
-                  <CompleteTheLook />
+                  <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
+                    Complete The Look
+                  </h3>
+                  <ShopifyRecommendations 
+                    productId={product.id} 
+                    limit={3}
+                  >
+                    {({recommendations, isLoading}) => (
+                      <div className="grid gap-4">
+                        {isLoading ? (
+                          <>
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <div key={i} className="animate-pulse">
+                                <div className="h-40 w-full rounded bg-gray-200" />
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            {recommendations.map((product) => (
+                              <ShopifyRecommendationCard 
+                                key={product.id} 
+                                product={product} 
+                                layout="horizontal"
+                                className="mb-4"
+                              />
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </ShopifyRecommendations>
                 </div>
               </div>
             </section>
@@ -433,27 +497,6 @@ function ResponsiveBrowserWidget({
   } else {
     return <div>loading...</div>;
   }
-}
-
-function CompleteTheLook() {
-  const {product} = useLoaderData<typeof loader>();
-
-  if (!product.complete_the_look) return null;
-
-  return (
-    <div>
-      <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
-        Complete The Look
-      </h3>
-      <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
-        {product?.complete_the_look?.references.nodes.map((product: any) => (
-          <div key={product.id}>
-            <MiniProductCard product={product} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 export function InlineProductCard({
