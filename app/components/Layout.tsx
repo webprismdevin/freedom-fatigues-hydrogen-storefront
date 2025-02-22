@@ -32,7 +32,7 @@ import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
 import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {useCart} from '~/hooks/useCart';
-
+import { CartEmpty } from './Cart';
 type RootData = {
   cart: Promise<CartType>;
   settings: any;
@@ -149,11 +149,11 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       heading="Your Cart"
       openFrom="right"
     >
-      <Suspense fallback={<CartLoading />}>
+      <Suspense fallback={<CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={cart} />}>
         {cart ? (
           <Cart layout="drawer" onClose={onClose} cart={cart} />
         ) : (
-          <CartLoading />
+          <CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={cart} />
         )}
       </Suspense>
     </Drawer>

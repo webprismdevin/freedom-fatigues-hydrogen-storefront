@@ -375,27 +375,41 @@ function CartCheckoutActions({
   // Memoize the fallback button
   const fallbackButton = useMemo(
     () => (
-      <a
-        href={checkoutUrl}
-        onClick={() => handleAnalytics(false)}
-        target="_self"
-        className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+      <CartForm
+        route="/cart"
+        action={CartForm.ACTIONS.LinesAdd}
+        inputs={{
+          lines: [{
+            merchandiseId: 'your-redo-product-id',
+            quantity: 1,
+            attributes: [{
+              key: 'redo_opted_in_from_cart',
+              value: 'true'
+            }]
+          }]
+        }}
       >
-        Continue to Checkout
-      </a>
+        <input type="hidden" name="checkoutUrl" value={checkoutUrl} />
+        <button
+          type="submit"
+          onClick={() => handleAnalytics(false)}
+          className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+        >
+          Continue to Checkout
+        </button>
+      </CartForm>
     ),
     [checkoutUrl, handleAnalytics],
   );
 
   return (
     <div className="mt-2 flex w-full flex-col text-center">
-      {/* 🚧 re-add after done upgrading */}
       <RedoCheckoutButtons
         onClick={handleAnalytics}
         cart={cartForRedo}
         storeId={REDO_STORE_ID}
       >
-      {fallbackButton}
+        {fallbackButton}
       </RedoCheckoutButtons>
     </div>
   );
