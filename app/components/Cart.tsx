@@ -22,7 +22,7 @@ import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import confetti from 'canvas-confetti';
 import posthog from 'posthog-js';
-import {CartForm} from '@shopify/hydrogen';
+import {CartForm, useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
 import {RedoProvider} from '@redotech/redo-hydrogen';
@@ -33,6 +33,10 @@ type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
 const REDO_STORE_ID = '6439e48e41e6bb001f6407a5';
+
+type OptimisticCartLine = CartLine & {
+  isOptimistic?: boolean;
+};
 
 export function Cart({
   layout,
@@ -45,64 +49,45 @@ export function Cart({
 }) {
   if (!cart) return null;
 
-  // Use flattenConnection to handle the cart lines
-  const lines = flattenConnection(cart.lines);
+  // Use optimistic cart
+  const optimisticCart = useOptimisticCart(cart);
+
+  const lines = optimisticCart?.lines?.nodes || [];
   const linesCount = lines.length > 0;
 
   // Memoize the cart transformation for Redo
   const cartForRedo = useMemo(
     () =>
       ({
-        ...cart,
+        ...optimisticCart,
         lines: {
           nodes: lines,
           edges: lines.map((node) => ({node})),
           pageInfo: {hasNextPage: false, hasPreviousPage: false},
         },
       } as unknown as CartType),
-    [cart, lines],
+    [optimisticCart, lines],
   );
 
   // Ensure cart has all required properties
-  if (!cart.cost?.totalAmount) {
+  if (!optimisticCart?.cost?.totalAmount) {
     console.log('Missing required cart properties');
     return (
       <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
     );
   }
 
-  // Memoize the RedoProvider children
-  const cartContent = useMemo(
-    () => (
-      <>
-        <CartEmpty
-          hidden={linesCount}
-          onClose={onClose}
-          layout={layout}
-          cart={cart}
-        />
-        <CartDetails cart={cart} layout={layout} />
-      </>
-    ),
-    [linesCount, onClose, layout, cart],
-  );
+  // If cart is empty, show empty state
+  if (!linesCount) {
+    return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />;
+  }
 
   return (
-    // <>
-    //   <CartEmpty
-    //     hidden={linesCount}
-    //     onClose={onClose}
-    //     layout={layout}
-    //     cart={cart}
-    //   />
-    //   <CartDetails cart={cart} layout={layout} />
-    // </>
-    // 🚧 re-add after done upgrading
     <RedoProvider
       cart={cartForRedo}
       storeId={REDO_STORE_ID}
     >
-    {cartContent}
+      <CartDetails cart={cart} layout={layout} />
     </RedoProvider>
   );
 }
@@ -283,12 +268,11 @@ export function CartDetails({
                     layout === 'drawer' ? 'px-6' : 'px-0',
                   )}
                 >
-                  {cart?.lines?.edges && cart.lines.edges.length > 0 && (
+                  {cart?.lines?.nodes && cart.lines.nodes.length > 0 && (
                     <ShopifyRecommendations
                       containerClassName="w-1/3 shrink-0 grow-0 md:w-1/4"
                       productId={
-                        cart.lines.edges[cart.lines.edges.length - 1].node
-                          .merchandise.product.id
+                        cart.lines.nodes[cart.lines.nodes.length - 1].merchandise.product.id
                       }
                     >
                       {({recommendations, isLoading}) => (
@@ -597,6 +581,8 @@ function CartLineItem({line}: {line: CartLine}) {
 
   if (typeof quantity === 'undefined' || !merchandise?.product) return null;
 
+  if (merchandise.product.vendor === 're:do') return null;
+
   return (
     <li key={id} className="flex gap-4">
       <div className="shrink-0">
@@ -636,7 +622,7 @@ function CartLineItem({line}: {line: CartLine}) {
 
           <div className="flex items-center gap-2">
             <div className="flex justify-start text-copy">
-              <CartLineQuantityAdjust line={line} />
+              <CartLineQuantityAdjust line={line as OptimisticCartLine} />
             </div>
             <ItemRemoveButton lineIds={[id]} />
           </div>
@@ -667,9 +653,9 @@ function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
   );
 }
 
-function CartLineQuantityAdjust({line}: {line: CartLine}) {
+function CartLineQuantityAdjust({line}: {line: OptimisticCartLine}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity} = line;
+  const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
@@ -683,9 +669,12 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
-            className="h-10 w-10 text-primary/50 transition hover:text-primary disabled:text-primary/10"
+            className={clsx(
+              'h-10 w-10 transition hover:text-primary disabled:text-primary/10',
+              isOptimistic ? 'opacity-50' : 'text-primary/50',
+            )}
             value={prevQuantity}
-            disabled={quantity <= 1}
+            disabled={quantity <= 1 || isOptimistic}
           >
             <span>&#8722;</span>
           </button>
@@ -697,10 +686,14 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
 
         <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
-            className="h-10 w-10 text-primary/50 transition hover:text-primary"
+            className={clsx(
+              'h-10 w-10 transition hover:text-primary',
+              isOptimistic ? 'opacity-50' : 'text-primary/50',
+            )}
             name="increase-quantity"
             value={nextQuantity}
             aria-label="Increase quantity"
+            disabled={isOptimistic}
           >
             <span>&#43;</span>
           </button>

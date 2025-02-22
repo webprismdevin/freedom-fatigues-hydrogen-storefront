@@ -10,7 +10,7 @@ import {
 } from '@shopify/remix-oxygen';
 import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {isLocalPath} from '~/lib/utils';
-import {CartForm} from '@shopify/hydrogen';
+import {CartForm, flattenConnection} from '@shopify/hydrogen';
 import type {HydrogenCart} from '@shopify/hydrogen';
 
 type ActionContext = AppLoadContext & {
@@ -32,7 +32,7 @@ type RootData = {
 };
 
 export async function action({request, context}: ActionFunctionArgs) {
-  const {cart} = context;
+  const {cart} = context as ActionContext;
   const formData = await request.formData();
   const {action, inputs} = CartForm.getFormInput(formData);
   let status = 200;
@@ -104,9 +104,22 @@ export async function action({request, context}: ActionFunctionArgs) {
 }
 
 export async function loader({context}: LoaderFunctionArgs) {
-  const {cart} = context as unknown as ActionContext;
+  const {cart} = context as ActionContext;
   const cartData = await cart.get();
-  return json({cart: cartData});
+
+  // Transform cart data for optimistic updates
+  const transformedCart = cartData ? {
+    ...cartData,
+    lines: {
+      nodes: flattenConnection(cartData.lines),
+      edges: cartData.lines.edges,
+      pageInfo: cartData.lines.pageInfo,
+    },
+  } : null;
+
+  return json({
+    cart: transformedCart,
+  });
 }
 
 export default function CartRoute() {

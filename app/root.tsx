@@ -152,6 +152,23 @@ export async function loader({context}: LoaderFunctionArgs) {
       shopifySalesChannel: ShopifySalesChannel.hydrogen,
       shopId: shop.shop.id,
     },
+    optimisticData: {
+      cart: {
+        id: cartId,
+        totalQuantity: 0,
+        lines: [],
+        cost: {
+          subtotalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+          totalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+        },
+      },
+    },
   });
 }
 
