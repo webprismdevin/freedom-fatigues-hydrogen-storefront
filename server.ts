@@ -69,6 +69,11 @@ export default {
 
       const response = await handleRequest(request);
 
+      // Check if session has pending changes and commit them
+      if (session.isPending) {
+        response.headers.set('Set-Cookie', await session.commit());
+      }
+
       if (response.status === 404) {
         /**
          * Check for redirects only when there's a 404 from the app.

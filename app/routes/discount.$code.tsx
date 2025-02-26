@@ -43,7 +43,7 @@ export async function loader({request, context, params}: LoaderFunctionArgs) {
   if (!cartId) {
     const result = await cart.create({});
     cartId = result.cart.id;
-    headers.append('Set-Cookie', await session.commit());
+    session.set('cartId', cartId);
   }
 
   //! apply discount to the cart

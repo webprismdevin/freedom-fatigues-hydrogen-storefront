@@ -10,6 +10,8 @@ import {
  * swap out the cookie-based implementation with something else!
  */
 export class HydrogenSession {
+  public isPending = false;
+
   constructor(
     private sessionStorage: SessionStorage,
     private session: Session,
@@ -36,22 +38,27 @@ export class HydrogenSession {
   }
 
   destroy() {
+    this.isPending = true;
     return this.sessionStorage.destroySession(this.session);
   }
 
   flash(key: string, value: any) {
+    this.isPending = true;
     this.session.flash(key, value);
   }
 
   unset(key: string) {
+    this.isPending = true;
     this.session.unset(key);
   }
 
   set(key: string, value: any) {
+    this.isPending = true;
     this.session.set(key, value);
   }
 
   commit() {
+    this.isPending = false;
     return this.sessionStorage.commitSession(this.session);
   }
 }

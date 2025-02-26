@@ -16,17 +16,6 @@ export function useCartFetchers(actionType?: string) {
 
     return true;
   }).map(fetcher => {
-    const formInputs = CartForm.getFormInput(fetcher.formData!);
-    const isRedoAction = formInputs.action === CartForm.ACTIONS.LinesAdd && 
-      formInputs.inputs?.lines?.some((line: any) => 
-        line.attributes?.some((attr: any) => 
-          attr.key === 'redo_opted_in_from_cart' && attr.value === 'true'
-        )
-      );
-
-    return {
-      ...fetcher,
-      isRedoAction
-    };
+    return fetcher;
   });
 }

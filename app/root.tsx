@@ -17,6 +17,7 @@ import {
   useMatches,
   useRouteError,
   isRouteErrorResponse,
+  useRouteLoaderData,
 } from '@remix-run/react';
 import {
   ShopifySalesChannel,
@@ -152,43 +153,47 @@ export async function loader({context}: LoaderFunctionArgs) {
       shopifySalesChannel: ShopifySalesChannel.hydrogen,
       shopId: shop.shop.id,
     },
+    optimisticData: {
+      cart: {
+        id: cartId,
+        totalQuantity: 0,
+        lines: [],
+        cost: {
+          subtotalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+          totalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+        },
+      },
+    },
   });
 }
 
 export default function App() {
-  const {settings, shop, selectedLocale, cart} = useLoaderData<typeof loader>();
-  const locale = selectedLocale ?? DEFAULT_LOCALE;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <Document>
+      <Layout
+        settings={data.settings}
+        layout={data.shop as ShopData}
+        key={`${data.selectedLocale.language}-${data.selectedLocale.country}`}
+        optimisticData={data.optimisticData}
+      >
+        <Outlet />
+      </Layout>
+    </Document>
+  );
+}
+
+function Document({children}: {children: React.ReactNode}) {
+  const data = useLoaderData<typeof loader>();
+  const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
-  // const location = useLocation();
-  // const [fbp, fbc] = useFbCookies();
-  // const [sessionId, setSessionId] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   // Generate a unique identifier
-  //   const sessionId = uuidv4();
-  //   // Store the unique identifier in sessionStorage
-  //   sessionStorage.setItem('ff_id', sessionId);
-  //   // Set the state variable
-  //   setSessionId(sessionId);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (sessionId) {
-  //     const event_id = `pv__${sessionId}__${uuidv4()}`;
-
-  //     const customData = {
-  //       eventID: event_id,
-  //     };
-  //     window.fbq('track', 'PageView', {}, customData);
-
-  //     fetch(
-  //       `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
-  //         fbc !== null ? `&fbc=${fbc}` : ''
-  //       }&event_source_url=${location.href}`,
-  //     ).then((res) => res.json());
-  //   }
-  // }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);
 
@@ -215,13 +220,7 @@ export default function App() {
         )}
       </head>
       <body>
-        <Layout
-          settings={settings}
-          layout={shop as ShopData}
-          key={`${locale.language}-${locale.country}`}
-        >
-          <Outlet />
-        </Layout>
+        {children}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -248,22 +247,10 @@ export function ErrorBoundary() {
   }
 
   return (
-    <html lang={locale.language}>
-      <head>
-        <title>{`${errorStatus} ${errorMessage}`}</title>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Layout layout={data?.shop} settings={data?.settings}>
-          <div className="route-error">
-            <h1>{errorStatus}</h1>
-            <h2>{errorMessage}</h2>
-          </div>
-        </Layout>
-        <Scripts />
-      </body>
-    </html>
+    <div className="route-error">
+      <h1>{errorStatus}</h1>
+      <h2>{errorMessage}</h2>
+    </div>
   );
 }
 
