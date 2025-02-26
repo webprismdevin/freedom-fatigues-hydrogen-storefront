@@ -883,6 +883,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
                 {
                   merchandiseId: selectedVariant.id,
                   quantity: 1,
+                  selectedVariant: selectedVariant
                 },
               ]}
               variant={isOutOfStock ? 'secondary' : 'primary'}
