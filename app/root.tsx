@@ -52,7 +52,6 @@ declare global {
     TriplePixel: any;
     _learnq: any;
     plausible: any;
-    clarity: any;
     _aimTrack: any;
   }
 }
