@@ -174,11 +174,23 @@ export async function loader({context}: LoaderFunctionArgs) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <Document>
+      <Layout
+        settings={data.settings}
+        layout={data.shop as ShopData}
+        key={`${data.selectedLocale.language}-${data.selectedLocale.country}`}
+        optimisticData={data.optimisticData}
+      >
+        <Outlet />
+      </Layout>
+    </Document>
+  );
 }
 
-export function Layout({children}: {children?: React.ReactNode}) {
-  const data = useRouteLoaderData<typeof loader>('root');
+function Document({children}: {children: React.ReactNode}) {
+  const data = useLoaderData<typeof loader>();
   const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
@@ -208,18 +220,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         )}
       </head>
       <body>
-        {data ? (
-          <Layout
-            settings={data.settings}
-            layout={data.shop as ShopData}
-            key={`${locale.language}-${locale.country}`}
-            optimisticData={data.optimisticData}
-          >
-            {children}
-          </Layout>
-        ) : (
-          children
-        )}
+        {children}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
