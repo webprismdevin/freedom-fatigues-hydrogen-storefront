@@ -177,7 +177,7 @@ export default function App() {
   return <Outlet />;
 }
 
-export function Layout({children}: {children?: React.ReactNode}) {
+export function RootLayout({children}: {children?: React.ReactNode}) {
   const data = useRouteLoaderData<typeof loader>('root');
   const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
