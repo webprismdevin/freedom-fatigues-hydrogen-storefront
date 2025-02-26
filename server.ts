@@ -1,9 +1,17 @@
 // Virtual entry point for the app
 import * as remixBuild from '@remix-run/dev/server-build';
 import {createRequestHandler} from '@shopify/remix-oxygen';
-import {createStorefrontClient, storefrontRedirect} from '@shopify/hydrogen';
+import {
+  createStorefrontClient,
+  storefrontRedirect,
+  createCartHandler,
+  cartGetIdDefault,
+  cartSetIdDefault,
+} from '@shopify/hydrogen';
 import {HydrogenSession} from '~/lib/session.server';
 import {getLocaleFromRequest} from '~/lib/utils';
+import {REDO_REQUIRED_HOSTNAMES} from '@redotech/redo-hydrogen';
+import {createContentSecurityPolicy} from '@shopify/hydrogen';
 
 /**
  * Export a fetch handler in module format.
@@ -42,17 +50,29 @@ export default {
         storefrontId: env.PUBLIC_STOREFRONT_ID,
       });
 
+      // Create the cart handler and attach it to context
+      const cart = createCartHandler({
+        storefront,
+        getCartId: cartGetIdDefault(request.headers),
+        setCartId: cartSetIdDefault(),
+      });
+
       /**
        * Create a Remix request handler and pass
-       * Hydrogen's Storefront client to the loader context.
+       * Hydrogen's Storefront client and cart handler to the loader context.
        */
       const handleRequest = createRequestHandler({
         build: remixBuild,
         mode: process.env.NODE_ENV,
-        getLoadContext: () => ({session, storefront, env, waitUntil}),
+        getLoadContext: () => ({session, storefront, cart, env, waitUntil}),
       });
 
       const response = await handleRequest(request);
+
+      // Check if session has pending changes and commit them
+      if (session.isPending) {
+        response.headers.set('Set-Cookie', await session.commit());
+      }
 
       if (response.status === 404) {
         /**
@@ -71,3 +91,19 @@ export default {
     }
   },
 };
+
+// const {nonce, header, NonceProvider} = createContentSecurityPolicy({
+//   defaultSrc: [
+//     "'self'",
+//     'cdn.shopify.com',
+//     'shopify.com',
+//     ...REDO_REQUIRED_HOSTNAMES,
+//   ],
+//   connectSrc: [
+//     "'self'",
+//     'cdn.shopify.com',
+//     'monorail-edge.shopifysvc.com',
+//     ...REDO_REQUIRED_HOSTNAMES,
+//   ],
+//   // ... rest of CSP config ...
+// });

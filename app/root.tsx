@@ -17,23 +17,27 @@ import {
   useMatches,
   useRouteError,
   isRouteErrorResponse,
+  useRouteLoaderData,
 } from '@remix-run/react';
 import {
   ShopifySalesChannel,
   Seo,
   type SeoHandleFunction,
   Script,
+  type HydrogenCart,
 } from '@shopify/hydrogen';
+import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {Layout} from '~/components/Layout';
 import {GenericError} from './components/GenericError';
 import {NotFound} from './components/NotFound';
+import {Suspense} from 'react';
 
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
 import {DEFAULT_LOCALE, useIsHomePath} from './lib/utils';
 import invariant from 'tiny-invariant';
-import {Shop, Cart} from '@shopify/hydrogen/storefront-api-types';
+import {Shop} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 // analytics
@@ -112,8 +116,15 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+type LoaderContext = AppLoadContext & {
+  cart: HydrogenCart;
+  session: {
+    get: (key: string) => Promise<string | undefined>;
+  };
+};
+
 export async function loader({context}: LoaderFunctionArgs) {
-  const {storefront, session} = context;
+  const {storefront, session, cart} = context as unknown as LoaderContext;
   const [cartId, shop] = await Promise.all([
     session.get('cartId'),
     getShopData(context),
@@ -121,52 +132,68 @@ export async function loader({context}: LoaderFunctionArgs) {
 
   const settings = await getSiteSettings();
 
+  let cartPromise;
+  if (cartId) {
+    cartPromise = cart.get();
+  } else {
+    // Initialize a new cart if one doesn't exist
+    cartPromise = cart.create({}).then((result) => {
+      const headers = cart.setCartId(result.cart.id);
+      // Note: In a real implementation, you'd want to handle these headers
+      return result.cart;
+    });
+  }
+
   return defer({
     settings,
     shop,
     selectedLocale: storefront.i18n,
-    cart: cartId ? getCart(context, cartId) : undefined,
+    cart: cartPromise,
     analytics: {
       shopifySalesChannel: ShopifySalesChannel.hydrogen,
       shopId: shop.shop.id,
+    },
+    optimisticData: {
+      cart: {
+        id: cartId,
+        totalQuantity: 0,
+        lines: [],
+        cost: {
+          subtotalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+          totalAmount: {
+            amount: '0.0',
+            currencyCode: 'USD',
+          },
+        },
+      },
     },
   });
 }
 
 export default function App() {
-  const {settings, shop, selectedLocale} = useLoaderData<typeof loader>();
-  const locale = selectedLocale ?? DEFAULT_LOCALE;
+  const data = useLoaderData<typeof loader>();
+  return (
+    <Document>
+      <Layout
+        settings={data.settings}
+        layout={data.shop as ShopData}
+        key={`${data.selectedLocale.language}-${data.selectedLocale.country}`}
+        optimisticData={data.optimisticData}
+      >
+        <Outlet />
+      </Layout>
+    </Document>
+  );
+}
+
+function Document({children}: {children: React.ReactNode}) {
+  const data = useLoaderData<typeof loader>();
+  const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
   const isHome = useIsHomePath();
-  // const location = useLocation();
-  // const [fbp, fbc] = useFbCookies();
-  // const [sessionId, setSessionId] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   // Generate a unique identifier
-  //   const sessionId = uuidv4();
-  //   // Store the unique identifier in sessionStorage
-  //   sessionStorage.setItem('ff_id', sessionId);
-  //   // Set the state variable
-  //   setSessionId(sessionId);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (sessionId) {
-  //     const event_id = `pv__${sessionId}__${uuidv4()}`;
-
-  //     const customData = {
-  //       eventID: event_id,
-  //     };
-  //     window.fbq('track', 'PageView', {}, customData);
-
-  //     fetch(
-  //       `/server/PageView?event_id=${event_id}${fbp ? `&fbp=${fbp}` : ''}${
-  //         fbc !== null ? `&fbc=${fbc}` : ''
-  //       }&event_source_url=${location.href}`,
-  //     ).then((res) => res.json());
-  //   }
-  // }, [location.href, sessionId]);
 
   useAnalytics(hasUserConsent, locale);
 
@@ -193,13 +220,7 @@ export default function App() {
         )}
       </head>
       <body>
-        <Layout
-          settings={settings}
-          layout={shop as ShopData}
-          key={`${locale.language}-${locale.country}`}
-        >
-          <Outlet />
-        </Layout>
+        {children}
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
@@ -226,27 +247,15 @@ export function ErrorBoundary() {
   }
 
   return (
-    <html lang={locale.language}>
-      <head>
-        <title>{`${errorStatus} ${errorMessage}`}</title>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <Layout layout={data?.shop} settings={data?.settings}>
-          <div className="route-error">
-            <h1>{errorStatus}</h1>
-            <h2>{errorMessage}</h2>
-          </div>
-        </Layout>
-        <Scripts />
-      </body>
-    </html>
+    <div className="route-error">
+      <h1>{errorStatus}</h1>
+      <h2>{errorMessage}</h2>
+    </div>
   );
 }
 
 const LAYOUT_QUERY = `#graphql
-  query layoutMenus(
+  query layout(
     $language: LanguageCode
   ) @inContext(language: $language) {
     shop {
@@ -259,11 +268,10 @@ const LAYOUT_QUERY = `#graphql
 
 export interface ShopData {
   shop: Shop;
-  cart?: Promise<Cart>;
 }
 
 async function getShopData({storefront}: AppLoadContext) {
-  const data = await storefront.query<ShopData>(LAYOUT_QUERY, {
+  const data = await storefront.query(LAYOUT_QUERY, {
     variables: {
       language: storefront.i18n.language,
     },
@@ -276,151 +284,13 @@ async function getShopData({storefront}: AppLoadContext) {
   };
 }
 
-const CART_QUERY = `#graphql
-  query CartQuery($cartId: ID!, $country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    cart(id: $cartId) {
-      ...CartFragment
-    }
-  }
-
-  fragment CartFragment on Cart {
-    id
-    checkoutUrl
-    totalQuantity
-    buyerIdentity {
-      countryCode
-      customer {
-        id
-        email
-        firstName
-        lastName
-        displayName
-      }
-      email
-      phone
-    }
-    discountAllocations {
-      discountedAmount {
-        amount
-        currencyCode
-      }
-    }
-    lines(first: 100) {
-      edges {
-        node {
-          id
-          quantity
-          discountAllocations {
-            discountedAmount {
-              amount
-              currencyCode
-            }
-          }
-          attributes {
-            key
-            value
-          }
-          cost {
-            totalAmount {
-              amount
-              currencyCode
-            }
-            amountPerQuantity {
-              amount
-              currencyCode
-            }
-            compareAtAmountPerQuantity {
-              amount
-              currencyCode
-            }
-          }
-          merchandise {
-            ... on ProductVariant {
-              id
-              sku
-              availableForSale
-              compareAtPrice {
-                ...MoneyFragment
-              }
-              price {
-                ...MoneyFragment
-              }
-              requiresShipping
-              title
-              image {
-                ...ImageFragment
-              }
-              product {
-                handle
-                title
-                id
-                tags
-              }
-              selectedOptions {
-                name
-                value
-              }
-            }
-          }
-        }
-      }
-    }
-    cost {
-      subtotalAmount {
-        ...MoneyFragment
-      }
-      totalAmount {
-        ...MoneyFragment
-      }
-      totalDutyAmount {
-        ...MoneyFragment
-      }
-      totalTaxAmount {
-        ...MoneyFragment
-      }
-    }
-    note
-    attributes {
-      key
-      value
-    }
-    discountCodes {
-      code
-    }
-  }
-
-  fragment MoneyFragment on MoneyV2 {
-    currencyCode
-    amount
-  }
-
-  fragment ImageFragment on Image {
-    id
-    url
-    altText
-    width
-    height
-  }
-`;
-
-export async function getCart({storefront}: AppLoadContext, cartId: string) {
-  invariant(storefront, 'missing storefront client in cart query');
-
-  const {cart} = await storefront.query<{cart?: Cart}>(CART_QUERY, {
-    variables: {
-      cartId,
-      country: storefront.i18n.country,
-      language: storefront.i18n.language,
-    },
-    cache: storefront.CacheNone(),
-  });
-
-  return cart;
-}
-
 export interface RootData {
   selectedLocale: typeof DEFAULT_LOCALE;
   shop: any;
   settings: any;
+  cart: Promise<CartType | null>;
+  analytics: {
+    shopifySalesChannel: string;
+    shopId: string;
+  };
 }

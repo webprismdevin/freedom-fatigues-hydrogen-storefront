@@ -16,6 +16,7 @@ import {
   useFetcher,
   useMatches,
   useNavigation,
+  useParams,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -25,6 +26,8 @@ import {
   type SeoHandleFunction,
   type SeoConfig,
   Image,
+  ShopPayButton,
+  useOptimisticVariant,
 } from '@shopify/hydrogen';
 import {
   Heading,
@@ -63,7 +66,6 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/hooks/useScript';
-import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
@@ -194,6 +196,15 @@ export default function Product() {
   const {media, title, vendor, descriptionHtml} = product;
   const {collective_accordions, badges, modules} = pageContent;
 
+  const variants = flattenConnection(product.variants);
+  
+  // The selectedVariant optimistically changes during page
+  // transitions with one of the preloaded product variants
+  const selectedVariant = useOptimisticVariant(
+    product.selectedVariant,
+    variants,
+  );
+
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
@@ -242,7 +253,7 @@ export default function Product() {
                   count={Number(product.num_reviews?.value)}
                 />
               </div>
-              <ProductForm />
+              <ProductForm selectedVariant={selectedVariant} />
               {badges && badges?.length > 0 && <Badges />}
               <div className="grid gap-4 py-4">
                 <hr />
@@ -417,7 +428,7 @@ export function InlineProductCard({
   );
 }
 
-export function ProductForm() {
+export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}) {
   const {product, analytics} = useLoaderData<typeof loader>();
 
   const [root] = useMatches();
@@ -466,12 +477,6 @@ export function ProductForm() {
 
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
-
-  // 👇 swap this line with the one below to enable first variant
-  // const selectedVariant = product.selectedVariant ?? firstVariant;
-  const selectedVariant = onlyHasDefault
-    ? firstVariant
-    : product.selectedVariant;
 
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
@@ -660,9 +665,6 @@ export function ProductForm() {
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
 
-  // const isClearance = useTags(product.tags, 'Clearance');
-  // const isExcludeRedo = useTags(product.tags, 'exclude_redo');
-
   return (
     <div className="grid gap-10">
       <div className="grid gap-4">
@@ -683,24 +685,6 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {/* {selectedVariant &&
-              // !isRedoInCart &&
-              !isClearance &&
-              !isExcludeRedo && (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    ref={redoBox}
-                    onChange={(e) => setAddRedo(e.target.checked)}
-                    checked={addRedo}
-                  />
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-[11px]">
-                      {defaults.product.redoCopy}
-                    </span>
-                  </div>
-                </div>
-              )} */}
             {!isOutOfStock ? (
               <AddToCartButton
                 lines={[
@@ -817,7 +801,7 @@ export function ProductOptions({
       {options
         .filter(
           (option) =>
-            option.values.length >= 1 && option.values[0] !== 'Default Title',
+            option.values.length > 1 && option.values[0] !== 'Default Title',
         )
         .map((option) => (
           <div
@@ -875,6 +859,7 @@ export function ProductOptions({
                                     active && 'bg-contrast/10',
                                   )}
                                   searchParams={searchParamsWithDefaults}
+                                  waitForNavigation
                                   onClick={() => {
                                     if (!closeRef?.current) return;
                                     closeRef.current.click();
@@ -909,9 +894,12 @@ export function ProductOptions({
                           optionName={option.name}
                           optionValue={value}
                           searchParams={searchParamsWithDefaults}
+                          waitForNavigation
                           className={clsx(
                             'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
-                            checked ? '!border-primary/50 selected_option' : '!border-primary/0',
+                            checked
+                              ? 'selected_option !border-primary/50'
+                              : '!border-primary/0',
                           )}
                         />
                       </Text>
@@ -931,12 +919,14 @@ function ProductOptionLink({
   optionValue,
   searchParams,
   children,
+  waitForNavigation,
   ...props
 }: {
   optionName: string;
   optionValue: string;
   searchParams: URLSearchParams;
   children?: ReactNode;
+  waitForNavigation?: boolean;
   [key: string]: any;
 }) {
   const {pathname} = useLocation();
@@ -956,6 +946,7 @@ function ProductOptionLink({
       prefetch="intent"
       replace
       to={`${path}?${clonedSearchParams.toString()}`}
+      unstable_viewTransition={waitForNavigation ? false : undefined}
     >
       {children ?? optionValue}
     </Link>

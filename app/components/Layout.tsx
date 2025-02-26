@@ -1,6 +1,4 @@
 import {
-  type EnhancedMenu,
-  type EnhancedMenuItem,
   useIsHomePath,
 } from '~/lib/utils';
 import {
@@ -20,26 +18,42 @@ import {
   CartLoading,
   Link,
 } from '~/components';
-import {useParams, Form, Await, useMatches} from '@remix-run/react';
+import {useParams, Form, Await, useMatches, useFetcher} from '@remix-run/react';
 import {useLocalStorage, useLocation, useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo, useState} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
+import {useDrawerCart} from '~/hooks/useDrawerCart';
 import {AnimatePresence, motion} from 'framer-motion';
 import {urlFor} from '~/lib/sanity';
 import AnnouncementBar from './AnnouncementBar';
 import {Image} from '@shopify/hydrogen';
 import EmailSignup, {SignUpForm} from './EmailSignup';
+import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
+import {useCart} from '~/hooks/useCart';
+import { CartEmpty } from './Cart';
+type RootData = {
+  cart: Promise<CartType>;
+  settings: any;
+  selectedLocale: any;
+  shop: any;
+  analytics: {
+    shopifySalesChannel: string;
+    shopId: string;
+  };
+};
 
 export function Layout({
   children,
   layout,
   settings,
+  optimisticData,
 }: {
   children: React.ReactNode;
   layout: any;
   settings: any;
+  optimisticData?: any;
 }) {
   const {announcements} = settings;
 
@@ -51,12 +65,12 @@ export function Layout({
             Skip to content
           </a>
         </div>
-        <Suspense fallback={<div className="h-12"></div>}>
-          <Await resolve={settings}>
+        {/* <Suspense fallback={<div className="h-12"></div>}>
+          <Await resolve={settings}> */}
             <AnnouncementBar data={announcements} />
-          </Await>
-        </Suspense>
-        <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
+          {/* </Await>
+        </Suspense> */}
+        <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} optimisticData={optimisticData} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}
         </main>
@@ -76,8 +90,9 @@ export function Layout({
   );
 }
 
-function Header({title, menu}: {title: string; menu?: any}) {
+function Header({title, menu, optimisticData}: {title: string; menu?: any; optimisticData?: any}) {
   const isHome = useIsHomePath();
+  const fetcher = useFetcher<{cart: CartType}>();
 
   const {
     isOpen: isCartOpen,
@@ -91,23 +106,22 @@ function Header({title, menu}: {title: string; menu?: any}) {
     closeDrawer: closeMenu,
   } = useDrawer();
 
-  const addToCartFetchers = useCartFetchers('ADD_TO_CART');
-  const location = useLocation();
+  // Use the drawer cart hook to handle cart additions
+  useDrawerCart({
+    isOpen: isCartOpen,
+    openDrawer: openCart,
+  });
 
-  // toggle cart drawer when adding to cart
-  useEffect(() => {
-    if (isCartOpen || !addToCartFetchers.length) return;
-    openCart();
-  }, [addToCartFetchers, isCartOpen, openCart]);
+  const location = useLocation();
 
   useEffect(() => {
     if (!isMenuOpen || !menu) return;
     closeMenu();
-  }, [location]);
+  }, [location, isMenuOpen, menu, closeMenu]);
 
   return (
     <>
-      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} optimisticData={optimisticData} />
       {menu && (
         <MenuDrawer isOpen={isMenuOpen} onClose={closeMenu} menu={menu} />
       )}
@@ -127,9 +141,9 @@ function Header({title, menu}: {title: string; menu?: any}) {
   );
 }
 
-function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
-  const [root] = useMatches();
-
+function CartDrawer({isOpen, onClose, optimisticData}: {isOpen: boolean; onClose: () => void; optimisticData?: any}) {
+  const {cart, isLoading} = useCart();
+  
   return (
     <Drawer
       open={isOpen}
@@ -137,16 +151,34 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       heading="Your Cart"
       openFrom="right"
     >
-      {/* <div className="grid"> */}
-      <Suspense fallback={<CartLoading />}>
-        <Await resolve={root.data?.cart}>
-          {(cart) => <Cart layout="drawer" onClose={onClose} cart={cart} />}
-        </Await>
+      <Suspense fallback={<CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={optimisticData?.cart} />}>
+        {cart ? (
+          <Cart layout="drawer" onClose={onClose} cart={cart} />
+        ) : (
+          <CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={optimisticData?.cart} />
+        )}
       </Suspense>
-      {/* </div> */}
     </Drawer>
   );
 }
+
+type SanityMenuItem = {
+  _key: string;
+  _type: string;
+  title: string;
+  collectionLinks?: Array<{
+    _key: string;
+    slug: string;
+    title: string;
+    target?: string;
+  }>;
+  megaMenuTitle?: {
+    to: string;
+    title: string;
+  };
+  slug?: string;
+  target?: string;
+};
 
 export function MenuDrawer({
   isOpen,
@@ -155,7 +187,7 @@ export function MenuDrawer({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  menu: EnhancedMenu;
+  menu: SanityMenuItem[];
 }) {
   return (
     <Drawer
@@ -171,11 +203,21 @@ export function MenuDrawer({
   );
 }
 
-function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
+type LinkListItem = {
+  title: string;
+  to: string;
+};
+
+type LinkList = {
+  title: string;
+  links: LinkListItem[];
+};
+
+function MenuMobileNav({menu, onClose}: {menu: SanityMenuItem[]; onClose: () => void}) {
   return (
     <nav className="grid gap-4 p-6 sm:gap-6 sm:px-12 sm:py-8 max-h-screen overflow-y-auto">
       {/* Top level menu items */}
-      {(menu || []).map((item) => (
+      {(menu || []).map((item: SanityMenuItem) => (
         <div key={item._key}>
           {item.collectionLinks && (
             <Disclosure>
@@ -217,8 +259,8 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
                           </Link>
                         </li>
                       )}
-                      {item.collectionLinks.map((link) => (
-                        <li key={link.slug}>
+                      {item.collectionLinks?.map((link) => (
+                        <li key={link._key}>
                           <Link
                             to={link.slug}
                             target={link.target}
@@ -239,7 +281,7 @@ function MenuMobileNav({menu, onClose}: {menu: any; onClose: () => void}) {
               )}
             </Disclosure>
           )}
-          {item._type == 'linkInternal' && (
+          {item._type == 'linkInternal' && item.slug && (
             <span className="block font-heading text-xl">
               <Link
                 to={item.slug}
@@ -401,7 +443,7 @@ function DesktopHeader({
         !isHome && y > 50 && ' shadow-lightHeader'
       } sticky top-12 z-40 hidden h-nav w-full items-center justify-between gap-8 px-12 py-8 leading-none transition duration-300 lg:flex`}
     >
-      <div className="flex items-center gap-6 font-heading tracking-wider">
+      <div className="flex min-w-0 flex-1 items-center gap-6 font-heading tracking-wider">
         <Link to="/" prefetch="intent" className="shrink-0">
           <div>
             <img
@@ -414,40 +456,43 @@ function DesktopHeader({
             />
           </div>
         </Link>
-        <nav className="flex select-none items-start gap-x-4 overflow-x-auto h-[30px] scrollbar-none">
-          {/* Top level menu items */}
-          {(menu || []).map((item: any) => {
-            if (item._type === 'collectionGroup') {
-              return (
-                <MegaMenuLink
-                  menu={item}
-                  key={item._key}
-                  open={item._key === megaMenu.menu?._key && megaMenu.open}
-                  onClick={() => handleMegaMenu(item)}
-                />
-              );
-            }
-            if (item._type === 'linkInternal') {
-              return (
-                <Link
-                  key={item._key}
-                  to={item.slug}
-                  target="_parent"
-                  prefetch="intent"
-                  className={({isActive}) =>
-                    isActive
-                      ? '-mb-px border-b-2 border-red-500 whitespace-nowrap'
-                      : 'hover:border-b-2 hover:border-b-red-500 whitespace-nowrap'
-                  }
-                >
-                  <LinkTitle text={item.title} />
-                </Link>
-              );
-            }
-          })}
+        <nav className="min-w-0 flex-1">
+          <div className="flex select-none items-start gap-x-4 overflow-x-auto pb-1 hiddenScroll">
+            {/* Top level menu items */}
+            {(menu || []).map((item: SanityMenuItem) => {
+              if (item._type === 'collectionGroup') {
+                return (
+                  <MegaMenuLink
+                    menu={item}
+                    key={item._key}
+                    open={item._key === megaMenu.menu?._key && megaMenu.open}
+                    onClick={() => handleMegaMenu(item)}
+                  />
+                );
+              }
+              if (item._type === 'linkInternal' && item.slug) {
+                return (
+                  <Link
+                    key={item._key}
+                    to={item.slug}
+                    target="_parent"
+                    prefetch="intent"
+                    className={({isActive}) =>
+                      isActive
+                        ? '-mb-px border-b-2 border-red-500 whitespace-nowrap'
+                        : 'hover:border-b-2 hover:border-b-red-500 whitespace-nowrap'
+                    }
+                  >
+                    <LinkTitle text={item.title} />
+                  </Link>
+                );
+              }
+              return null;
+            })}
+          </div>
         </nav>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1">
         <Form
           method="get"
           action={params.lang ? `/${params.lang}/search` : '/search'}
@@ -493,15 +538,15 @@ function LinkTitle({text}: {text: string}) {
 function MegaMenuLink({
   menu,
   open,
-  ...props
+  onClick,
 }: {
   menu: any;
   open: boolean;
-  props?: any;
+  onClick: () => void;
 }) {
   return (
     <div
-      {...props}
+      onClick={onClick}
       className="flex cursor-pointer items-center whitespace-nowrap tracking-wider"
     >
       <div className="hover:border-b-2 hover:border-b-red-500">
@@ -614,19 +659,15 @@ function CartCount({
   isHome: boolean;
   openCart: () => void;
 }) {
-  const [root] = useMatches();
+  const {cart} = useCart();
 
   return (
     <Suspense fallback={<Badge count={0} dark={isHome} openCart={openCart} />}>
-      <Await resolve={root.data?.cart}>
-        {(cart) => (
-          <Badge
-            dark={isHome}
-            openCart={openCart}
-            count={cart?.totalQuantity || 0}
-          />
-        )}
-      </Await>
+      <Badge
+        dark={isHome}
+        openCart={openCart}
+        count={cart?.totalQuantity || 0}
+      />
     </Suspense>
   );
 }
@@ -695,12 +736,12 @@ export function GodFamilyCountry({preFooter}: {preFooter: any}) {
   );
 }
 
-const FooterLinkList = ({linkList}) => {
+const FooterLinkList = ({linkList}: {linkList: LinkList}) => {
   return (
     <div>
       <LinkListTitle title={linkList.title} />
       <ul>
-        {linkList.links.map((link) => (
+        {linkList.links.map((link: LinkListItem) => (
           <li key={link.title} className={'my-2'}>
             <Link to={link.to}>{link.title}</Link>
           </li>

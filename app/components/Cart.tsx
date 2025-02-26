@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, {useMemo, useRef} from 'react';
+import React, {useMemo, useRef, useEffect, useState, useCallback} from 'react';
 import {useScroll} from 'react-use';
 import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
@@ -20,14 +20,23 @@ import type {
 import {useFetcher, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
-import {fromGID} from '~/lib/gidUtils';
 import confetti from 'canvas-confetti';
-import {Switch} from '@headlessui/react';
 import posthog from 'posthog-js';
+import {CartForm, useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
+import {useIsHydrated} from '~/hooks/useIsHydrated';
+import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
+import {RedoProvider} from '@redotech/redo-hydrogen';
+import ShopifyRecommendations from './ShopifyRecommendations';
+import ShopifyRecommendationCard from './ShopifyRecommendationCard';
 
 type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
+const REDO_STORE_ID = '6439e48e41e6bb001f6407a5';
+
+type OptimisticCartLine = CartLine & {
+  isOptimistic?: boolean;
+};
 
 export function Cart({
   layout,
@@ -38,46 +47,86 @@ export function Cart({
   onClose?: () => void;
   cart: CartType | null;
 }) {
-  const linesCount = Boolean(cart?.lines?.edges?.length || 0);
+  if (!cart) return null;
+
+  // Use optimistic cart
+  const optimisticCart = useOptimisticCart(cart);
+
+  const lines = optimisticCart?.lines?.nodes || [];
+  const linesCount = lines.length > 0;
+
+  // Memoize the cart transformation for Redo
+  const cartForRedo = useMemo(
+    () =>
+      ({
+        ...optimisticCart,
+        lines: {
+          nodes: lines,
+          edges: lines.map((node) => ({node})),
+          pageInfo: {hasNextPage: false, hasPreviousPage: false},
+        },
+      } as unknown as CartType),
+    [optimisticCart, lines],
+  );
+
+  // Ensure cart has all required properties
+  if (!optimisticCart?.cost?.totalAmount) {
+    console.log('Missing required cart properties');
+    return (
+      <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
+    );
+  }
+
+  // If cart is empty, show empty state
+  if (!linesCount) {
+    return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />;
+  }
 
   return (
-    <>
-      <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
+    <RedoProvider
+      cart={cartForRedo}
+      storeId={REDO_STORE_ID}
+    >
       <CartDetails cart={cart} layout={layout} />
-    </>
+    </RedoProvider>
   );
 }
 
-import {useState, useEffect} from 'react';
-import {Rebuy_MiniProductCard} from './ProductCard';
-import useRedo from '~/hooks/useRedo';
-
 function ProgressBar({value}: {value: number}) {
+  const isHydrated = useIsHydrated();
   const [width, setWidth] = useState(0);
-  const [confettiFired, setConfettiFired] = useState(() => {
-    if (window.sessionStorage.getItem('confettiFired') === 'true') {
-      return true;
+  const [confettiFired, setConfettiFired] = useState(false);
+
+  useEffect(() => {
+    // Check sessionStorage only after hydration
+    if (isHydrated) {
+      const hasConfettiFired =
+        window.sessionStorage.getItem('confettiFired') === 'true';
+      setConfettiFired(hasConfettiFired);
     }
-    return false;
-  });
+  }, [isHydrated]);
 
   useEffect(() => {
     if (value >= 1) {
       setWidth(100);
-      if (!confettiFired) {
-        confetti({
-          colors: ['#B31942', '#0A3161', '#FFFFFF'],
-          particleCount: 100,
-          spread: 70,
-          origin: {y: 0.6, x: 0.8},
-        });
-        setConfettiFired(true);
-        window.sessionStorage.setItem('confettiFired', 'true');
+      if (!confettiFired && isHydrated) {
+        const hasConfettiFired =
+          window.sessionStorage.getItem('confettiFired') === 'true';
+        if (!hasConfettiFired) {
+          confetti({
+            colors: ['#B31942', '#0A3161', '#FFFFFF'],
+            particleCount: 100,
+            spread: 70,
+            origin: {y: 0.6, x: 0.8},
+          });
+          window.sessionStorage.setItem('confettiFired', 'true');
+          setConfettiFired(true);
+        }
       }
       return;
     }
     setWidth(value * 100);
-  }, [value]);
+  }, [value, confettiFired, isHydrated]);
 
   return (
     <div className="relative h-2 w-full bg-slate-200">
@@ -113,7 +162,7 @@ export function CartDetails({
   const [offerUnlocked, setOfferUnlocked] = useState(false);
   const [offerValid, setOfferValid] = useState(false);
 
-  const settings = root.data.settings;
+  const settings = (root.data as any).settings;
 
   useEffect(() => {
     if (cart) {
@@ -205,14 +254,56 @@ export function CartDetails({
               </div>
             ) : (
               <div>
-                <h5 className="px-6 font-heading text-lg md:px-12">
+                <h5
+                  className={clsx(
+                    'font-heading text-lg',
+                    layout === 'drawer' ? 'px-6' : 'px-0',
+                  )}
+                >
                   You might also like
                 </h5>
-                <div className="hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto px-6 py-4 md:px-12">
-                  <RebuyRecommendations
-                    className="w-1/3 shrink-0 grow-0 md:w-1/4"
-                    lines={cart?.lines}
-                  />
+                <div
+                  className={clsx(
+                    'hiddenScroll relative flex min-h-48 snap-x flex-row gap-4 overflow-x-auto py-4',
+                    layout === 'drawer' ? 'px-6' : 'px-0',
+                  )}
+                >
+                  {cart?.lines?.nodes && cart.lines.nodes.length > 0 && (
+                    <ShopifyRecommendations
+                      containerClassName="w-1/3 shrink-0 grow-0 md:w-1/4"
+                      productId={
+                        cart.lines.nodes[cart.lines.nodes.length - 1].merchandise.product.id
+                      }
+                    >
+                      {({recommendations, isLoading}) => (
+                        <>
+                          {isLoading ? (
+                            <>
+                              {Array.from({length: 4}).map((_, i) => (
+                                <div
+                                  key={i}
+                                  className="w-1/3 shrink-0 grow-0 animate-pulse md:w-1/4"
+                                >
+                                  <div className="h-40 w-full rounded bg-gray-200" />
+                                </div>
+                              ))}
+                            </>
+                          ) : (
+                            <>
+                              {recommendations.map((product) => (
+                                <ShopifyRecommendationCard
+                                  key={product.id}
+                                  product={product}
+                                  layout="vertical"
+                                  className="w-1/3 shrink-0 grow-0 md:w-1/4"
+                                />
+                              ))}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ShopifyRecommendations>
+                  )}
                 </div>
               </div>
             )}
@@ -223,7 +314,6 @@ export function CartDetails({
           <CartSummary cost={cart.cost} layout={layout}>
             {cart && layout == 'page' && <FreeShippingProgress cart={cart} />}
             <CartDiscounts discountCodes={cart.discountCodes} />
-            {/* <RedoToggle /> */}
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
           </CartSummary>
@@ -233,11 +323,104 @@ export function CartDetails({
   );
 }
 
-function FreeShippingProgress({cart}: any) {
+function CartCheckoutActions({
+  cart,
+  checkoutUrl,
+}: {
+  cart: CartType;
+  checkoutUrl: string;
+}) {
+  if (!checkoutUrl) return null;
+
+  // Add defensive check for cart data
+  if (!cart.cost?.totalAmount) return null;
+
+  const lines = flattenConnection(cart.lines);
+  if (lines.length === 0) return null;
+
+  const handleAnalytics = useCallback(
+    (enabled: boolean) => {
+      // Capture checkout event
+      posthog.capture('begin_checkout', {
+        $value: cart.cost.totalAmount.amount,
+        currency: cart.cost.totalAmount.currencyCode,
+        items: lines.map((line) => ({
+          product_id: line.merchandise.product.id,
+          variant_id: line.merchandise.id,
+          product_title: line.merchandise.product.title,
+          variant_title: line.merchandise.title,
+          price: parseFloat(line.cost.totalAmount.amount),
+          quantity: line.quantity,
+        })),
+        redo_coverage: enabled,
+      });
+    },
+    [cart.cost.totalAmount, lines],
+  );
+
+  // Memoize the cart transformation for Redo
+  const cartForRedo = useMemo(
+    () =>
+      ({
+        ...cart,
+        lines: {
+          nodes: lines,
+          edges: lines.map((node) => ({node})),
+          pageInfo: {hasNextPage: false, hasPreviousPage: false},
+        },
+      } as unknown as CartType),
+    [cart, lines],
+  );
+
+  // Memoize the fallback button
+  const fallbackButton = useMemo(
+    () => (
+      <CartForm
+        route="/cart"
+        action={CartForm.ACTIONS.LinesAdd}
+        inputs={{
+          lines: [{
+            merchandiseId: 'your-redo-product-id',
+            quantity: 1,
+            attributes: [{
+              key: 'redo_opted_in_from_cart',
+              value: 'true'
+            }]
+          }]
+        }}
+      >
+        <input type="hidden" name="checkoutUrl" value={checkoutUrl} />
+        <button
+          type="submit"
+          onClick={() => handleAnalytics(false)}
+          className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
+        >
+          Continue to Checkout
+        </button>
+      </CartForm>
+    ),
+    [checkoutUrl, handleAnalytics],
+  );
+
+  return (
+    <div className="mt-2 flex w-full flex-col text-center">
+      <RedoCheckoutButtons
+        onClick={handleAnalytics}
+        cart={cartForRedo}
+        storeId={REDO_STORE_ID}
+      >
+        {fallbackButton}
+      </RedoCheckoutButtons>
+    </div>
+  );
+}
+
+function FreeShippingProgress({cart}: {cart: CartType}) {
   //qualified shipping cart cost
   const cart_cost = useMemo(() => {
-    return cart.lines.edges.reduce((total, {node}) => {
-      return total + Number(node.cost.totalAmount.amount);
+    const lines = flattenConnection(cart.lines) as CartLine[];
+    return lines.reduce((total: number, line: CartLine) => {
+      return total + Number(line.cost.totalAmount.amount);
     }, 0);
   }, [cart.lines]);
 
@@ -256,40 +439,6 @@ function FreeShippingProgress({cart}: any) {
       <div className="text-center text-xs">
         (Free shipping only applicable to FF gear)
       </div>
-    </div>
-  );
-}
-
-function RedoToggle() {
-  const [enabled, setEnabled] = useState(true);
-  const [isInCart, redoResponse, addRedo, setAddRedo] = useRedo();
-  const [root] = useMatches();
-
-  useEffect(() => {
-    setAddRedo(enabled);
-  }, [enabled]);
-
-  const redoCopy = root?.data?.settings.redoCopy;
-
-  if (!redoResponse) return null;
-
-  return (
-    <div className="flex items-center justify-start gap-3">
-      <span className="text-xs">{redoCopy}</span>
-      <Switch
-        checked={enabled}
-        onChange={setEnabled}
-        className={`${
-          enabled ? 'bg-blue-600' : 'bg-gray-200'
-        } relative inline-flex h-5 w-10 shrink-0 items-center rounded-full`}
-      >
-        <span className="sr-only">{redoCopy}</span>
-        <span
-          className={`${
-            enabled ? 'translate-x-6' : 'translate-x-1'
-          } inline-block h-3 w-3 transform rounded-full bg-white transition`}
-        />
-      </Switch>
     </div>
   );
 }
@@ -401,51 +550,6 @@ function CartLines({
   );
 }
 
-function CartCheckoutActions({
-  cart,
-  checkoutUrl,
-}: {
-  cart: CartType;
-  checkoutUrl: string;
-}) {
-  if (!checkoutUrl) return null;
-
-  const handleCheckout = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-
-    // Capture checkout event
-    posthog.capture('begin_checkout', {
-      $value: cart.cost.totalAmount.amount,
-      currency: cart.cost.totalAmount.currencyCode,
-      items: cart.lines.edges.map(({node}) => ({
-        product_id: node.merchandise.product.id,
-        variant_id: node.merchandise.id,
-        product_title: node.merchandise.product.title,
-        variant_title: node.merchandise.title,
-        price: parseFloat(node.cost.totalAmount.amount),
-        quantity: node.quantity,
-      })),
-    });
-
-    // Small delay to ensure event is captured
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    window.location.href = checkoutUrl;
-  };
-
-  return (
-    <div className="mt-2 flex flex-col">
-      <a
-        href={checkoutUrl}
-        onClick={handleCheckout}
-        target="_self"
-        className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-      >
-        Continue to Checkout
-      </a>
-    </div>
-  );
-}
-
 function CartSummary({
   cost,
   layout,
@@ -491,6 +595,8 @@ function CartLineItem({line}: {line: CartLine}) {
 
   if (typeof quantity === 'undefined' || !merchandise?.product) return null;
 
+  if (merchandise.product.vendor === 're:do') return null;
+
   return (
     <li key={id} className="flex gap-4">
       <div className="shrink-0">
@@ -530,7 +636,7 @@ function CartLineItem({line}: {line: CartLine}) {
 
           <div className="flex items-center gap-2">
             <div className="flex justify-start text-copy">
-              <CartLineQuantityAdjust line={line} />
+              <CartLineQuantityAdjust line={line as OptimisticCartLine} />
             </div>
             <ItemRemoveButton lineIds={[id]} />
           </div>
@@ -544,16 +650,12 @@ function CartLineItem({line}: {line: CartLine}) {
 }
 
 function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
-  const fetcher = useFetcher();
-
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input
-        type="hidden"
-        name="cartAction"
-        value={CartAction.REMOVE_FROM_CART}
-      />
-      <input type="hidden" name="linesIds" value={JSON.stringify(lineIds)} />
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.LinesRemove}
+      inputs={{lineIds}}
+    >
       <button
         className="flex h-10 w-10 items-center justify-center rounded border"
         type="submit"
@@ -561,13 +663,13 @@ function ItemRemoveButton({lineIds}: {lineIds: CartLine['id'][]}) {
         <span className="sr-only">Remove</span>
         <IconRemove aria-hidden="true" />
       </button>
-    </fetcher.Form>
+    </CartForm>
   );
 }
 
-function CartLineQuantityAdjust({line}: {line: CartLine}) {
+function CartLineQuantityAdjust({line}: {line: OptimisticCartLine}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity} = line;
+  const {id: lineId, quantity, isOptimistic} = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
@@ -581,9 +683,12 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
-            className="h-10 w-10 text-primary/50 transition hover:text-primary disabled:text-primary/10"
+            className={clsx(
+              'h-10 w-10 transition hover:text-primary disabled:text-primary/10',
+              isOptimistic ? 'opacity-50' : 'text-primary/50',
+            )}
             value={prevQuantity}
-            disabled={quantity <= 1}
+            disabled={quantity <= 1 || isOptimistic}
           >
             <span>&#8722;</span>
           </button>
@@ -595,10 +700,14 @@ function CartLineQuantityAdjust({line}: {line: CartLine}) {
 
         <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
           <button
-            className="h-10 w-10 text-primary/50 transition hover:text-primary"
+            className={clsx(
+              'h-10 w-10 transition hover:text-primary',
+              isOptimistic ? 'opacity-50' : 'text-primary/50',
+            )}
             name="increase-quantity"
             value={nextQuantity}
             aria-label="Increase quantity"
+            disabled={isOptimistic}
           >
             <span>&#43;</span>
           </button>
@@ -615,14 +724,14 @@ function UpdateCartButton({
   children: React.ReactNode;
   lines: CartLineUpdateInput[];
 }) {
-  const fetcher = useFetcher();
-
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input type="hidden" name="cartAction" value={CartAction.UPDATE_CART} />
-      <input type="hidden" name="lines" value={JSON.stringify(lines)} />
+    <CartForm
+      action={CartForm.ACTIONS.LinesUpdate}
+      inputs={{lines}}
+      route="/cart" // adjust if needed
+    >
       {children}
-    </fetcher.Form>
+    </CartForm>
   );
 }
 
@@ -653,10 +762,12 @@ export function CartEmpty({
   hidden = false,
   layout = 'drawer',
   onClose,
+  cart,
 }: {
   hidden: boolean;
-  layout?: Layouts;
+  layout?: 'page' | 'drawer';
   onClose?: () => void;
+  cart?: CartType;
 }) {
   const scrollRef = useRef(null);
   const {y} = useScroll(scrollRef);
@@ -676,8 +787,7 @@ export function CartEmpty({
     <div ref={scrollRef} className={container[layout]} hidden={hidden}>
       <section className="grid gap-6">
         <Text format>
-          Looks like you haven&rsquo;t added anything yet, let&rsquo;s get you
-          started!
+          Looks like you haven't added anything yet, let's get you started!
         </Text>
         <div>
           <Button onClick={onClose} width="full">
@@ -688,54 +798,6 @@ export function CartEmpty({
       <div className="mt-2">
         <GovXID />
       </div>
-      <section className="grid gap-8 pt-16">
-        <h5 className="font-heading text-lg">You might like</h5>
-        <div className="grid grid-cols-3 gap-4">
-          <RebuyRecommendations className="w-full shrink-0 grow-0" />
-        </div>
-      </section>
     </div>
   );
 }
-
-const RebuyRecommendations = ({
-  className,
-  lines,
-}: {
-  className?: string;
-  lines?: CartType['lines'] | undefined;
-}) => {
-  const {load, data} = useFetcher();
-
-  let string_of_pids = '';
-
-  if (lines) {
-    const pids = lines?.edges.map(({node}) =>
-      fromGID(node.merchandise.product.id),
-    );
-    string_of_pids = pids.join(',');
-  }
-
-  useEffect(() => {
-    load(`/rebuy/recommended?lines=${string_of_pids}`);
-  }, [load]);
-
-  if (!data)
-    return [1, 2, 3].map(() => (
-      <div className={`${className} animate-pulse`}>
-        <div className="h-[176px] w-full rounded bg-primary/5" />
-      </div>
-    ));
-
-  return (
-    <>
-      {data.map((product: any) => (
-        <Rebuy_MiniProductCard
-          className={className ?? ''}
-          product={product}
-          key={product.admin_graphql_api_id}
-        />
-      ))}
-    </>
-  );
-};

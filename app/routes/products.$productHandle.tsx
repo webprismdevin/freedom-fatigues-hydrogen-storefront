@@ -17,6 +17,7 @@ import {
   useFetcher,
   useMatches,
   useNavigation,
+  useParams,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -26,6 +27,8 @@ import {
   type SeoHandleFunction,
   type SeoConfig,
   Image,
+  ShopPayButton,
+  useOptimisticVariant,
 } from '@shopify/hydrogen';
 import {
   Heading,
@@ -64,12 +67,13 @@ import Modules from '~/components/Modules';
 import groq from 'groq';
 import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/hooks/useScript';
-import useRedo from '~/hooks/useRedo';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
 import {v4 as uuidv4} from 'uuid';
+import ShopifyRecommendations from '~/components/ShopifyRecommendations';
+import {ShopifyRecommendationCard} from '~/components/ShopifyRecommendationCard';
 
 export type AimerceProduct = {
   id: string; // shopify product id, for eaxmple: "gid://shopify/Product/1234567890"
@@ -91,7 +95,7 @@ export type AimerceProduct = {
       url: string;
     };
   };
-}
+};
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -177,7 +181,7 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
     },
   );
 
-  if (product.tags.some((tag) => tag == 'Shopify Collective')) {
+  if (product?.tags && product?.tags.length > 0 && product?.tags?.some((tag) => tag == 'Shopify Collective')) {
     return redirect(`/products/partner/${productHandle}`);
   }
 
@@ -243,6 +247,15 @@ export default function Product() {
     window._aimTrack.push(['aim_view_item', product]);
   }, []);
 
+  const variants = flattenConnection(product.variants);
+  
+  // The selectedVariant optimistically changes during page
+  // transitions with one of the preloaded product variants
+  const selectedVariant = useOptimisticVariant(
+    product.selectedVariant,
+    variants,
+  );
+
   return (
     <>
       <Section className="px-0">
@@ -278,7 +291,7 @@ export default function Product() {
                 />
               </div>
 
-              <ProductForm />
+              <ProductForm selectedVariant={selectedVariant} />
               <Badges />
               <div className="grid gap-4 py-4">
                 <hr />
@@ -336,7 +349,38 @@ export default function Product() {
                 /> */}
                 {/* <hr /> */}
                 <div className="hidden lg:block">
-                  <CompleteTheLook />
+                  <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
+                    Complete The Look
+                  </h3>
+                  <ShopifyRecommendations 
+                    productId={product.id} 
+                    limit={3}
+                  >
+                    {({recommendations, isLoading}) => (
+                      <div className="grid gap-4">
+                        {isLoading ? (
+                          <>
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <div key={i} className="animate-pulse">
+                                <div className="h-40 w-full rounded bg-gray-200" />
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            {recommendations.map((product) => (
+                              <ShopifyRecommendationCard 
+                                key={product.id} 
+                                product={product} 
+                                layout="horizontal"
+                                className="mb-4"
+                              />
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </ShopifyRecommendations>
                 </div>
                 {product.num_reviews?.value && (
                   <ResponsiveBrowserWidget breakpoint={768}>
@@ -349,7 +393,38 @@ export default function Product() {
                   </ResponsiveBrowserWidget>
                 )}
                 <div className="lg:hidden">
-                  <CompleteTheLook />
+                  <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
+                    Complete The Look
+                  </h3>
+                  <ShopifyRecommendations 
+                    productId={product.id} 
+                    limit={3}
+                  >
+                    {({recommendations, isLoading}) => (
+                      <div className="grid gap-4">
+                        {isLoading ? (
+                          <>
+                            {Array.from({ length: 3 }).map((_, i) => (
+                              <div key={i} className="animate-pulse">
+                                <div className="h-40 w-full rounded bg-gray-200" />
+                              </div>
+                            ))}
+                          </>
+                        ) : (
+                          <>
+                            {recommendations.map((product) => (
+                              <ShopifyRecommendationCard 
+                                key={product.id} 
+                                product={product} 
+                                layout="horizontal"
+                                className="mb-4"
+                              />
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </ShopifyRecommendations>
                 </div>
               </div>
             </section>
@@ -436,27 +511,6 @@ function ResponsiveBrowserWidget({
   }
 }
 
-function CompleteTheLook() {
-  const {product} = useLoaderData<typeof loader>();
-
-  if (!product.complete_the_look) return null;
-
-  return (
-    <div>
-      <h3 className="my-4 text-center font-heading text-3xl font-bold uppercase md:text-3xl">
-        Complete The Look
-      </h3>
-      <div className={`mx-auto grid max-w-xl grid-cols-1 gap-4`}>
-        {product?.complete_the_look?.references.nodes.map((product: any) => (
-          <div key={product.id}>
-            <MiniProductCard product={product} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function InlineProductCard({
   product,
 }: {
@@ -483,7 +537,7 @@ export function InlineProductCard({
   );
 }
 
-export function ProductForm() {
+export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}) {
   const {product, analytics, defaults} = useLoaderData<typeof loader>();
   const {belowCartCopy} = defaults.product;
 
@@ -492,11 +546,7 @@ export function ProductForm() {
   const [currentSearchParams] = useSearchParams();
   const {location} = useNavigation();
 
-  const redoBox = useRef(null);
-  const [redo, setRedo] = useState(true);
   const [sizeChartOpen, setSizeChartOpen] = useState(false);
-
-  const [isRedoInCart, redoResponse, addRedo, setAddRedo] = useRedo();
 
   const [fbp, fbc] = useFbCookies();
 
@@ -539,12 +589,6 @@ export function ProductForm() {
 
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
-
-  // 👇 swap this line with the one below to enable first variant
-  // const selectedVariant = product.selectedVariant ?? firstVariant;
-  const selectedVariant = onlyHasDefault
-    ? firstVariant
-    : product.selectedVariant;
 
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
@@ -596,7 +640,6 @@ export function ProductForm() {
     }
 
     if (window._aimTrack) {
-
       const productData: AimerceProduct = {
         id: fromGID(product.id),
         title: product.title,
@@ -759,7 +802,6 @@ export function ProductForm() {
   }, [root.data?.cart]);
 
   const isClearance = useTags(product.tags, 'Clearance');
-  const isExcludeRedo = useTags(product.tags, 'exclude_redo');
 
   return (
     <div className="grid gap-10">
@@ -845,47 +887,14 @@ export function ProductForm() {
                   left in this size
                 </div>
               )}
-            {selectedVariant &&
-              redoResponse &&
-              !isRedoInCart &&
-              !isClearance &&
-              !isExcludeRedo && (
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    ref={redoBox}
-                    onChange={(e) => setAddRedo(e.target.checked)}
-                    checked={addRedo}
-                  />
-                  <div className="flex flex-wrap items-center gap-1">
-                    <span className="text-[11px]">
-                      {defaults.product.redoCopy}
-                    </span>
-                  </div>
-                </div>
-              )}
             {!isOutOfStock ? (
               <AddToCartButton
-                lines={
-                  !addRedo || isClearance || !redoResponse
-                    ? [
+                lines={[
                         {
                           merchandiseId: selectedVariant.id,
                           quantity: 1,
                         },
-                      ]
-                    : [
-                        {
-                          merchandiseId: selectedVariant.id,
-                          quantity: 1,
-                        },
-                        // redo hack
-                        {
-                          merchandiseId: redoResponse?.id,
-                          quantity: 1,
-                        },
-                      ]
-                }
+                ]}
                 variant={isOutOfStock ? 'secondary' : 'primary'}
                 data-test="add-to-cart"
                 analytics={{
@@ -996,7 +1005,7 @@ export function ProductOptions({
       {options
         .filter(
           (option) =>
-            option.values.length >= 1 && option.values[0] !== 'Default Title',
+            option.values.length > 1 && option.values[0] !== 'Default Title',
         )
         .map((option) => (
           <div
@@ -1054,6 +1063,7 @@ export function ProductOptions({
                                     active && 'bg-contrast/10',
                                   )}
                                   searchParams={searchParamsWithDefaults}
+                                  waitForNavigation
                                   onClick={() => {
                                     if (!closeRef?.current) return;
                                     closeRef.current.click();
@@ -1088,6 +1098,7 @@ export function ProductOptions({
                           optionName={option.name}
                           optionValue={value}
                           searchParams={searchParamsWithDefaults}
+                          waitForNavigation
                           className={clsx(
                             'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
                             checked
@@ -1112,12 +1123,14 @@ function ProductOptionLink({
   optionValue,
   searchParams,
   children,
+  waitForNavigation,
   ...props
 }: {
   optionName: string;
   optionValue: string;
   searchParams: URLSearchParams;
   children?: ReactNode;
+  waitForNavigation?: boolean;
   [key: string]: any;
 }) {
   const {pathname} = useLocation();
@@ -1137,6 +1150,7 @@ function ProductOptionLink({
       prefetch="intent"
       replace
       to={`${path}?${clonedSearchParams.toString()}`}
+      unstable_viewTransition={waitForNavigation ? false : undefined}
     >
       {children ?? optionValue}
     </Link>
