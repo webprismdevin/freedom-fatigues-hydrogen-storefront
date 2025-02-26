@@ -1247,7 +1247,7 @@ const PRODUCT_QUERY = `#graphql
         name
         values
       }
-      selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions) {
+      selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
         ...ProductVariantFragment
       }
       avg_rating: metafield(namespace: "loox", key: "avg_rating") {

@@ -2489,6 +2489,9 @@ select{
 .cursor-pointer{
   cursor: pointer;
 }
+.cursor-not-allowed{
+  cursor: not-allowed;
+}
 .select-none{
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -3388,6 +3391,9 @@ select{
 }
 .opacity-50{
   opacity: 0.5;
+}
+.opacity-70{
+  opacity: 0.7;
 }
 .shadow-darkHeader{
   --tw-shadow: inset 0px -1px 0px 0px rgba(21, 21, 21, 0.4);

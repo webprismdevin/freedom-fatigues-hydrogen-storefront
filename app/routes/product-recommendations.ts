@@ -1,6 +1,29 @@
 import {json} from '@shopify/remix-oxygen';
 import invariant from 'tiny-invariant';
 
+// Define a type for the product recommendation from the API
+type ProductRecommendation = {
+  id: string;
+  title: string;
+  handle: string;
+  priceRange: {
+    minVariantPrice: {
+      amount: string;
+      currencyCode: string;
+    };
+  };
+  featuredImage?: {
+    url: string;
+    altText?: string;
+  } | null;
+  ratingMetafield?: {
+    value: string;
+  } | null;
+  reviewCountMetafield?: {
+    value: string;
+  } | null;
+};
+
 export async function loader({
   request,
   context,
@@ -35,6 +58,12 @@ export async function loader({
           url
           altText
         }
+        ratingMetafield: metafield(namespace: "loox", key: "avg_rating") {
+          value
+        }
+        reviewCountMetafield: metafield(namespace: "loox", key: "num_reviews") {
+          value
+        }
       }
     }
   `;
@@ -61,5 +90,15 @@ export async function loader({
     recommendations = recommendations.slice(0, limit);
   }
 
-  return json({ recommendations });
+  // Process the recommendations to extract rating and reviewCount from metafields
+  const processedRecommendations = recommendations.map((product: ProductRecommendation) => {
+    const { ratingMetafield, reviewCountMetafield, ...rest } = product;
+    return {
+      ...rest,
+      rating: ratingMetafield?.value ? parseFloat(ratingMetafield.value) : 0,
+      reviewCount: reviewCountMetafield?.value ? parseInt(reviewCountMetafield.value) : 0
+    };
+  });
+
+  return json({ recommendations: processedRecommendations });
 }
