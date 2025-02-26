@@ -48,10 +48,12 @@ export function Layout({
   children,
   layout,
   settings,
+  optimisticData,
 }: {
   children: React.ReactNode;
   layout: any;
   settings: any;
+  optimisticData?: any;
 }) {
   const {announcements} = settings;
 
@@ -68,7 +70,7 @@ export function Layout({
             <AnnouncementBar data={announcements} />
           {/* </Await>
         </Suspense> */}
-        <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} />
+        <Header title={layout?.shop.name ?? 'Hydrogen'} menu={settings?.menu} optimisticData={optimisticData} />
         <main role="main" id="mainContent" className="flex-grow">
           {children}
         </main>
@@ -88,7 +90,7 @@ export function Layout({
   );
 }
 
-function Header({title, menu}: {title: string; menu?: any}) {
+function Header({title, menu, optimisticData}: {title: string; menu?: any; optimisticData?: any}) {
   const isHome = useIsHomePath();
   const fetcher = useFetcher<{cart: CartType}>();
 
@@ -119,7 +121,7 @@ function Header({title, menu}: {title: string; menu?: any}) {
 
   return (
     <>
-      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} optimisticData={optimisticData} />
       {menu && (
         <MenuDrawer isOpen={isMenuOpen} onClose={closeMenu} menu={menu} />
       )}
@@ -139,7 +141,7 @@ function Header({title, menu}: {title: string; menu?: any}) {
   );
 }
 
-function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
+function CartDrawer({isOpen, onClose, optimisticData}: {isOpen: boolean; onClose: () => void; optimisticData?: any}) {
   const {cart, isLoading} = useCart();
   
   return (
@@ -149,11 +151,11 @@ function CartDrawer({isOpen, onClose}: {isOpen: boolean; onClose: () => void}) {
       heading="Your Cart"
       openFrom="right"
     >
-      <Suspense fallback={<CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={cart} />}>
+      <Suspense fallback={<CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={optimisticData?.cart} />}>
         {cart ? (
           <Cart layout="drawer" onClose={onClose} cart={cart} />
         ) : (
-          <CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={cart} />
+          <CartEmpty hidden={false} layout="drawer" onClose={onClose} cart={optimisticData?.cart} />
         )}
       </Suspense>
     </Drawer>

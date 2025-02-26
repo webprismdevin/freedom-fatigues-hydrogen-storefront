@@ -17,6 +17,7 @@ import {
   useFetcher,
   useMatches,
   useNavigation,
+  useParams,
 } from '@remix-run/react';
 import {
   AnalyticsPageType,
@@ -26,6 +27,8 @@ import {
   type SeoHandleFunction,
   type SeoConfig,
   Image,
+  ShopPayButton,
+  useOptimisticVariant,
 } from '@shopify/hydrogen';
 import {
   Heading,
@@ -244,6 +247,15 @@ export default function Product() {
     window._aimTrack.push(['aim_view_item', product]);
   }, []);
 
+  const variants = flattenConnection(product.variants);
+  
+  // The selectedVariant optimistically changes during page
+  // transitions with one of the preloaded product variants
+  const selectedVariant = useOptimisticVariant(
+    product.selectedVariant,
+    variants,
+  );
+
   return (
     <>
       <Section className="px-0">
@@ -279,7 +291,7 @@ export default function Product() {
                 />
               </div>
 
-              <ProductForm />
+              <ProductForm selectedVariant={selectedVariant} />
               <Badges />
               <div className="grid gap-4 py-4">
                 <hr />
@@ -525,7 +537,7 @@ export function InlineProductCard({
   );
 }
 
-export function ProductForm() {
+export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}) {
   const {product, analytics, defaults} = useLoaderData<typeof loader>();
   const {belowCartCopy} = defaults.product;
 
@@ -577,12 +589,6 @@ export function ProductForm() {
 
     return clonedParams;
   }, [searchParams, firstVariant.selectedOptions]);
-
-  // 👇 swap this line with the one below to enable first variant
-  // const selectedVariant = product.selectedVariant ?? firstVariant;
-  const selectedVariant = onlyHasDefault
-    ? firstVariant
-    : product.selectedVariant;
 
   const isOutOfStock = !selectedVariant?.availableForSale;
   const availableForSale = selectedVariant?.availableForSale;
@@ -999,7 +1005,7 @@ export function ProductOptions({
       {options
         .filter(
           (option) =>
-            option.values.length >= 1 && option.values[0] !== 'Default Title',
+            option.values.length > 1 && option.values[0] !== 'Default Title',
         )
         .map((option) => (
           <div
@@ -1057,6 +1063,7 @@ export function ProductOptions({
                                     active && 'bg-contrast/10',
                                   )}
                                   searchParams={searchParamsWithDefaults}
+                                  waitForNavigation
                                   onClick={() => {
                                     if (!closeRef?.current) return;
                                     closeRef.current.click();
@@ -1091,6 +1098,7 @@ export function ProductOptions({
                           optionName={option.name}
                           optionValue={value}
                           searchParams={searchParamsWithDefaults}
+                          waitForNavigation
                           className={clsx(
                             'cursor-pointer border-[1.5px] p-2 leading-none transition-all duration-200',
                             checked
@@ -1115,12 +1123,14 @@ function ProductOptionLink({
   optionValue,
   searchParams,
   children,
+  waitForNavigation,
   ...props
 }: {
   optionName: string;
   optionValue: string;
   searchParams: URLSearchParams;
   children?: ReactNode;
+  waitForNavigation?: boolean;
   [key: string]: any;
 }) {
   const {pathname} = useLocation();
@@ -1140,6 +1150,7 @@ function ProductOptionLink({
       prefetch="intent"
       replace
       to={`${path}?${clonedSearchParams.toString()}`}
+      unstable_viewTransition={waitForNavigation ? false : undefined}
     >
       {children ?? optionValue}
     </Link>

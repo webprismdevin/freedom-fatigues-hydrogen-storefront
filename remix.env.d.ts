@@ -4,7 +4,6 @@
 
 import type {Storefront} from '~/lib/type';
 import type {HydrogenSession} from '~/lib/session.server';
-import {any} from 'zod';
 
 declare global {
   /**

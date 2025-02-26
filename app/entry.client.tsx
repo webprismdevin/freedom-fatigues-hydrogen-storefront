@@ -1,6 +1,6 @@
 import {RemixBrowser} from '@remix-run/react';
 import {hydrateRoot} from 'react-dom/client';
-import {StrictMode, useEffect} from 'react';
+import {StrictMode, useEffect, startTransition} from 'react';
 import posthog from 'posthog-js';
 
 // Add type declaration for window.posthog
@@ -28,10 +28,15 @@ function PosthogInit() {
   return null;
 }
 
-hydrateRoot(
-  document,
-  <StrictMode>
-    <RemixBrowser />
-    <PosthogInit />
-  </StrictMode>,
-);
+// Check if we're not in Google Web Cache before hydrating
+if (!window.location.origin.includes("webcache.googleusercontent.com")) {
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <StrictMode>
+        <RemixBrowser />
+        <PosthogInit />
+      </StrictMode>,
+    );
+  });
+}
