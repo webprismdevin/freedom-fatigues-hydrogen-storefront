@@ -448,17 +448,21 @@ function FreeShippingProgress({cart}: {cart: CartType}) {
  * @param discountCodes the current discount codes applied to the cart
  * @todo rework when a design is ready
  */
-function CartDiscounts({
+export function CartDiscounts({
   discountCodes,
 }: {
   discountCodes: CartType['discountCodes'];
 }) {
-  const codes = discountCodes?.map(({code}) => code).join(', ') || null;
+
+  const codes: string[] =
+    discountCodes
+      ?.filter((discount) => discount.applicable)
+      ?.map(({code}) => code) || [];
 
   return (
     <>
       {/* Have existing discount, display it with a remove option */}
-      <dl className={codes ? 'grid' : 'hidden'}>
+      <dl className={codes && codes.length !== 0 ? 'grid' : 'hidden'}>
         <div className="flex items-center justify-between font-medium">
           <Text as="dt">Discount(s)</Text>
           <div className="flex items-center justify-between">
@@ -470,26 +474,27 @@ function CartDiscounts({
                 />
               </button>
             </UpdateDiscountForm>
-            <Text as="dd">{codes}</Text>
+            <Text as="dd">{codes?.join(', ')}</Text>
           </div>
         </div>
       </dl>
-      {/* No discounts, show an input to apply a discount */}
-      <UpdateDiscountForm>
+
+      {/* Show an input to apply a discount */}
+      <UpdateDiscountForm discountCodes={codes}>
         <div
           className={clsx(
-            codes ? 'hidden' : 'flex',
-            'items-stretch justify-between gap-4 text-copy',
+            'flex',
+            'items-center gap-4 justify-between text-copy',
           )}
         >
           <input
-            className={getInputStyleClasses()}
+            className="flex-grow w-full p-2 border border-slate-300 rounded-sm bg-transparent focus:ring-0"
             type="text"
             name="discountCode"
             placeholder="Discount code"
           />
-          <button className="flex items-center justify-end whitespace-nowrap rounded bg-slate-200 px-3 py-1 font-medium text-black">
-            <span>Apply Discount</span>
+          <button className="flex justify-end font-medium whitespace-nowrap py-2 px-3 rounded-sm border border-slate-300 text-slate-500">
+            Apply Discount
           </button>
         </div>
       </UpdateDiscountForm>
@@ -497,22 +502,23 @@ function CartDiscounts({
   );
 }
 
-function UpdateDiscountForm({children}: {children: React.ReactNode}) {
-  const fetcher = useFetcher();
-
-  useEffect(() => {
-    console.log(fetcher.data);
-  }, [fetcher]);
-
+function UpdateDiscountForm({
+  discountCodes,
+  children,
+}: {
+  discountCodes?: string[];
+  children: React.ReactNode;
+}) {
   return (
-    <fetcher.Form action="/cart" method="post">
-      <input
-        type="hidden"
-        name="cartAction"
-        value={CartAction.UPDATE_DISCOUNT}
-      />
+    <CartForm
+      route="/cart"
+      action={CartForm.ACTIONS.DiscountCodesUpdate}
+      inputs={{
+        discountCodes: discountCodes || [],
+      }}
+    >
       {children}
-    </fetcher.Form>
+    </CartForm>
   );
 }
 

@@ -34,7 +34,13 @@ type RootData = {
 export async function action({request, context}: ActionFunctionArgs) {
   const {cart} = context as ActionContext;
   const formData = await request.formData();
+  
+  // Get action and inputs from CartForm
   const {action, inputs} = CartForm.getFormInput(formData);
+  
+  console.log('action', action);
+  console.log('inputs', inputs);
+  
   let status = 200;
   let result;
 
@@ -50,7 +56,19 @@ export async function action({request, context}: ActionFunctionArgs) {
         result = await cart.removeLines(inputs.lineIds);
         break;
       case CartForm.ACTIONS.DiscountCodesUpdate:
-        result = await cart.updateDiscountCodes(inputs.discountCodes);
+        const formDiscountCode = inputs.discountCode;
+
+        // User inputted discount code
+        const discountCodes = (
+          formDiscountCode ? [formDiscountCode] : []
+        ) as string[];
+
+        // Combine discount codes already applied on cart
+        if (Array.isArray(inputs.discountCodes)) {
+          discountCodes.push(...inputs.discountCodes);
+        }
+
+        result = await cart.updateDiscountCodes(discountCodes);
         break;
       case CartForm.ACTIONS.BuyerIdentityUpdate:
         result = await cart.updateBuyerIdentity(inputs.buyerIdentity);
@@ -110,11 +128,11 @@ export async function loader({context}: LoaderFunctionArgs) {
   // Transform cart data for optimistic updates
   const transformedCart = cartData ? {
     ...cartData,
-    lines: {
+    lines: cartData.lines ? {
       nodes: flattenConnection(cartData.lines),
       edges: cartData.lines.edges,
       pageInfo: cartData.lines.pageInfo,
-    },
+    } : null,
   } : null;
 
   return json({
@@ -123,7 +141,8 @@ export async function loader({context}: LoaderFunctionArgs) {
 }
 
 export default function CartRoute() {
-  const {cart} = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
+  const cart = data.cart;
 
   return (
     <div className="grid w-full justify-items-start gap-8 p-6 py-8 md:p-8 lg:p-12">
