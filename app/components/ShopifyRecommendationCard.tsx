@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from '@remix-run/react';
 import clsx from 'clsx';
+import StarRating from './StarRating';
 
 // Define the type for a Shopify Recommendation
 export type ShopifyRecommendation = {
@@ -17,15 +18,11 @@ export type ShopifyRecommendation = {
     url: string;
     altText?: string;
   } | null;
+  rating?: number;
+  reviewCount?: number;
 };
 
 type Layout = 'vertical' | 'horizontal';
-
-// A placeholder component for review stars
-const ReviewStars = () => {
-  // You can later replace this with a dynamic stars component
-  return <div className="flex text-yellow-500">★★★★☆</div>;
-};
 
 export const ShopifyRecommendationCard = ({
   product,
@@ -71,7 +68,7 @@ export const ShopifyRecommendationCard = ({
           layout === 'horizontal' ? "flex-1" : "mt-2"
         )}>
           <div className="my-1">
-            <ReviewStars />
+            <StarRating rating={product.rating || 0} count={product.reviewCount} />
           </div>
           <h3 className="line-clamp-2 font-medium">{product.title}</h3>
           <p className="text-primary/50 text-sm">

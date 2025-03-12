@@ -27,7 +27,10 @@ export function AddToCartButton({
     <CartForm
       action={CartForm.ACTIONS.LinesAdd}
       inputs={{
-        lines,
+        lines: lines.map(line => ({
+          ...line,
+          selectedVariant: line.selectedVariant || (line.merchandiseId ? { id: line.merchandiseId } : undefined)
+        })),
         countryCode: selectedLocale?.country,
         analytics,
       }}

@@ -1,4 +1,4 @@
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useEffect, useState, useRef} from 'react';
 import {Dialog, Transition} from '@headlessui/react';
 
 import {Heading, IconClose} from '~/components';
@@ -31,12 +31,20 @@ export function Drawer({
   };
 
   const location = useLocation();
+  const prevLocationRef = useRef(location);
+  
+  // Log when the open state changes
+  useEffect(() => {
+    console.log('Drawer open state changed:', open);
+  }, [open]);
 
   useEffect(() => {
-    if (open) {
+    // Only close the drawer if the location has changed and the drawer is open
+    if (open && prevLocationRef.current !== location) {
       onClose();
     }
-  }, [location]);
+    prevLocationRef.current = location;
+  }, [location, open, onClose]);
 
   return (
     <Transition appear show={open} as={Fragment}>
@@ -110,10 +118,12 @@ export function useDrawer(openDefault = false) {
   const [isOpen, setIsOpen] = useState(openDefault);
 
   function openDrawer() {
+    console.log('Opening drawer');
     setIsOpen(true);
   }
 
   function closeDrawer() {
+    console.log('Closing drawer');
     setIsOpen(false);
   }
 

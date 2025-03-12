@@ -21,7 +21,7 @@ import {
 import {useParams, Form, Await, useMatches, useFetcher} from '@remix-run/react';
 import {useLocalStorage, useLocation, useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
-import {Suspense, useEffect, useMemo, useState} from 'react';
+import {Suspense, useEffect, useMemo, useState, useRef} from 'react';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {useCartFetchers} from '~/hooks/useCartFetchers';
 import {useDrawerCart} from '~/hooks/useDrawerCart';
@@ -94,17 +94,20 @@ function Header({title, menu, optimisticData}: {title: string; menu?: any; optim
   const isHome = useIsHomePath();
   const fetcher = useFetcher<{cart: CartType}>();
 
-  const {
-    isOpen: isCartOpen,
-    openDrawer: openCart,
-    closeDrawer: closeCart,
-  } = useDrawer();
+  // Create separate named hooks for cart and menu with unique identifiers
+  const cartDrawer = useDrawer();
+  const menuDrawer = useDrawer();
 
-  const {
-    isOpen: isMenuOpen,
-    openDrawer: openMenu,
-    closeDrawer: closeMenu,
-  } = useDrawer();
+  const isCartOpen = cartDrawer.isOpen;
+  const openCart = cartDrawer.openDrawer;
+  const closeCart = cartDrawer.closeDrawer;
+
+  const isMenuOpen = menuDrawer.isOpen;
+  const openMenu = () => {
+    console.log('Opening menu drawer from Header');
+    menuDrawer.openDrawer();
+  };
+  const closeMenu = menuDrawer.closeDrawer;
 
   // Use the drawer cart hook to handle cart additions
   useDrawerCart({
@@ -113,10 +116,19 @@ function Header({title, menu, optimisticData}: {title: string; menu?: any; optim
   });
 
   const location = useLocation();
+  const prevLocationRef = useRef(location);
 
   useEffect(() => {
+    console.log('Menu state:', isMenuOpen);
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    // Only close if the location has actually changed and the menu is open
     if (!isMenuOpen || !menu) return;
-    closeMenu();
+    if (prevLocationRef.current !== location) {
+      closeMenu();
+      prevLocationRef.current = location;
+    }
   }, [location, isMenuOpen, menu, closeMenu]);
 
   return (
@@ -189,6 +201,8 @@ export function MenuDrawer({
   onClose: () => void;
   menu: SanityMenuItem[];
 }) {
+  console.log('MenuDrawer isOpen:', isOpen);
+  
   return (
     <Drawer
       open={isOpen}
@@ -327,7 +341,10 @@ function MobileHeader({
     >
       <div className="flex w-full items-center justify-start gap-4">
         <button
-          onClick={openMenu}
+          onClick={() => {
+            console.log('Menu button clicked');
+            openMenu();
+          }}
           className="relative flex h-8 w-8 items-center justify-center"
         >
           <IconMenu />

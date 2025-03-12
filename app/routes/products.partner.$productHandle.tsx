@@ -165,7 +165,14 @@ export async function loader({params, request, context}: LoaderArgs) {
 
   const recommended = getRecommendedProducts(context.storefront, product.id);
   const firstVariant = product.variants.nodes[0];
-  const selectedVariant = product.selectedVariant ?? firstVariant;
+  
+  // Ensure we always have a selectedVariant by defaulting to the first variant if needed
+  // This is critical for server-side rendering
+  if (!product.selectedVariant) {
+    product.selectedVariant = firstVariant;
+  }
+  
+  const selectedVariant = product.selectedVariant;
 
   const productAnalytics: ShopifyAnalyticsProduct = {
     productGid: product.id,
@@ -451,23 +458,18 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   const firstVariant = product.variants.nodes[0];
 
-  const onlyHasDefault =
-    product.options.length === 1 && product.options[0].values.length == 1;
-
   /**
    * We're making an explicit choice here to display the product options
    * UI with a default variant, rather than wait for the user to select
-   * options first. Developers are welcome to opt-out of this behavior.
-   * By default, the first variant's options are used.
+   * options first. Always use the first variant's options.
    */
   const searchParamsWithDefaults = useMemo<URLSearchParams>(() => {
     const clonedParams = new URLSearchParams(searchParams);
-    // 👇 remove if statement to enable first variant
-    if (onlyHasDefault) {
-      for (const {name, value} of firstVariant.selectedOptions) {
-        if (!searchParams.has(name)) {
-          clonedParams.set(name, value);
-        }
+    
+    // Always apply the first variant's options to the search params
+    for (const {name, value} of firstVariant.selectedOptions) {
+      if (!clonedParams.has(name)) {
+        clonedParams.set(name, value);
       }
     }
 
@@ -657,7 +659,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
         total_price: cartObj.cost.totalAmount.amount,
         $value: cartObj.cost.totalAmount.amount,
         original_total_price: cartObj.cost.subtotalAmount.amount,
-        items: cartObj.lines.edges,
+        items: cartObj.lines.nodes,
       };
 
       if (_learnq) _learnq.push(['track', 'Added to Cart', cart]);
@@ -671,80 +673,50 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
         <ProductOptions
           options={product.options}
           searchParamsWithDefaults={searchParamsWithDefaults}
+          variants={product.variants}
         />
-        {selectedVariant ? (
-          <div className="grid items-stretch gap-4">
-            {availableForSale !== false &&
-              quantityAvailable < 20 &&
-              quantityAvailable > 0 && (
-                <div
-                  className={`${quantityAvailable < 10 ? 'text-red-500' : ''}`}
-                >
-                  {quantityAvailable < 10 && <span>Only&nbsp;</span>}
-                  <span className="font-bold">{quantityAvailable}&nbsp;</span>
-                  left in this size
-                </div>
-              )}
-            {!isOutOfStock ? (
-              <AddToCartButton
-                lines={[
-                  {
-                    merchandiseId: selectedVariant.id,
-                    quantity: 1,
-                  },
-                ]}
-                variant={isOutOfStock ? 'secondary' : 'primary'}
-                data-test="add-to-cart"
-                analytics={{
-                  products: [productAnalytics],
-                  totalValue: parseFloat(productAnalytics.price),
-                }}
-                onClick={fireAnalytics}
-              >
-                <Text
-                  as="span"
-                  className="flex items-center justify-center gap-2"
-                >
-                  <span>Add to Bag</span> <span>·</span>{' '}
-                  <Money
-                    withoutTrailingZeros
-                    data={selectedVariant?.price!}
-                    as="span"
-                  />
-                  {isOnSale && (
-                    <Money
-                      withoutTrailingZeros
-                      data={selectedVariant?.compareAtPrice!}
-                      as="span"
-                      className="strike opacity-50"
-                    />
-                  )}
-                </Text>
-              </AddToCartButton>
-            ) : (
-              <BackInStock variant={fromGID(selectedVariant.id)} />
-            )}
-          </div>
-        ) : (
-          <div>
-            <Button variant="secondary" disabled className="w-full">
-              <span>Make a selection</span> <span>·</span>{' '}
-              <Money
-                withoutTrailingZeros
-                data={product.variants.nodes[0]?.price!}
+        <div className="grid items-stretch gap-4">
+          {!isOutOfStock ? (
+            <AddToCartButton
+              lines={[
+                {
+                  merchandiseId: selectedVariant.id,
+                  quantity: 1,
+                  selectedVariant: selectedVariant
+                },
+              ]}
+              variant={isOutOfStock ? 'secondary' : 'primary'}
+              data-test="add-to-cart"
+              analytics={{
+                products: [productAnalytics],
+                totalValue: parseFloat(productAnalytics.price),
+              }}
+              onClick={fireAnalytics}
+            >
+              <Text
                 as="span"
-              />
-              {isOnSale && (
+                className="flex items-center justify-center gap-2"
+              >
+                <span>Add to Bag</span> <span>·</span>{' '}
                 <Money
                   withoutTrailingZeros
-                  data={product.variants.nodes[0]?.compareAtPrice!}
+                  data={selectedVariant.price}
                   as="span"
-                  className="strike opacity-50"
                 />
-              )}
-            </Button>
-          </div>
-        )}
+                {isOnSale && (
+                  <Money
+                    withoutTrailingZeros
+                    data={selectedVariant.compareAtPrice}
+                    as="span"
+                    className="strike opacity-50"
+                  />
+                )}
+              </Text>
+            </AddToCartButton>
+          ) : (
+            <BackInStock variant={fromGID(selectedVariant.id)} />
+          )}
+        </div>
         {/* <div className="flex justify-between">
           <div className="text-xs">{belowCartCopy.left}</div>
           <div className="text-xs">{belowCartCopy.right}</div>
@@ -791,9 +763,11 @@ function BackInStock({variant}: {variant: any}) {
 export function ProductOptions({
   options,
   searchParamsWithDefaults,
+  variants,
 }: {
   options: ProductType['options'];
   searchParamsWithDefaults: URLSearchParams;
+  variants: ProductConnection;
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
   return (
@@ -1072,7 +1046,7 @@ const PRODUCT_QUERY = `#graphql
         name
         values
       }
-      selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions) {
+      selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
         ...ProductVariantFragment
       }
       avg_rating: metafield(namespace: "loox", key: "avg_rating") {

@@ -7,13 +7,8 @@ export default function StarRating({
 }) {
   if (!rating) return (
     <div className="flex flex-row items-center">
-      <IconStar color={"#e5d5d5"} />
-      <IconStar color={"#e5d5d5"} />
-      <IconStar color={"#e5d5d5"} />
-      <IconStar color={"#e5d5d5"} />
-      <IconStar color={"#e5d5d5"} />
-      <span className="ml-2 text-xs text-slate-500">
-        [0]
+      <span className="text-xs text-slate-500">
+        No reviews yet
       </span>
     </div>
   );
@@ -24,7 +19,7 @@ export default function StarRating({
         <IconStar key={i} />
       ))}{' '}
       <span className="ml-2 text-xs text-slate-500">
-        {rating} {count && `[${count}]`}
+        {rating} {count && Number(count) > 0 ? `[${count}]` : ''}
       </span>
     </div>
   );

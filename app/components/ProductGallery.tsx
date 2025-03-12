@@ -1,7 +1,7 @@
 import {Image} from '@shopify/hydrogen';
 import type {MediaEdge} from '@shopify/hydrogen/storefront-api-types';
 import type {MediaImage} from '@shopify/hydrogen/storefront-api-types';
-import {Video} from '@shopify/hydrogen-react';
+import {Video} from '@shopify/hydrogen';
 import {useScroll, useMotionValueEvent} from 'framer-motion';
 import {useRef, useState} from 'react';
 
