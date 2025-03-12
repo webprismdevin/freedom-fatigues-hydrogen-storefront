@@ -20,17 +20,6 @@ type ActionContext = AppLoadContext & {
   };
 };
 
-type RootData = {
-  cart: Promise<CartType>;
-  settings: any;
-  selectedLocale: any;
-  shop: any;
-  analytics: {
-    shopifySalesChannel: string;
-    shopId: string;
-  };
-};
-
 export async function action({request, context}: ActionFunctionArgs) {
   const {cart} = context as ActionContext;
   const formData = await request.formData();
@@ -124,25 +113,36 @@ export async function action({request, context}: ActionFunctionArgs) {
 export async function loader({context}: LoaderFunctionArgs) {
   const {cart} = context as ActionContext;
   const cartData = await cart.get();
-
-  // Transform cart data for optimistic updates
-  const transformedCart = cartData ? {
-    ...cartData,
-    lines: cartData.lines ? {
-      nodes: flattenConnection(cartData.lines),
-      edges: cartData.lines.edges,
-      pageInfo: cartData.lines.pageInfo,
-    } : null,
-  } : null;
-
+  
+  // Transform cart data for optimistic updates and Redo
+  let transformedCart = null;
+  
+  if (cartData) {
+    // Extract the actual cart object if it's nested
+    const cartObject = cartData.cart || cartData;
+    
+    // Ensure lines are properly transformed for optimistic updates
+    transformedCart = {
+      ...cartObject,
+      lines: cartObject.lines ? {
+        nodes: flattenConnection(cartObject.lines),
+        edges: cartObject.lines.edges || [],
+        pageInfo: cartObject.lines.pageInfo || { hasNextPage: false, hasPreviousPage: false },
+      } : {
+        nodes: [],
+        edges: [],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      },
+    };
+  }
+  
   return json({
     cart: transformedCart,
   });
 }
 
 export default function CartRoute() {
-  const data = useLoaderData<typeof loader>();
-  const cart = data.cart;
+  const {cart} = useLoaderData<{cart: CartType}>();
 
   return (
     <div className="grid w-full justify-items-start gap-8 p-6 py-8 md:p-8 lg:p-12">

@@ -2827,6 +2827,11 @@ select{
   border-color: rgba(239, 68, 68, 1);
   border-color: rgba(239, 68, 68, var(--tw-border-opacity, 1));
 }
+.border-slate-300{
+  --tw-border-opacity: 1;
+  border-color: rgba(203, 213, 225, 1);
+  border-color: rgba(203, 213, 225, var(--tw-border-opacity, 1));
+}
 .border-transparent{
   border-color: transparent;
 }
@@ -2834,11 +2839,6 @@ select{
   --tw-border-opacity: 1;
   border-color: rgba(255, 255, 255, 1);
   border-color: rgba(255, 255, 255, var(--tw-border-opacity, 1));
-}
-.border-slate-300{
-  --tw-border-opacity: 1;
-  border-color: rgba(203, 213, 225, 1);
-  border-color: rgba(203, 213, 225, var(--tw-border-opacity, 1));
 }
 .border-b-black{
   --tw-border-opacity: 1;

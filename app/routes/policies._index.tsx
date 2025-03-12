@@ -57,7 +57,7 @@ export default function Policies() {
 }
 
 const POLICIES_QUERY = `#graphql
-  fragment Policy on ShopPolicy {
+  fragment PolicyItem on ShopPolicy {
     id
     title
     handle
@@ -66,21 +66,19 @@ const POLICIES_QUERY = `#graphql
   query PoliciesQuery {
     shop {
       privacyPolicy {
-        ...Policy
+        ...PolicyItem
       }
       shippingPolicy {
-        ...Policy
+        ...PolicyItem
       }
       termsOfService {
-        ...Policy
+        ...PolicyItem
       }
       refundPolicy {
-        ...Policy
+        ...PolicyItem
       }
       subscriptionPolicy {
-        id
-        title
-        handle
+        ...PolicyItem
       }
     }
   }

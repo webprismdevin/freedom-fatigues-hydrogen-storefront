@@ -47,30 +47,33 @@ export function Cart({
   onClose?: () => void;
   cart: CartType | null;
 }) {
-  if (!cart) return null;
+  if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={null} />;
 
   // Use optimistic cart
   const optimisticCart = useOptimisticCart(cart);
 
-  const lines = optimisticCart?.lines?.nodes || [];
+  // If optimisticCart is undefined, use the original cart
+  const safeCart = optimisticCart || cart;
+  
+  const lines = safeCart?.lines?.nodes || [];
   const linesCount = lines.length > 0;
 
   // Memoize the cart transformation for Redo
   const cartForRedo = useMemo(
     () =>
       ({
-        ...optimisticCart,
+        ...safeCart,
         lines: {
           nodes: lines,
           edges: lines.map((node) => ({node})),
           pageInfo: {hasNextPage: false, hasPreviousPage: false},
         },
       } as unknown as CartType),
-    [optimisticCart, lines],
+    [safeCart, lines],
   );
 
   // Ensure cart has all required properties
-  if (!optimisticCart?.cost?.totalAmount) {
+  if (!safeCart?.cost?.totalAmount) {
     console.log('Missing required cart properties');
     return (
       <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
@@ -313,7 +316,7 @@ export function CartDetails({
           {/* should stay at the bottom of the cart */}
           <CartSummary cost={cart.cost} layout={layout}>
             {cart && layout == 'page' && <FreeShippingProgress cart={cart} />}
-            <CartDiscounts discountCodes={cart.discountCodes} />
+            <CartDiscounts discountCodes={cart.discountCodes || []} />
             <CartCheckoutActions cart={cart} checkoutUrl={cart.checkoutUrl} />
             <GovXID center />
           </CartSummary>
@@ -459,10 +462,12 @@ export function CartDiscounts({
       ?.filter((discount) => discount.applicable)
       ?.map(({code}) => code) || [];
 
+  const hasActiveDiscounts = codes && codes.length > 0;
+
   return (
     <>
       {/* Have existing discount, display it with a remove option */}
-      <dl className={codes && codes.length !== 0 ? 'grid' : 'hidden'}>
+      <dl className={hasActiveDiscounts ? 'grid' : 'hidden'}>
         <div className="flex items-center justify-between font-medium">
           <Text as="dt">Discount(s)</Text>
           <div className="flex items-center justify-between">
@@ -479,25 +484,27 @@ export function CartDiscounts({
         </div>
       </dl>
 
-      {/* Show an input to apply a discount */}
-      <UpdateDiscountForm discountCodes={codes}>
-        <div
-          className={clsx(
-            'flex',
-            'items-center gap-4 justify-between text-copy',
-          )}
-        >
-          <input
-            className="flex-grow w-full p-2 border border-slate-300 rounded-sm bg-transparent focus:ring-0"
-            type="text"
-            name="discountCode"
-            placeholder="Discount code"
-          />
-          <button className="flex justify-end font-medium whitespace-nowrap py-2 px-3 rounded-sm border border-slate-300 text-slate-500">
-            Apply Discount
-          </button>
-        </div>
-      </UpdateDiscountForm>
+      {/* Show an input to apply a discount only if no active discounts */}
+      {!hasActiveDiscounts && (
+        <UpdateDiscountForm discountCodes={codes}>
+          <div
+            className={clsx(
+              'flex',
+              'items-center gap-4 justify-between text-copy',
+            )}
+          >
+            <input
+              className="flex-grow w-full p-2 border border-slate-300 rounded-sm bg-transparent focus:ring-0"
+              type="text"
+              name="discountCode"
+              placeholder="Discount code"
+            />
+            <button className="flex justify-end font-medium whitespace-nowrap py-2 px-3 rounded-sm border border-slate-300 text-slate-500">
+              Apply Discount
+            </button>
+          </div>
+        </UpdateDiscountForm>
+      )}
     </>
   );
 }

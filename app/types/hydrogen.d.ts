@@ -24,7 +24,14 @@ declare module '@shopify/hydrogen' {
     [key: string]: any;
   }
 
-  export const CartForm: {
+  // Define CartForm as a React component
+  export const CartForm: React.FC<{
+    route?: string;
+    action: string;
+    inputs?: Record<string, any>;
+    children: React.ReactNode;
+    [key: string]: any;
+  }> & {
     ACTIONS: {
       LinesAdd: string;
       LinesUpdate: string;
@@ -37,6 +44,37 @@ declare module '@shopify/hydrogen' {
       action: string;
       inputs: any;
     };
+  };
+
+  export function useOptimisticCart<T extends { lines?: any }>(cart: T): T | undefined;
+  export type OptimisticCart = {
+    lines: {
+      nodes: Array<{
+        id: string;
+        quantity: number;
+        merchandise: any;
+        cost: any;
+        isOptimistic?: boolean;
+      }>;
+      edges: Array<{
+        node: any;
+      }>;
+      pageInfo: {
+        hasNextPage: boolean;
+        hasPreviousPage: boolean;
+      };
+    };
+    cost?: {
+      totalAmount: {
+        amount: string;
+        currencyCode: string;
+      };
+      subtotalAmount: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+    [key: string]: any;
   };
 
   export function flattenConnection<T>(connection: any): T[];
@@ -274,5 +312,88 @@ declare module '@shopify/hydrogen/storefront-api-types' {
         currencyCode: string;
       };
     };
+    checkoutUrl?: string;
+    discountCodes?: Array<{
+      code: string;
+      applicable: boolean;
+    }>;
+  }
+
+  export interface CartCost {
+    totalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    subtotalAmount: {
+      amount: string;
+      currencyCode: string;
+    };
+    compareAtAmountPerQuantity?: {
+      amount: string;
+      currencyCode: string;
+    };
+    amountPerQuantity?: {
+      amount: string;
+      currencyCode: string;
+    };
+  }
+
+  export interface CartLine {
+    id: string;
+    quantity: number;
+    merchandise: {
+      id: string;
+      title: string;
+      product: {
+        id: string;
+        title: string;
+        handle: string;
+        vendor?: string;
+      };
+      image?: {
+        url: string;
+        altText?: string;
+        width?: number;
+        height?: number;
+      };
+      selectedOptions?: Array<{
+        name: string;
+        value: string;
+      }>;
+    };
+    cost: {
+      totalAmount: {
+        amount: string;
+        currencyCode: string;
+      };
+      compareAtAmountPerQuantity?: {
+        amount: string;
+        currencyCode: string;
+      };
+      amountPerQuantity: {
+        amount: string;
+        currencyCode: string;
+      };
+    };
+  }
+
+  export interface CartLineInput {
+    merchandiseId: string;
+    quantity: number;
+    attributes?: Array<{
+      key: string;
+      value: string;
+    }>;
+    sellingPlanId?: string;
+  }
+
+  export interface CartLineUpdateInput {
+    id: string;
+    quantity: number;
+    attributes?: Array<{
+      key: string;
+      value: string;
+    }>;
+    sellingPlanId?: string;
   }
 } 
