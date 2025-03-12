@@ -1,7 +1,10 @@
 import {useEffect} from 'react';
 import useScript from '../hooks/useScript';
+import useFbCookies from '../hooks/useFbCookies';
 
 export function CustomScriptsAndAnalytics() {
+  const [fbp, fbc] = useFbCookies();
+
   // Facebook Pixel
   useEffect(() => {
     (function (f, b, e, v, n, t, s) {
@@ -17,7 +20,7 @@ export function CustomScriptsAndAnalytics() {
       n.version = '2.0';
       n.queue = [];
       t = b.createElement(e);
-      t.async = 0;
+      t.async = !0; // Changed from 0 to true for better performance
       t.src = v;
       s = b.getElementsByTagName(e)[0];
       s.parentNode.insertBefore(t, s);
@@ -27,8 +30,21 @@ export function CustomScriptsAndAnalytics() {
       'script',
       'https://connect.facebook.net/en_US/fbevents.js',
     );
-    window.fbq('init', '280447639311369');
+
+    // Get user data from localStorage/sessionStorage if available
+    const userData = getUserDataForFacebookPixel();
+    
+    // Initialize with user data for Advanced Matching if available
+    if (Object.keys(userData).length > 0) {
+      window.fbq('init', '280447639311369', userData);
+    } else {
+      window.fbq('init', '280447639311369');
+    }
+    
+    // Send a pageview event
+    window.fbq('track', 'PageView');
   }, []);
+
   // tag manager
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -49,13 +65,31 @@ export function CustomScriptsAndAnalytics() {
     'https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=QuicR8',
   );
 
-  return (
-    <>
-      <script
-        defer
-        data-domain="freedomfatigues.com"
-        src="https://plausible.io/js/script.js"
-      ></script>
-    </>
-  );
+  return <></>;
+}
+
+// Helper function to get user data for Facebook Advanced Matching
+function getUserDataForFacebookPixel() {
+  const userData: Record<string, string> = {};
+  
+  // Try to get customer data from localStorage or sessionStorage
+  try {
+    const customerDataString = localStorage.getItem('customerData');
+    if (customerDataString) {
+      const customerData = JSON.parse(customerDataString);
+      
+      // Add available user data for advanced matching
+      if (customerData.email) userData.em = customerData.email;
+      if (customerData.phone) userData.ph = customerData.phone;
+      if (customerData.firstName) userData.fn = customerData.firstName;
+      if (customerData.lastName) userData.ln = customerData.lastName;
+      if (customerData.city) userData.ct = customerData.city;
+      if (customerData.state) userData.st = customerData.state;
+      if (customerData.zip) userData.zp = customerData.zip;
+    }
+  } catch (error) {
+    console.error('Error parsing customer data for Facebook Pixel:', error);
+  }
+  
+  return userData;
 }

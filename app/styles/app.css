@@ -1929,6 +1929,10 @@ select{
   bottom: 0px;
   left: 0px;
 }
+.inset-x-0{
+  left: 0px;
+  right: 0px;
+}
 .inset-y-0{
   top: 0px;
   bottom: 0px;
@@ -1963,9 +1967,6 @@ select{
 .right-3{
   right: 0.75rem;
 }
-.right-4{
-  right: 1rem;
-}
 .right-5{
   right: 1.25rem;
 }
@@ -1983,12 +1984,6 @@ select{
 }
 .top-36{
   top: 9rem;
-}
-.top-4{
-  top: 1rem;
-}
-.top-\[-82\%\]{
-  top: -82%;
 }
 .top-nav{
   top: 3.5rem;
@@ -2226,6 +2221,12 @@ select{
 .h-\[800px\]{
   height: 800px;
 }
+.h-\[90vh\]{
+  height: 90vh;
+}
+.h-auto{
+  height: auto;
+}
 .h-cart-content{
   height: calc(100svh - 4rem);
 }
@@ -2438,6 +2439,10 @@ select{
   --tw-translate-y: 50%;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
+.translate-y-full{
+  --tw-translate-y: 100%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
 .-rotate-90{
   --tw-rotate: -90deg;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
@@ -2483,8 +2488,20 @@ select{
 .animate-pulse{
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+@keyframes spin{
+
+  to{
+    transform: rotate(360deg);
+  }
+}
+.animate-spin{
+  animation: spin 1s linear infinite;
+}
 .cursor-default{
   cursor: default;
+}
+.cursor-not-allowed{
+  cursor: not-allowed;
 }
 .cursor-pointer{
   cursor: pointer;
@@ -2734,6 +2751,10 @@ select{
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
 }
+.rounded-t-xl{
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
 .border{
   border-width: 1px;
 }
@@ -2742,6 +2763,9 @@ select{
 }
 .border-2{
   border-width: 2px;
+}
+.border-4{
+  border-width: 4px;
 }
 .border-\[1\.5px\]{
   border-width: 1.5px;
@@ -2855,15 +2879,13 @@ select{
   border-left-color: rgba(168, 85, 247, 1);
   border-left-color: rgba(168, 85, 247, var(--tw-border-opacity, 1));
 }
+.border-t-transparent{
+  border-top-color: transparent;
+}
 .bg-FF-red{
   --tw-bg-opacity: 1;
   background-color: rgba(233, 56, 43, 1);
   background-color: rgba(233, 56, 43, var(--tw-bg-opacity, 1));
-}
-.bg-amber-100{
-  --tw-bg-opacity: 1;
-  background-color: rgba(254, 243, 199, 1);
-  background-color: rgba(254, 243, 199, var(--tw-bg-opacity, 1));
 }
 .bg-black{
   --tw-bg-opacity: 1;
@@ -3101,6 +3123,9 @@ select{
 .pb-2{
   padding-bottom: 0.5rem;
 }
+.pb-20{
+  padding-bottom: 5rem;
+}
 .pb-4{
   padding-bottom: 1rem;
 }
@@ -3269,11 +3294,6 @@ select{
 .tracking-wider{
   letter-spacing: 0.05em;
 }
-.text-amber-900{
-  --tw-text-opacity: 1;
-  color: rgba(120, 53, 15, 1);
-  color: rgba(120, 53, 15, var(--tw-text-opacity, 1));
-}
 .text-black{
   --tw-text-opacity: 1;
   color: rgba(0, 0, 0, 1);
@@ -3404,6 +3424,12 @@ select{
 .shadow-lightHeader{
   --tw-shadow: inset 0px -1px 0px 0px rgba(21, 21, 21, 0.05);
   --tw-shadow-colored: inset 0px -1px 0px 0px var(--tw-shadow-color);
+  box-shadow: 0 0 rgba(0,0,0,0), 0 0 rgba(0,0,0,0), var(--tw-shadow);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0,0,0,0)), var(--tw-ring-shadow, 0 0 rgba(0,0,0,0)), var(--tw-shadow);
+}
+.shadow-md{
+  --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: 0 0 rgba(0,0,0,0), 0 0 rgba(0,0,0,0), var(--tw-shadow);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 rgba(0,0,0,0)), var(--tw-ring-shadow, 0 0 rgba(0,0,0,0)), var(--tw-shadow);
 }
@@ -3974,10 +4000,6 @@ button.uploadcare--button_primary {
     position: sticky;
   }
 
-  .md\:top-auto{
-    top: auto;
-  }
-
   .md\:top-nav{
     top: 3.5rem;
     top: var(--height-nav);
@@ -4112,6 +4134,10 @@ button.uploadcare--button_primary {
 
   .md\:max-w-\[80px\]{
     max-width: 80px;
+  }
+
+  .md\:max-w-lg{
+    max-width: 32rem;
   }
 
   .md\:max-w-md{

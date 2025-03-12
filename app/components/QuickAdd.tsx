@@ -1,15 +1,25 @@
-import {Fragment, ReactNode, useEffect, useState} from 'react';
-import {Dialog, Listbox, Popover, Transition} from '@headlessui/react';
+import {useEffect, useCallback, useState, Suspense, useRef} from 'react';
+import {useFetcher} from '@remix-run/react';
 import {Image} from '@shopify/hydrogen';
+import {Listbox} from '@headlessui/react';
 import {AddToCartButton} from './AddToCartButton';
-import {useCartFetchers} from '~/hooks/useCartFetchers';
+import {Drawer, useDrawer} from './Drawer';
+import {IconClose, IconSelect, IconCheck} from './Icon';
 import StarRating from './StarRating';
-import {IconClose, IconSelect} from './Icon';
 import {Link} from './Link';
-// import {RebuyPriceRange} from './ProductCard';
-import {fromGID} from '~/lib/gidUtils';
 import useFbCookies from '~/hooks/useFbCookies';
-import { v4 as uuidv4 } from 'uuid';
+import {fromGID} from '~/lib/gidUtils';
+import clsx from 'clsx';
+import {useCartFetchers} from '~/hooks/useCartFetchers';
+import {CartForm} from '@shopify/hydrogen';
+
+type QuickAddProps = {
+  children?: React.ReactNode;
+  className?: string;
+  product: any;
+  image?: any;
+  rebuy?: boolean;
+};
 
 export default function QuickAdd({
   children,
@@ -17,35 +27,143 @@ export default function QuickAdd({
   product,
   image,
   rebuy,
-}: {
-  children?: ReactNode;
-  className?: string;
-  product?: any;
-  image?: any;
-  rebuy?: boolean;
-}) {
-  const variants = product?.variants?.nodes ?? product.variants;
-  const [isOpen, setIsOpen] = useState(false);
+}: QuickAddProps) {
+  const {isOpen, openDrawer, closeDrawer} = useDrawer();
+  const fetcher = useFetcher<{product: any}>();
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedVariant, setSelectedVariant] = useState<null | {
     title: string;
     id: string;
     price: string;
+    availableForSale: boolean;
+    image?: any;
   }>(null);
   const [fbp, fbc] = useFbCookies();
-
-  // toggle modal when adding to cart
-  const addToCartFetchers = useCartFetchers('ADD_TO_CART');
-
+  const initialLoadDone = useRef(false);
+  const optionChangeInProgress = useRef(false);
+  
+  // Monitor cart fetchers to detect when cart drawer opens
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
+  
+  // Close QuickAdd drawer when an item is added to cart
   useEffect(() => {
-    if (addToCartFetchers[0]?.state === 'loading') {
-      setIsOpen(false);
+    if (!isOpen) return;
+    
+    // Check if there's a new cart action that's not a redo
+    const hasNewCartAction = addToCartFetchers.some(fetcher => 
+      fetcher.state === 'loading' && !fetcher.isRedoAction
+    );
+    
+    if (hasNewCartAction) {
+      closeDrawer();
     }
-  }, [addToCartFetchers]);
+  }, [addToCartFetchers, isOpen, closeDrawer]);
+
+  // Initial product data load when drawer opens
+  useEffect(() => {
+    if (isOpen && fetcher.state === 'idle' && !fetcher.data) {
+      // Reset state when drawer opens
+      setSelectedOptions({});
+      setSelectedVariant(null);
+      initialLoadDone.current = false;
+      optionChangeInProgress.current = false;
+      
+      // Load product data when drawer opens
+      fetcher.load(`/resource/product/${product.handle}`);
+    }
+  }, [isOpen, product.handle, fetcher]);
+
+  // Handle initial product data load
+  useEffect(() => {
+    if (fetcher.data?.product && !initialLoadDone.current && !optionChangeInProgress.current) {
+      // Initialize selected options with first available variant
+      const firstVariant = 
+        fetcher.data.product.variants.nodes.find((variant: any) => variant.availableForSale) ||
+        fetcher.data.product.variants.nodes[0];
+
+      if (firstVariant) {
+        const initialOptions: Record<string, string> = {};
+        firstVariant.selectedOptions.forEach((option: any) => {
+          initialOptions[option.name] = option.value;
+        });
+        setSelectedOptions(initialOptions);
+        
+        // Set the selected variant
+        setSelectedVariant({
+          title: firstVariant.title,
+          id: firstVariant.id,
+          price: firstVariant.price?.amount || firstVariant.priceV2?.amount,
+          availableForSale: firstVariant.availableForSale,
+          image: firstVariant.image
+        });
+        
+        initialLoadDone.current = true;
+      }
+    }
+  }, [fetcher.data]);
+
+  // Update selected variant when options change or when receiving new data after option change
+  useEffect(() => {
+    if (fetcher.data?.product && initialLoadDone.current) {
+      // If we have a selectedVariant from the API response, use it
+      if (fetcher.data.product.selectedVariant) {
+        setSelectedVariant({
+          title: fetcher.data.product.selectedVariant.title,
+          id: fetcher.data.product.selectedVariant.id,
+          price: fetcher.data.product.selectedVariant.price.amount,
+          availableForSale: fetcher.data.product.selectedVariant.availableForSale,
+          image: fetcher.data.product.selectedVariant.image
+        });
+        optionChangeInProgress.current = false;
+        return;
+      }
+      
+      // Otherwise, find the variant manually
+      const matchedVariant = fetcher.data.product.variants.nodes.find(
+        (variant: any) => {
+          return variant.selectedOptions.every(
+            (option: any) => selectedOptions[option.name] === option.value,
+          );
+        },
+      );
+
+      if (matchedVariant) {
+        setSelectedVariant({
+          title: matchedVariant.title,
+          id: matchedVariant.id,
+          price: matchedVariant.price?.amount || matchedVariant.priceV2?.amount,
+          availableForSale: matchedVariant.availableForSale,
+          image: matchedVariant.image
+        });
+        optionChangeInProgress.current = false;
+      }
+    }
+  }, [selectedOptions, fetcher.data]);
+
+  const handleOptionChange = useCallback(
+    (optionName: string, value: string) => {
+      optionChangeInProgress.current = true;
+      
+      setSelectedOptions((prev) => {
+        const newOptions = {...prev, [optionName]: value};
+
+        const queryString = Object.entries(newOptions)
+          .map(
+            ([key, val]) =>
+              `${encodeURIComponent(key)}=${encodeURIComponent(val)}`,
+          )
+          .join('&');
+
+        // Fetch updated product data with new options
+        fetcher.load(`/resource/product/${product.handle}?${queryString}`);
+
+        return newOptions;
+      });
+    },
+    [fetcher, product.handle],
+  );
 
   function fireAnalytics() {
-    const ff_id = window.sessionStorage.getItem('ff_id');
-
-    const event_id = `atc__${ff_id}__${uuidv4()}`;
     const event_source_url = window.location.href;
     const content_ids = [fromGID(selectedVariant?.id!)];
     const content_name = product.title;
@@ -63,24 +181,13 @@ export default function QuickAdd({
           content_type,
           value,
           currency,
-        },
-        {
-          eventID: event_id,
-        },
+        }
       );
-
-    // fetch(
-    //   `/server/AddToCart?event_id=${event_id}&event_source_url=${event_source_url}&content_ids=${content_ids}&content_name=${content_name}&content_type=${content_type}&value=${
-    //     selectedVariant?.price
-    //   }&currency=${currency}${fbp ? `&fbp=${fbp}` : ''}${
-    //     fbc !== null ? `&fbc=${fbc}` : ''
-    //   }`,
-    // );
   }
 
-  if (product.variants.nodes?.length === 1 || product.variants.length === 1) {
+  // Handle simple product with only one variant
+  if (product.variants?.nodes?.length === 1 || product.variants?.length === 1) {
     const isFromShopify = product.variants.nodes !== undefined;
-
     const availableForSale = isFromShopify
       ? product.variants.nodes[0].availableForSale
       : true;
@@ -107,152 +214,186 @@ export default function QuickAdd({
     else
       return (
         <Link to={`/products/${product.handle}`}>
-          <button className={` ${className} bg-primary/10`}>Notify me</button>
+          <button className={`${className} bg-primary/10`}>Notify me</button>
         </Link>
       );
   }
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className={className}>
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          openDrawer();
+        }} 
+        className={className}
+      >
         {children ?? 'Add'}
       </button>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50"
-          onClose={() => setIsOpen(false)}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all md:p-8">
-                  <div className="absolute right-4 top-4 z-50 cursor-pointer text-lg">
-                    <IconClose onClick={() => setIsOpen(false)} />
+      
+      <Drawer open={isOpen} onClose={closeDrawer} openFrom="bottom" className="md:max-w-lg">
+        <div className="flex flex-col h-full">
+          <div className="flex-grow overflow-auto p-4 pb-20">
+            <Suspense fallback={<LoadingFallback />}>
+              {fetcher.data?.product ? (
+                <>
+                  <div className="mb-4">
+                    <Image
+                      data={selectedVariant?.image || fetcher.data.product.featuredImage}
+                      alt={
+                        selectedVariant?.image?.altText ||
+                        `Image for ${product.title}`
+                      }
+                      sizes="(max-width: 768px) 100vw, 30vw"
+                      className="w-full h-auto"
+                    />
                   </div>
-                  <div className="mt-2 grid gap-4 md:grid-cols-2">
+                  <div className="flex justify-between items-start gap-4 mb-4">
                     <div>
-                      {image && (
-                        <Image
-                          className="fadeIn aspect-[4/5] w-full object-cover"
-                          sizes="320px"
-                          aspectRatio="1/1"
-                          data={typeof image === 'object' ? image : undefined}
-                          src={typeof image === 'string' ? image : undefined}
-                          alt={image?.altText || `Picture of ${product.title}`}
-                          loading={'lazy'}
-                        />
-                      )}
-                    </div>
-                    <div className="relative">
                       <StarRating
-                        rating={product.avg_rating?.value ?? product.avg_rating}
+                        rating={fetcher.data.product.avg_rating?.value ?? fetcher.data.product.avg_rating}
                         count={
-                          product.num_reviews?.value ?? product.num_reviews
+                          fetcher.data.product.num_reviews?.value ?? fetcher.data.product.num_reviews
                         }
                       />
-                      <h3 className="font-heading text-lg font-medium leading-6 text-gray-900">
-                        {product.title}
-                      </h3>
+                      <h2 className="font-heading text-2xl font-medium leading-6 text-gray-900">
+                        {fetcher.data.product.title}
+                      </h2>
                       <p className="mb-2 mt-1 text-xs text-primary/50">
-                        {product?.caption?.value ?? product.caption}
+                        {fetcher.data.product?.caption?.value ?? fetcher.data.product.caption}
                       </p>
-                      {/* <p>{selectedVariant?.price}</p> */}
-                      <Listbox
-                        onChange={setSelectedVariant}
-                        value={selectedVariant}
-                      >
-                        <Listbox.Button className="relative flex w-full cursor-default items-center justify-between rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm">
-                          <span className="flex items-center">
-                            {selectedVariant ? (
-                              <span>Selected: {selectedVariant.title}</span>
-                            ) : (
-                              <span className="block truncate">
-                                Select an option
-                              </span>
-                            )}
-                          </span>
-                          <IconSelect />
-                        </Listbox.Button>
-                        <Listbox.Options className="absolute top-[-82%] z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-3 pl-5 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm md:top-auto">
-                          {variants.map((variant: any) => {
-                            const soldOut = rebuy
-                              ? false
-                              : !variant.availableForSale;
-
-                            return (
-                              <Listbox.Option
-                                key={variant.admin_graphql_api_id ?? variant.id}
-                                value={{
-                                  title: variant.title,
-                                  id:
-                                    variant.admin_graphql_api_id ?? variant.id,
-                                  price:
-                                    variant.price ?? variant.priceV2.amount,
-                                }}
-                                disabled={soldOut}
-                                className={({active}) =>
-                                  `relative z-50 cursor-default select-none py-2 pl-10 pr-4 ${
-                                    active
-                                      ? 'bg-amber-100 text-amber-900'
-                                      : 'text-gray-900'
-                                  }
-                                ${soldOut ? 'opacity-50' : 'opacity-100'}
-                                `
-                                }
-                              >
-                                {variant.title}
-                              </Listbox.Option>
-                            );
-                          })}
-                        </Listbox.Options>
-                      </Listbox>
-                      <div className="mt-2">
-                        <AddToCartButton
-                          disabled={!selectedVariant}
-                          variant="primary"
-                          onClick={() => fireAnalytics()}
-                          className={!selectedVariant ? 'opacity-50' : ''}
-                          lines={[
-                            {
-                              merchandiseId: selectedVariant
-                                ? selectedVariant.id
-                                : '',
-                              quantity: 1,
-                            },
-                          ]}
-                        >
-                          {selectedVariant ? 'Add to Bag' : 'Select an option'}
-                        </AddToCartButton>
-                      </div>
                     </div>
                   </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
+                  
+                  {/* Only show variant selector if we have options other than default */}
+                  {!(fetcher.data.product.variants.nodes.length === 1 && 
+                     fetcher.data.product.variants.nodes[0].selectedOptions.length === 1 && 
+                     fetcher.data.product.variants.nodes[0].selectedOptions[0].name === 'Title' && 
+                     fetcher.data.product.variants.nodes[0].selectedOptions[0].value === 'Default Title') && (
+                    <div className="mb-6">
+                      {fetcher.data.product.options.map((option: any) => (
+                        <div key={option.name} className="mb-4">
+                          <p className="font-bold mb-2 uppercase">{option.name}</p>
+                          <div className="relative w-full">
+                            <Listbox
+                              value={selectedOptions[option.name] || ''}
+                              onChange={(value) => handleOptionChange(option.name, value)}
+                            >
+                              {({open}) => (
+                                <>
+                                  <Listbox.Button
+                                    className="relative flex w-full cursor-default items-center justify-between rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                                  >
+                                    <span className="flex items-center">
+                                      {selectedOptions[option.name] || 'Select an option'}
+                                    </span>
+                                    <IconSelect />
+                                  </Listbox.Button>
+                                  <Listbox.Options
+                                    className={clsx(
+                                      'absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-3 pl-5 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
+                                      open ? 'block' : 'hidden'
+                                    )}
+                                  >
+                                    {option.values.map((value: any) => {
+                                      // Check if this option value is available
+                                      const isAvailable = fetcher.data?.product.variants.nodes.some(
+                                        (variant: any) => {
+                                          const hasThisOption = variant.selectedOptions.some(
+                                            (opt: any) => opt.name === option.name && opt.value === value
+                                          );
+                                          return hasThisOption && variant.availableForSale;
+                                        }
+                                      );
+                                      
+                                      return (
+                                        <Listbox.Option
+                                          key={`option-${option.name}-${value}`}
+                                          value={value}
+                                          disabled={!isAvailable}
+                                          className={({active, selected, disabled}) => 
+                                            clsx(
+                                              'relative cursor-default select-none py-2 pl-10 pr-4',
+                                              active && 'bg-primary/10',
+                                              selected && 'font-semibold',
+                                              disabled && 'opacity-50 cursor-not-allowed'
+                                            )
+                                          }
+                                        >
+                                          {({selected}) => (
+                                            <div className="flex items-center">
+                                              <span>{value}</span>
+                                              {selected && (
+                                                <span className="ml-2">
+                                                  <IconCheck />
+                                                </span>
+                                              )}
+                                            </div>
+                                          )}
+                                        </Listbox.Option>
+                                      );
+                                    })}
+                                  </Listbox.Options>
+                                </>
+                              )}
+                            </Listbox>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="mb-4">
+                    <h3 className="font-bold mb-2 uppercase">Description</h3>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: fetcher.data.product.descriptionHtml,
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <LoadingFallback />
+              )}
+            </Suspense>
           </div>
-        </Dialog>
-      </Transition>
+          
+          {/* Fixed Add to Cart button at bottom */}
+          {fetcher.data?.product && (
+            <div className="fixed bottom-0 left-0 right-0 bg-white p-4 shadow-md">
+              <AddToCartButton
+                disabled={!selectedVariant?.availableForSale}
+                variant="primary"
+                className={!selectedVariant ? 'opacity-50 w-full' : 'w-full'}
+                onClick={() => fireAnalytics()}
+                lines={[
+                  {
+                    merchandiseId: selectedVariant?.id || '',
+                    quantity: 1,
+                  },
+                ]}
+              >
+                {selectedVariant?.availableForSale ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span>Add to Bag</span> | ${selectedVariant?.price}
+                  </span>
+                ) : (
+                  'Sold Out'
+                )}
+              </AddToCartButton>
+            </div>
+          )}
+        </div>
+      </Drawer>
     </>
   );
 }
+
+const LoadingFallback = () => {
+  return (
+    <div className="h-full w-full flex items-center justify-center">
+      <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+    </div>
+  );
+};

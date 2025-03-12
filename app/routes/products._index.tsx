@@ -63,6 +63,7 @@ export default function AllProducts() {
                 key={product.id}
                 product={product}
                 loading={getImageLoadingPriority(i)}
+                quickAdd={true}
               />
             ));
 

@@ -6,7 +6,6 @@ interface Window {
   fbq?: any;
   dataLayer?: any[];
   _learnq?: any[];
-  plausible?: any;
   TriplePixel?: any;
 }
 

@@ -12,7 +12,7 @@ import type {
   MailingAddress,
   Order,
 } from '@shopify/hydrogen/storefront-api-types';
-import {Suspense} from 'react';
+import {Suspense, useEffect} from 'react';
 import {
   Button,
   OrderCard,
@@ -135,6 +135,35 @@ function Account({
   addresses,
   featuredData,
 }: Account) {
+  const {firstName, lastName, email, phone} = customer;
+
+  // Store customer data for Facebook Advanced Matching
+  useEffect(() => {
+    try {
+      // Store customer data in localStorage for Facebook Advanced Matching
+      const customerData = {
+        firstName,
+        lastName,
+        email,
+        phone,
+      };
+      
+      localStorage.setItem('customerData', JSON.stringify(customerData));
+      
+      // If Facebook Pixel is loaded, update the user data
+      if (window.fbq) {
+        window.fbq('init', '280447639311369', {
+          em: email,
+          fn: firstName,
+          ln: lastName,
+          ph: phone,
+        });
+      }
+    } catch (error) {
+      console.error('Error storing customer data:', error);
+    }
+  }, [firstName, lastName, email, phone]);
+
   return (
     <>
       <PageHeader heading={heading}>

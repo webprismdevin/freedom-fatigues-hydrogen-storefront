@@ -70,7 +70,6 @@ import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
 import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
-import {v4 as uuidv4} from 'uuid';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
   const media = flattenConnection<MediaConnection>(data.product.media).find(
@@ -497,14 +496,6 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   //ATC analytics
   function fireAnalytics() {
-    if (window.plausible) {
-      window.plausible('AddToCart', {
-        props: {
-          product: product.title,
-          value: selectedVariant?.price!.amount,
-        },
-      });
-    }
     if (window.dataLayer) {
       //@ts-ignore
       window.dataLayer.push({ecommerce: null});
@@ -531,9 +522,6 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
     // if (window.TriplePixel)
     //   window.TriplePixel('AddToCart', {item: fromGID(product.id), q: 1});
 
-    const ff_id = window.sessionStorage.getItem('ff_id');
-    const event_id = `atc__${ff_id}__${uuidv4()}`;
-
     if (window.fbq)
       window.fbq(
         'track',
@@ -543,21 +531,8 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
           content_type: 'product',
           value: selectedVariant?.price!.amount,
           currency: 'USD',
-        },
-        {
-          eventID: event_id,
-        },
+        }
       );
-
-    // fetch(
-    //   `/server/AddToCart?event_id=${event_id}&content_ids=${fromGID(
-    //     product.id,
-    //   )}&content_name=${product.title}&content_type=product&value=${
-    //     selectedVariant?.price!.amount
-    //   }${fbp ? `&fbp=${fbp}` : ''}${
-    //     fbc !== null ? `&fbc=${fbc}` : ''
-    //   }&currency=USD&event_source_url=${window.location.href}`,
-    // );
   }
 
   // klaviyo 'viewed product' snippet
@@ -603,36 +578,20 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
   }, []);
 
   useEffect(() => {
-    const ff_id = sessionStorage.getItem('ff_id');
-
-    const content_ids = [fromGID(product.id)];
-    const event_id = `vc__${ff_id}__${uuidv4()}`;
     const value = Number(firstVariant.price.amount);
 
     const data = {
-      content_ids,
+      content_ids: [fromGID(product.id)],
       content_name: product.title,
       content_type: 'product',
       value,
       currency: 'USD',
     };
 
-    // fetch(
-    //   `/server/ViewContent?event_id=${event_id}&content_ids=${content_ids}&content_name=${
-    //     product.title
-    //   }${fbp ? `&fbp=${fbp}` : ''}${
-    //     fbc !== null ? `&fbc=${fbc}` : ''
-    //   }&content_type=product&value=${value}&currency=USD&event_source_url=${
-    //     window.location.href
-    //   }`,
-    // );
-
     const trackViewContent = () => {
       // facebook pixel
       if (typeof window !== 'undefined' && window.fbq) {
-        window.fbq('track', 'ViewContent', data, {
-          eventID: event_id,
-        });
+        window.fbq('track', 'ViewContent', data);
       }
     };
 

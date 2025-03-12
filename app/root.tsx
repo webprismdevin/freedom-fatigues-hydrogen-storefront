@@ -6,7 +6,6 @@ import {
   type AppLoadContext,
 } from '@shopify/remix-oxygen';
 import {
-  Await,
   Links,
   LiveReload,
   Meta,
@@ -17,7 +16,6 @@ import {
   useMatches,
   useRouteError,
   isRouteErrorResponse,
-  useRouteLoaderData,
 } from '@remix-run/react';
 import {
   ShopifySalesChannel,
@@ -28,31 +26,25 @@ import {
 } from '@shopify/hydrogen';
 import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
 import {Layout} from '~/components/Layout';
-import {GenericError} from './components/GenericError';
-import {NotFound} from './components/NotFound';
-import {Suspense} from 'react';
 
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
 import {DEFAULT_LOCALE, useIsHomePath} from './lib/utils';
 import invariant from 'tiny-invariant';
-import {Shop} from '@shopify/hydrogen/storefront-api-types';
 import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import {useEffect} from 'react';
-import posthog from 'posthog-js';
+import { useLoadScript } from '@shopify/hydrogen';
 
 declare global {
   interface Window {
-    fbq: any;
-    dataLayer: any;
-    TriplePixel: any;
-    _learnq: any;
-    plausible: any;
-    _aimTrack: any;
+    fbq?: any;
+    dataLayer?: any[];
+    TriplePixel?: any;
+    _learnq?: any[];
+    _aimTrack?: any[];
   }
 }
 
@@ -196,6 +188,8 @@ function Document({children}: {children: React.ReactNode}) {
 
   useAnalytics(hasUserConsent, locale);
 
+  useLoadScript("https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com")
+
   return (
     <html lang={locale.language}>
       <head>
@@ -208,15 +202,12 @@ function Document({children}: {children: React.ReactNode}) {
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
         />
-        <Script
+        {/* <Script
           async
           src="https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com"
-        />
+        /> */}
         <Meta />
         <Links />
-        {process.env.NODE_ENV == 'development' && (
-          <script src="http://localhost:8097"></script>
-        )}
       </head>
       <body>
         {children}
