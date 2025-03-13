@@ -68,8 +68,8 @@ export function ProductCard({
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className={clsx('grid gap-4', className)}>
+    <div className="flex flex-col">
+      <div className={clsx('grid gap-2', className)}>
         <div className="relative overflow-hidden">
           <Link
             onClick={onClick}
@@ -94,6 +94,13 @@ export function ProductCard({
               )}
             </div>
           </Link>
+        </div>
+        {/* star rating placeholder */}
+        <div className="h-4">
+          <StarRating
+            rating={Number(product.avg_rating?.value)}
+            count={Number(product.num_reviews?.value)}
+          />
         </div>
         <Link
           onClick={onClick}
@@ -126,13 +133,6 @@ export function ProductCard({
             {product.caption?.value}
           </p>
         </div>
-      </div>
-      {/* star rating placeholder */}
-      <div className="h-4">
-        <StarRating
-          rating={Number(product.avg_rating?.value)}
-          count={Number(product.num_reviews?.value)}
-        />
       </div>
       {quickAdd && (
         <QuickAdd
@@ -260,11 +260,13 @@ export function Rebuy_MiniProductCard({
           alt={product.title}
           className="rounded"
         />
+      </Link>
+      <StarRating rating={product.avg_rating ?? 0} />
+      <Link to={`/products/${product.handle}`}>
         <p className="col-span-2 line-clamp-2 w-full overflow-hidden text-ellipsis text-sm">
           {product.title}
         </p>
       </Link>
-      <StarRating rating={product.avg_rating ?? 0} />
       <div className="flex flex-row items-center justify-between">
         <RebuyPriceRange priceRange={product.priceRange} />
         <QuickAdd
@@ -280,7 +282,11 @@ export function Rebuy_MiniProductCard({
   );
 }
 
-export const RebuyPriceRange = ({priceRange}: {priceRange: RebuyPriceRange}) => {
+export const RebuyPriceRange = ({
+  priceRange,
+}: {
+  priceRange: RebuyPriceRange;
+}) => {
   function removeCents(dollarAmount: number) {
     if (dollarAmount.toString().endsWith('.00')) {
       return dollarAmount.toString().slice(0, -3); // Remove the last 3 characters (.00)

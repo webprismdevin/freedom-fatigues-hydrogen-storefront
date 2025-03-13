@@ -9,7 +9,5 @@ node_modules
 .vscode
 
 .shopify
-**/.DS_Store
-public/.DS_Store
 .DS_Store
 **/.DS_Store
