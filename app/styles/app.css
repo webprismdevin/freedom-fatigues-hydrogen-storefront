@@ -2065,6 +2065,9 @@ select{
 .mb-2{
   margin-bottom: 0.5rem;
 }
+.mb-20{
+  margin-bottom: 5rem;
+}
 .mb-24{
   margin-bottom: 6rem;
 }
@@ -2115,9 +2118,6 @@ select{
 }
 .mt-\[2px\]{
   margin-top: 2px;
-}
-.mb-20{
-  margin-bottom: 5rem;
 }
 .line-clamp-2{
   overflow: hidden;
