@@ -21,7 +21,7 @@ import type {
   CartLine,
   CartLineUpdateInput,
 } from '@shopify/hydrogen-react/storefront-api-types';
-import {useMatches} from '@remix-run/react';
+import {useMatches} from 'react-router-dom';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import confetti from 'canvas-confetti';
@@ -53,33 +53,32 @@ export function Cart({
   onClose?: () => void;
   cart: CartType | null;
 }) {
-  if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={null} />;
+  if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} />;
 
-  // Use optimistic cart
-  const optimisticCart = cart;
-  
-  // If optimisticCart is undefined, use the original cart
-  const safeCart = optimisticCart || cart;
-  
-  const lines = safeCart?.lines?.nodes || [];
+  const lines = cart?.lines?.nodes || [];
   const linesCount = lines.length > 0;
 
   // Memoize the cart transformation for Redo
   const cartForRedo = useMemo(
     () =>
       ({
-        ...safeCart,
+        ...cart,
         lines: {
           nodes: lines,
-          edges: lines.map((node: CartLine) => ({node})),
+          edges: lines.map((node) => ({
+            node: {
+              ...node,
+              __typename: 'CartLine' as const
+            }
+          })),
           pageInfo: {hasNextPage: false, hasPreviousPage: false},
         },
       } as CartType),
-    [safeCart, lines],
+    [cart, lines],
   );
 
   // Ensure cart has all required properties
-  if (!safeCart?.cost?.totalAmount) {
+  if (!cart?.cost?.totalAmount) {
     console.log('Missing required cart properties');
     return (
       <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
