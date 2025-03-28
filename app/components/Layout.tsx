@@ -18,7 +18,7 @@ import {
   CartLoading,
   Link,
 } from '~/components';
-import {useParams, Form, Await, useMatches, useFetcher} from '@remix-run/react';
+import {useParams, Form, Await, useMatches, useFetcher} from 'react-router-dom';
 import {useLocalStorage, useLocation, useWindowScroll} from 'react-use';
 import {Disclosure} from '@headlessui/react';
 import {Suspense, useEffect, useMemo, useState, useRef} from 'react';

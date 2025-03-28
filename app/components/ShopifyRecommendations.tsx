@@ -10,6 +10,8 @@ type RenderProps = {
   isLoading: boolean;
 };
 
+const EXCLUDED_HANDLES = ['free-return-for-store-credit-or-exchange-package-protection'];
+
 export default function ShopifyRecommendations({
   productId,
   className,
@@ -51,8 +53,13 @@ export default function ShopifyRecommendations({
     );
   }
 
+  // Filter out excluded handles
+  const filteredRecommendations = fetcher.data.recommendations.filter((rec: ShopifyRecommendation) => {
+    return !EXCLUDED_HANDLES.includes(rec.handle);
+  });
+
   return children({
-    recommendations: fetcher.data.recommendations,
+    recommendations: filteredRecommendations,
     isLoading: !fetcher.data,
   });
 } 

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {useEffect, useId, useMemo} from 'react';
-import {useFetcher} from '@remix-run/react';
+import {useFetcher} from 'react-router-dom';
 import {Heading, ProductCard, Skeleton, Text} from '~/components';
 import type {
   Product,
