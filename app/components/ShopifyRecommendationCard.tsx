@@ -73,7 +73,7 @@ export const ShopifyRecommendationCard = ({
           <h3 className="line-clamp-2 font-medium">{product.title}</h3>
           <p className="text-primary/50 text-sm">
             {product.priceRange?.minVariantPrice
-              ? `${product.priceRange.minVariantPrice.currencyCode} ${product.priceRange.minVariantPrice.amount}`
+              ? `$${product.priceRange.minVariantPrice.amount}`
               : ''}
           </p>
         </div>

@@ -1,7 +1,11 @@
 import clsx from 'clsx';
 import React, {useMemo, useRef, useEffect, useState, useCallback} from 'react';
 import {useScroll} from 'react-use';
-import {flattenConnection, Image, Money} from '@shopify/hydrogen';
+import {
+  Image,
+  Money,
+  flattenConnection,
+} from '@shopify/hydrogen-react';
 import {
   Button,
   Heading,
@@ -16,27 +20,29 @@ import type {
   CartCost,
   CartLine,
   CartLineUpdateInput,
-} from '@shopify/hydrogen/storefront-api-types';
-import {useFetcher, useMatches} from '@remix-run/react';
+} from '@shopify/hydrogen-react/storefront-api-types';
+import {useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import confetti from 'canvas-confetti';
 import posthog from 'posthog-js';
-import {CartForm, useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
+import {CartForm} from '@shopify/hydrogen';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
 import {RedoProvider} from '@redotech/redo-hydrogen';
 import ShopifyRecommendations from './ShopifyRecommendations';
 import ShopifyRecommendationCard from './ShopifyRecommendationCard';
+import {CheckoutConfidenceModal} from './CheckoutConfidenceModal';
 
 type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
 const REDO_STORE_ID = '6439e48e41e6bb001f6407a5';
 
-type OptimisticCartLine = CartLine & {
+// Add type for optimistic cart line
+interface OptimisticCartLine extends CartLine {
   isOptimistic?: boolean;
-};
+}
 
 export function Cart({
   layout,
@@ -50,8 +56,8 @@ export function Cart({
   if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={null} />;
 
   // Use optimistic cart
-  const optimisticCart = useOptimisticCart(cart);
-
+  const optimisticCart = cart;
+  
   // If optimisticCart is undefined, use the original cart
   const safeCart = optimisticCart || cart;
   
@@ -65,10 +71,10 @@ export function Cart({
         ...safeCart,
         lines: {
           nodes: lines,
-          edges: lines.map((node) => ({node})),
+          edges: lines.map((node: CartLine) => ({node})),
           pageInfo: {hasNextPage: false, hasPreviousPage: false},
         },
-      } as unknown as CartType),
+      } as CartType),
     [safeCart, lines],
   );
 
@@ -407,13 +413,23 @@ function CartCheckoutActions({
 
   return (
     <div className="mt-2 flex w-full flex-col text-center">
-      <RedoCheckoutButtons
-        onClick={handleAnalytics}
-        cart={cartForRedo}
-        storeId={REDO_STORE_ID}
-      >
-        {fallbackButton}
-      </RedoCheckoutButtons>
+      <div className="flex items-center justify-center gap-2 w-full relative">
+        <style>
+          {`
+            div:not([class]) {
+              width: 100%;
+            }
+          `}
+        </style>
+        <RedoCheckoutButtons
+          onClick={handleAnalytics}
+          cart={cartForRedo}
+          storeId={REDO_STORE_ID}
+        >
+          {fallbackButton}
+        </RedoCheckoutButtons>
+        <CheckoutConfidenceModal />
+      </div>
     </div>
   );
 }

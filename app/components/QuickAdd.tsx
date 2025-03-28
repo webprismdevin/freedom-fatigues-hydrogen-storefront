@@ -344,7 +344,7 @@ export default function QuickAdd({
                     </div>
                   )}
                   
-                  <div className="mb-4">
+                  <div className="mb-20">
                     <h3 className="font-bold mb-2 uppercase">Description</h3>
                     <div
                       dangerouslySetInnerHTML={{
