@@ -23,7 +23,7 @@ jobs:
       with:
         version: 8
     - name: Install dependencies
-      run: pnpm install
+      run: pnpm install --frozen-lockfile
     - name: Install deployment dependencies
       run: pnpm add -g @shopify/cli-kit @shopify/oxygen-cli @shopify/cli-hydrogen
     - name: Build and Publish to Oxygen
