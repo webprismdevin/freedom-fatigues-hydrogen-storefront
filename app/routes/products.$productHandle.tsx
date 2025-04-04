@@ -520,19 +520,31 @@ function ResponsiveBrowserWidget({
   children: ReactNode;
   greaterThan?: boolean;
 }) {
-  const [isHydrated, setIsHydrated] = useState(!isHydrating);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
-    isHydrating = false;
     setIsHydrated(true);
+    setWindowWidth(window.innerWidth);
+
+    function handleResize() {
+      setWindowWidth(window.innerWidth);
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (isHydrated && greaterThan) {
-    return <>{window.innerWidth > breakpoint && children}</>;
-  } else if (isHydrated && !greaterThan) {
-    return <>{window.innerWidth < breakpoint && children}</>;
+  // During SSR and initial client render, return a placeholder
+  if (!isHydrated) {
+    return <div className="min-h-[100px]">loading...</div>;
+  }
+
+  // After hydration, conditionally render based on window width
+  if (greaterThan) {
+    return <>{windowWidth > breakpoint && children}</>;
   } else {
-    return <div>loading...</div>;
+    return <>{windowWidth < breakpoint && children}</>;
   }
 }
 

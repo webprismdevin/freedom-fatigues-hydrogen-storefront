@@ -3,11 +3,9 @@ import type {Product} from '@shopify/hydrogen/storefront-api-types';
 import {ProductCard, Section} from '~/components';
 import {useIsHomePath} from '~/lib/utils';
 
-const mockProducts = new Array(12).fill('');
-
 export function ProductSwimlane({
   title = 'Featured Products',
-  products = mockProducts,
+  products = [],
   count = 12,
   ...props
 }: {
@@ -16,6 +14,10 @@ export function ProductSwimlane({
   count?: number;
 }) {
   const isHome = useIsHomePath();
+
+  if (!products?.length) {
+    return null;
+  }
 
   return (
     <Section
@@ -28,7 +30,6 @@ export function ProductSwimlane({
     >
       <div className="swimlane hiddenScroll md:scroll-px-8 md:px-8 md:pb-8 lg:scroll-px-12 lg:px-12">
         {products.map((product) => {
-          //hack out Re:do
           if (product.id === 'gid://shopify/Product/6859749195894') return null;
           return (
             <ProductCard

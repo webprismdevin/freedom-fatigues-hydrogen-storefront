@@ -2218,6 +2218,9 @@ select{
 .h-8{
   height: 2rem;
 }
+.h-\[200px\]{
+  height: 200px;
+}
 .h-\[500px\]{
   height: 500px;
 }
@@ -2519,6 +2522,9 @@ select{
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
+}
+.resize{
+  resize: both;
 }
 .snap-x{
   scroll-snap-type: x var(--tw-scroll-snap-strictness);

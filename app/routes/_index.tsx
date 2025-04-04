@@ -2,7 +2,7 @@ import {Hero} from '../components/Hero';
 import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {Suspense} from 'react';
 import {Await, useLoaderData} from '@remix-run/react';
-import {ProductSwimlane} from '~/components';
+import {ProductSwimlane, Section} from '~/components';
 import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
 import type {
   CollectionConnection,
@@ -104,10 +104,10 @@ export default function Homepage() {
     <div className="bg-primary text-contrast">
       <Hero data={hero.hero} />
 
-      <Suspense>
+      <Suspense fallback={<ProductSwimlaneLoading />}>
         <Await resolve={featuredProducts}>
           {({collection}) => {
-            if (!collection?.products?.nodes) return <></>;
+            if (!collection?.products?.nodes) return null;
             return (
               <ProductSwimlane
                 products={collection?.products.nodes}
@@ -125,10 +125,10 @@ export default function Homepage() {
         </Await>
       </Suspense>
 
-      <Suspense>
+      <Suspense fallback={<ProductSwimlaneLoading />}>
         <Await resolve={newlyReleased}>
           {({collection}) => {
-            if (!collection?.products?.nodes) return <></>;
+            if (!collection?.products?.nodes) return null;
             return (
               <ProductSwimlane
                 products={collection.products?.nodes}
@@ -140,6 +140,18 @@ export default function Homepage() {
         </Await>
       </Suspense>
     </div>
+  );
+}
+
+function ProductSwimlaneLoading() {
+  return (
+    <Section padding="y">
+      <div className="grid h-[200px] w-full animate-pulse grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-full rounded bg-primary/10" />
+        ))}
+      </div>
+    </Section>
   );
 }
 
