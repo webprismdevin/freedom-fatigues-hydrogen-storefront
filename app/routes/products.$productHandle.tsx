@@ -783,20 +783,84 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   // klaviyo ATC code
   useEffect(() => {
-
     const echoCart = async () => {
-      const cartObj = await root.data?.cart;
+      try {
+        console.log('Starting Klaviyo cart tracking...');
+        
+        const cartObj = await root.data?.cart;
+        console.log('Full cart object:', cartObj);
 
-      const cart = {
-        total_price: cartObj.cost.totalAmount.amount,
-        $value: cartObj.cost.totalAmount.amount,
-        original_total_price: cartObj.cost.subtotalAmount.amount,
-        items: cartObj.lines.edges,
-      };
+        // Skip if cart is not ready or empty
+        if (!cartObj || !cartObj.lines || cartObj.totalQuantity === 0) {
+          console.log('Cart is not ready or empty, waiting for update...');
+          return;
+        }
 
-      if (window.klaviyo) window.klaviyo.track('Added to Cart', cart);
+        // Get all cart items
+        const cartItems = cartObj.lines.edges?.map(({node}: any) => ({
+          ProductID: node.merchandise.product.id,
+          SKU: node.merchandise.sku,
+          ProductName: node.merchandise.product.title,
+          Quantity: node.quantity,
+          ItemPrice: node.cost.amountPerQuantity.amount,
+          RowTotal: node.cost.totalAmount.amount,
+          ProductURL: `https://freedomfatigues.com/products/${node.merchandise.product.handle}`,
+          ImageURL: node.merchandise.image?.url,
+          ProductCategories: [node.merchandise.product.productType].filter(Boolean)
+        })) || [];
+
+        console.log('Cart items:', cartItems);
+
+        // Get the newly added item (last item in cart)
+        const addedItem = cartItems[cartItems.length - 1];
+        
+        if (!addedItem) {
+          console.log('No items found in cart');
+          return;
+        }
+
+        const klaviyoData = {
+          $value: cartObj.cost?.totalAmount?.amount,
+          AddedItemProductName: addedItem.ProductName,
+          AddedItemProductID: addedItem.ProductID,
+          AddedItemSKU: addedItem.SKU,
+          AddedItemCategories: addedItem.ProductCategories,
+          AddedItemImageURL: addedItem.ImageURL,
+          AddedItemURL: addedItem.ProductURL,
+          AddedItemPrice: addedItem.ItemPrice,
+          AddedItemQuantity: addedItem.Quantity,
+          ItemNames: cartItems.map(item => item.ProductName),
+          CheckoutURL: cartObj.checkoutUrl,
+          Items: cartItems
+        };
+
+        console.log('Prepared Klaviyo cart data:', klaviyoData);
+        
+        if (window.klaviyo) {
+          console.log('Attempting to track Klaviyo Added to Cart event...');
+          window.klaviyo.track('Added to Cart', klaviyoData);
+          console.log('Klaviyo track call completed');
+        } else {
+          console.warn('Klaviyo object not available for tracking');
+        }
+      } catch (error) {
+        console.error('Error in Klaviyo cart tracking:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          });
+        }
+      }
     };
-    if (root.data?.cart) echoCart();
+
+    if (root.data?.cart) {
+      console.log('Cart data detected, initiating tracking...');
+      echoCart();
+    } else {
+      console.log('No cart data available yet');
+    }
   }, [root.data?.cart]);
 
   const isClearance = useTags(product.tags, 'Clearance');

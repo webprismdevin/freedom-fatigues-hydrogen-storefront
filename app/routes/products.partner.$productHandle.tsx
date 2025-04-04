@@ -612,17 +612,30 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
   // klaviyo ATC code
   useEffect(() => {
     const echoCart = async () => {
-      const cartObj = await root.data?.cart;
+      try {
+        const cartObj = await root.data?.cart;
+        
+        if (!cartObj?.cost?.totalAmount?.amount || !cartObj?.cost?.subtotalAmount?.amount) {
+          console.warn('Cart data is incomplete:', cartObj);
+          return;
+        }
 
-      const cart = {
-        total_price: cartObj.cost.totalAmount.amount,
-        $value: cartObj.cost.totalAmount.amount,
-        original_total_price: cartObj.cost.subtotalAmount.amount,
-        items: cartObj.lines.nodes,
-      };
+        const cart = {
+          total_price: cartObj.cost.totalAmount.amount,
+          $value: cartObj.cost.totalAmount.amount,
+          original_total_price: cartObj.cost.subtotalAmount.amount,
+          items: cartObj.lines?.nodes || [],
+        };
 
-      if (window.klaviyo) window.klaviyo.track('Added to Cart', cart);
+        if (window.klaviyo) {
+          console.log('Tracking Klaviyo Add to Cart:', cart);
+          window.klaviyo.track('Added to Cart', cart);
+        }
+      } catch (error) {
+        console.error('Error tracking Klaviyo Add to Cart:', error);
+      }
     };
+
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);
 
