@@ -36,7 +36,7 @@ import {useAnalytics} from './hooks/useAnalytics';
 import {getSiteSettings} from './lib/sanity';
 // analytics
 import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
-import { useLoadScript } from '@shopify/hydrogen';
+import { useLoadScript } from '@shopify/hydrogen-react';
 
 declare global {
   interface Window {
@@ -201,6 +201,10 @@ function Document({children}: {children: React.ReactNode}) {
         <Script
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
+        />
+        <Script
+          async
+          src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=QuicR8"
         />
         <Meta />
         <Links />

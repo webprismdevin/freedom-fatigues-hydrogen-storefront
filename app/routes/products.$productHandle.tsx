@@ -73,6 +73,7 @@ import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
 import ShopifyRecommendations from '~/components/ShopifyRecommendations';
 import {ShopifyRecommendationCard} from '~/components/ShopifyRecommendationCard';
+import {useKlaviyo} from '~/hooks/useKlaviyo';
 
 export type AimerceProduct = {
   id: string; // shopify product id, for eaxmple: "gid://shopify/Product/1234567890"
@@ -206,17 +207,6 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
   if (!product.selectedVariant) {
     product.selectedVariant = firstVariant;
   }
-  
-  const selectedVariant = product.selectedVariant;
-
-  const productAnalytics: ShopifyAnalyticsProduct = {
-    productGid: product.id,
-    variantGid: selectedVariant.id,
-    name: product.title,
-    variantName: selectedVariant.title,
-    brand: product.vendor,
-    price: selectedVariant.price.amount,
-  };
 
   return defer({
     product,
@@ -229,8 +219,15 @@ export async function loader({params, request, context}: LoaderFunctionArgs) {
     analytics: {
       pageType: AnalyticsPageType.product,
       resourceId: product.id,
-      products: [productAnalytics],
-      totalValue: parseFloat(selectedVariant.price.amount),
+      products: [{
+        productGid: product.id,
+        variantGid: firstVariant.id,
+        name: product.title,
+        variantName: firstVariant.title,
+        brand: product.vendor,
+        price: firstVariant.price.amount,
+      }],
+      totalValue: parseFloat(firstVariant.price.amount),
     },
   });
 }
@@ -241,6 +238,7 @@ export default function Product() {
   const {lastAccordion, modules: defaultModules} = defaults.product;
   const {media, title, vendor, descriptionHtml} = product;
   const {shippingPolicy, refundPolicy} = shop;
+  const isKlaviyoReady = useKlaviyo();
 
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
@@ -254,13 +252,34 @@ export default function Product() {
   }, []);
 
   const variants = flattenConnection(product.variants);
+  const firstVariant = product.variants.nodes[0];
   
   // The selectedVariant optimistically changes during page
   // transitions with one of the preloaded product variants
   const selectedVariant = useOptimisticVariant(
-    product.selectedVariant,
+    product.selectedVariant ?? firstVariant,
     variants,
   );
+
+  // klaviyo 'viewed product' snippet - only track once when Klaviyo is ready
+  useEffect(() => {
+    if (!isKlaviyoReady) return;
+
+    console.log('Attempting to track Klaviyo viewed product...');
+    const item = {
+      ProductName: product.title,
+      ProductID: product.id,
+      ImageURL: firstVariant.image.url,
+      URL: `https://freedomfatigues.com/products/${product.handle}`,
+      Brand: product.vendor,
+      Price: firstVariant.price.amount,
+      CompareAtPrice: firstVariant.compareAtPrice?.amount,
+    };
+
+    console.log('Klaviyo tracking data:', item);
+    window.klaviyo.track('Viewed Product', item);
+    console.log('Klaviyo track called successfully');
+  }, [isKlaviyoReady, product, firstVariant]); // Only run when Klaviyo is ready and product data changes
 
   return (
     <>
@@ -673,7 +692,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   // klaviyo 'viewed product' snippet
   useEffect(() => {
-
+    console.log('Attempting to track Klaviyo viewed product...');
     const item = {
       ProductName: product.title,
       ProductID: product.id,
@@ -684,7 +703,15 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
       CompareAtPrice: firstVariant.compareAtPrice?.amount,
     };
 
-    window.klaviyo?.track('Viewed Product', item);
+    console.log('Klaviyo tracking data:', item);
+    console.log('Klaviyo object available:', !!window.klaviyo);
+    
+    if (window.klaviyo) {
+      window.klaviyo.track('Viewed Product', item);
+      console.log('Klaviyo track called successfully');
+    } else {
+      console.log('Klaviyo object not available for tracking');
+    }
   }, []);
 
   useEffect(() => {

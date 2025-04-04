@@ -548,8 +548,11 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
       CompareAtPrice: firstVariant.compareAtPrice?.amount,
     };
 
-    window.klaviyo?.track('Viewed Product', item);
-  }, []);
+    if (window.klaviyo) {
+      console.log('klaviyo tracking', item);
+      window.klaviyo.track('Viewed Product', item);
+    }
+  }, [product.id, firstVariant.price.amount, selectedVariant]);
 
   useEffect(() => {
     // GA4 view_item event
@@ -574,7 +577,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
         },
       });
     }
-  }, []);
+  }, [product.id, firstVariant.price.amount, selectedVariant]);
 
   useEffect(() => {
     const value = Number(firstVariant.price.amount);
