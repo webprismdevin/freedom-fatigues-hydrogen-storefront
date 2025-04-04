@@ -537,7 +537,6 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   // klaviyo 'viewed product' snippet
   useEffect(() => {
-    const _learnq = window._learnq || [];
 
     const item = {
       ProductName: product.title,
@@ -549,7 +548,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
       CompareAtPrice: firstVariant.compareAtPrice?.amount,
     };
 
-    _learnq.push(['track', 'Viewed Product', item]);
+    window.klaviyo?.track('Viewed Product', item);
   }, []);
 
   useEffect(() => {
@@ -609,8 +608,6 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
 
   // klaviyo ATC code
   useEffect(() => {
-    const _learnq = window._learnq || [];
-
     const echoCart = async () => {
       const cartObj = await root.data?.cart;
 
@@ -621,7 +618,7 @@ export function ProductForm({selectedVariant}: {selectedVariant: ProductVariant}
         items: cartObj.lines.nodes,
       };
 
-      if (_learnq) _learnq.push(['track', 'Added to Cart', cart]);
+      if (window.klaviyo) window.klaviyo.track('Added to Cart', cart);
     };
     if (root.data?.cart) echoCart();
   }, [root.data?.cart]);

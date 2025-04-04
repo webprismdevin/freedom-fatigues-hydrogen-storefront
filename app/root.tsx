@@ -43,8 +43,8 @@ declare global {
     fbq?: any;
     dataLayer?: any[];
     TriplePixel?: any;
-    _learnq?: any[];
     _aimTrack?: any[];
+    klaviyo?: any;
   }
 }
 
@@ -202,10 +202,6 @@ function Document({children}: {children: React.ReactNode}) {
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"
         />
-        {/* <Script
-          async
-          src="https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com"
-        /> */}
         <Meta />
         <Links />
       </head>

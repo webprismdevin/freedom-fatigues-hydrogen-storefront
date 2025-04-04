@@ -5,8 +5,8 @@ interface Window {
   _aimTrack?: any[];
   fbq?: any;
   dataLayer?: any[];
-  _learnq?: any[];
   TriplePixel?: any;
+  klaviyo?: any;
 }
 
 // Extend the Remix Link props
