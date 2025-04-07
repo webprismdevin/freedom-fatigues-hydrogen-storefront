@@ -10,7 +10,6 @@ import {
   Form,
   useActionData,
   useLoaderData,
-  type V2_MetaFunction,
 } from '@remix-run/react';
 import {useState} from 'react';
 import {getInputStyleClasses} from '~/lib/utils';
@@ -63,26 +62,41 @@ export const action: ActionFunction = async ({request, context, params}) => {
 
     return redirect(params.lang ? `/${params.lang}/account` : '/account');
   } catch (error: any) {
-    if (storefront.isApiError(error)) {
+    // Parse the error message which contains the Shopify error details
+    try {
+      const errorDetails = JSON.parse(error.message);
+      const shopifyError = Array.isArray(errorDetails) ? errorDetails[0] : null;
+      
+      console.error('Login error details:', JSON.stringify({
+        code: shopifyError?.code,
+        field: shopifyError?.field,
+        message: shopifyError?.message
+      }, null, 2));
+
+      // Handle specific error codes
+      switch (shopifyError?.code) {
+        case 'UNIDENTIFIED_CUSTOMER':
+          return badRequest({
+            formError: 'Invalid email or password. Please try again or click "Forgot password" below to reset it.',
+          });
+        default:
+          return badRequest({
+            formError: 'An error occurred while signing in. Please try again.',
+          });
+      }
+    } catch (parseError) {
+      // If we can't parse the error, log it and return a generic message
+      console.error('Error parsing login error:', error.message);
       return badRequest({
-        formError: 'Something went wrong. Please try again later.',
+        formError: 'An unexpected error occurred. Please try again.',
       });
     }
-
-    /**
-     * The user did something wrong, but the raw error from the API is not super friendly.
-     * Let's make one up.
-     */
-    return badRequest({
-      formError:
-        'Sorry. We did not recognize either your email or password. Please try to sign in again or create a new account.',
-    });
   }
 };
 
-export const meta: MetaFunction = () => {
-  return [{title: 'Login'}];
-};
+export const meta: MetaFunction = () => ({
+  title: 'Login',
+});
 
 export default function Login() {
   const {shopName} = useLoaderData<typeof loader>();
@@ -238,10 +252,11 @@ export async function doLogin(
     return data.customerAccessTokenCreate.customerAccessToken.accessToken;
   }
 
-  /**
-   * Something is wrong with the user's input.
-   */
-  throw new Error(
-    data?.customerAccessTokenCreate?.customerUserErrors.join(', '),
-  );
+  // Improve error handling by including the actual customer errors
+  const errors = data?.customerAccessTokenCreate?.customerUserErrors;
+  if (errors?.length) {
+    throw new Error(JSON.stringify(errors));
+  }
+
+  throw new Error('Login failed: Unknown error occurred');
 }
