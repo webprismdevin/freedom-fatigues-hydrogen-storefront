@@ -36,8 +36,8 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { getSiteSettings } from './lib/sanity';
 // analytics
 import { CustomScriptsAndAnalytics } from './components/CustomScriptsAndAnalytics';
-import { useLoadScript } from '@shopify/hydrogen-react';
-import { LoaderFunctionArgs } from '@remix-run/server-runtime';
+import { useLoadScript } from '@shopify/hydrogen';
+import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
 
 declare global {
   interface Window {
@@ -104,7 +104,7 @@ type LoaderContext = AppLoadContext & {
   };
 };
 
-export async function loader({ context }: LoaderFunctionArgs) {
+export async function loader({ context }) {
   const { storefront, session, cart } = context as unknown as LoaderContext;
   const [cartId, shop] = await Promise.all([
     session.get('cartId'),

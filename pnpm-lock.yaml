@@ -31,9 +31,6 @@ importers:
       '@remix-run/react':
         specifier: ^2.13.1
         version: 2.16.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.2)
-      '@remix-run/server-runtime':
-        specifier: 2.16.1
-        version: 2.16.1(typescript@5.8.2)
       '@sanity/client':
         specifier: ^5.3.0
         version: 5.4.2
