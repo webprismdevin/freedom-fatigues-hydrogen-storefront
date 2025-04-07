@@ -4,23 +4,23 @@ import {
   type ActionFunction,
   type AppLoadContext,
   type LoaderArgs,
-  MetaFunction,
+  V2_MetaFunction,
 } from '@shopify/remix-oxygen';
 import {
   Form,
   useActionData,
   useLoaderData,
 } from '@remix-run/react';
-import {useState} from 'react';
-import {getInputStyleClasses} from '~/lib/utils';
-import {Link} from '~/components';
-import type {CustomerAccessTokenCreatePayload} from '@shopify/hydrogen/storefront-api-types';
+import { useState } from 'react';
+import { getInputStyleClasses } from '~/lib/utils';
+import { Link } from '~/components';
+import type { CustomerAccessTokenCreatePayload } from '@shopify/hydrogen/storefront-api-types';
 
 export const handle = {
   isPublic: true,
 };
 
-export async function loader({context, params}: LoaderArgs) {
+export async function loader({ context, params }: LoaderArgs) {
   const customerAccessToken = await context.session.get('customerAccessToken');
 
   if (customerAccessToken) {
@@ -28,16 +28,16 @@ export async function loader({context, params}: LoaderArgs) {
   }
 
   // TODO: Query for this?
-  return json({shopName: 'Freedom Fatigues'});
+  return json({ shopName: 'Freedom Fatigues' });
 }
 
 type ActionData = {
   formError?: string;
 };
 
-const badRequest = (data: ActionData) => json(data, {status: 400});
+const badRequest = (data: ActionData) => json(data, { status: 400 });
 
-export const action: ActionFunction = async ({request, context, params}) => {
+export const action: ActionFunction = async ({ request, context, params }) => {
   const formData = await request.formData();
 
   const email = formData.get('email');
@@ -54,10 +54,10 @@ export const action: ActionFunction = async ({request, context, params}) => {
     });
   }
 
-  const {session, storefront} = context;
+  const { session, storefront } = context;
 
   try {
-    const customerAccessToken = await doLogin(context, {email, password});
+    const customerAccessToken = await doLogin(context, { email, password });
     session.set('customerAccessToken', customerAccessToken);
 
     return redirect(params.lang ? `/${params.lang}/account` : '/account');
@@ -66,7 +66,7 @@ export const action: ActionFunction = async ({request, context, params}) => {
     try {
       const errorDetails = JSON.parse(error.message);
       const shopifyError = Array.isArray(errorDetails) ? errorDetails[0] : null;
-      
+
       console.error('Login error details:', JSON.stringify({
         code: shopifyError?.code,
         field: shopifyError?.field,
@@ -94,12 +94,12 @@ export const action: ActionFunction = async ({request, context, params}) => {
   }
 };
 
-export const meta: MetaFunction = () => ({
-  title: 'Login',
-});
+export const meta: V2_MetaFunction = () => {
+  return [{title: 'Login'}];
+};
 
 export default function Login() {
-  const {shopName} = useLoaderData<typeof loader>();
+  const { shopName } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionData>();
   const [nativeEmailError, setNativeEmailError] = useState<null | string>(null);
   const [nativePasswordError, setNativePasswordError] = useState<null | string>(
@@ -228,7 +228,7 @@ const LOGIN_MUTATION = `#graphql
 `;
 
 export async function doLogin(
-  {storefront}: AppLoadContext,
+  { storefront }: AppLoadContext,
   {
     email,
     password,

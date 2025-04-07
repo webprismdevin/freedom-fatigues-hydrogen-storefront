@@ -2,7 +2,6 @@ import {
   defer,
   type LinksFunction,
   type MetaFunction,
-  type LoaderFunctionArgs,
   type AppLoadContext,
 } from '@shopify/remix-oxygen';
 import {
@@ -24,19 +23,20 @@ import {
   Script,
   type HydrogenCart,
 } from '@shopify/hydrogen';
-import type {Cart as CartType} from '@shopify/hydrogen/storefront-api-types';
-import {Layout} from '~/components/Layout';
+import type { Cart as CartType } from '@shopify/hydrogen/storefront-api-types';
+import { Layout } from '~/components/Layout';
 
 import styles from './styles/app.css';
 import favicon from '../public/favicon.png';
 
-import {DEFAULT_LOCALE, useIsHomePath} from './lib/utils';
+import { DEFAULT_LOCALE, useIsHomePath } from './lib/utils';
 import invariant from 'tiny-invariant';
-import {useAnalytics} from './hooks/useAnalytics';
-import {getSiteSettings} from './lib/sanity';
+import { useAnalytics } from './hooks/useAnalytics';
+import { getSiteSettings } from './lib/sanity';
 // analytics
-import {CustomScriptsAndAnalytics} from './components/CustomScriptsAndAnalytics';
+import { CustomScriptsAndAnalytics } from './components/CustomScriptsAndAnalytics';
 import { useLoadScript } from '@shopify/hydrogen-react';
+import { LoaderFunctionArgs } from '@remix-run/server-runtime';
 
 declare global {
   interface Window {
@@ -48,7 +48,7 @@ declare global {
   }
 }
 
-const seo: SeoHandleFunction<typeof loader> = ({data, pathname}) => ({
+const seo: SeoHandleFunction<typeof loader> = ({ data, pathname }) => ({
   title: 'Freedom Fatigues | American Made | Veteran Owned & Operated',
   titleTemplate: '%s',
   description: data?.shop?.shop?.description,
@@ -73,7 +73,7 @@ export const handle = {
 
 export const links: LinksFunction = () => {
   return [
-    {rel: 'stylesheet', href: styles},
+    { rel: 'stylesheet', href: styles },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -86,7 +86,7 @@ export const links: LinksFunction = () => {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/png', href: favicon},
+    { rel: 'icon', type: 'image/png', href: favicon },
     {
       rel: 'preconnect dns-prefetch',
       href: 'https://triplewhale-pixel.web.app/',
@@ -102,8 +102,8 @@ export const links: LinksFunction = () => {
 
 export const meta: MetaFunction = () => {
   return [
-    {charset: 'utf-8'},
-    {name: 'viewport', content: 'width=device-width,initial-scale=1'},
+    { charset: 'utf-8' },
+    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
   ];
 };
 
@@ -114,8 +114,8 @@ type LoaderContext = AppLoadContext & {
   };
 };
 
-export async function loader({context}: LoaderFunctionArgs) {
-  const {storefront, session, cart} = context as unknown as LoaderContext;
+export async function loader({ context }: LoaderFunctionArgs) {
+  const { storefront, session, cart } = context as unknown as LoaderContext;
   const [cartId, shop] = await Promise.all([
     session.get('cartId'),
     getShopData(context),
@@ -180,7 +180,7 @@ export default function App() {
   );
 }
 
-function Document({children}: {children: React.ReactNode}) {
+function Document({ children }: { children: React.ReactNode }) {
   const data = useLoaderData<typeof loader>();
   const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
@@ -260,7 +260,7 @@ export interface ShopData {
   shop: Shop;
 }
 
-async function getShopData({storefront}: AppLoadContext) {
+async function getShopData({ storefront }: AppLoadContext) {
   const data = await storefront.query(LAYOUT_QUERY, {
     variables: {
       language: storefront.i18n.language,
