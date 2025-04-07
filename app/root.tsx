@@ -3,6 +3,7 @@ import {
   type LinksFunction,
   type MetaFunction,
   type AppLoadContext,
+  V2_MetaFunction,
 } from '@shopify/remix-oxygen';
 import {
   Links,
@@ -87,23 +88,12 @@ export const links: LinksFunction = () => {
       href: 'https://shop.app',
     },
     { rel: 'icon', type: 'image/png', href: favicon },
-    {
-      rel: 'preconnect dns-prefetch',
-      href: 'https://triplewhale-pixel.web.app/',
-      crossOrigin: 'anonymous',
-    },
-    {
-      rel: 'preconnect dns-prefetch',
-      href: 'https://api.config-security.com/',
-      crossOrigin: 'anonymous',
-    },
   ];
 };
 
-export const meta: MetaFunction = () => {
+export const meta: V2_MetaFunction = () => {
   return [
     { charset: 'utf-8' },
-    { name: 'viewport', content: 'width=device-width,initial-scale=1' },
   ];
 };
 
@@ -198,6 +188,7 @@ function Document({ children }: { children: React.ReactNode }) {
           name="theme-color"
           content={`${isHome ? '#141414' : '#FFFFFF'}`}
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <Script
           async
           src="https://chat-widget.getredo.com/widget.js?widgetId=sshis2brqgi1wgx"

@@ -68,7 +68,6 @@ import {SanityImageAssetDocument} from '@sanity/client';
 import useScript from '~/hooks/useScript';
 import useTags from '~/hooks/useTags';
 import {MiniProductCard} from '~/components/ProductCard';
-import useRebuyEvent from '~/hooks/useRebuyEvent';
 import useFbCookies from '~/hooks/useFbCookies';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => {
@@ -214,8 +213,6 @@ export default function Product() {
   useScript(
     'https://loox.io/widget/loox.js?shop=freedom-fatigues.myshopify.com',
   );
-
-  useRebuyEvent({handle: product.handle, event: 'viewed'});
 
   return (
     <>
