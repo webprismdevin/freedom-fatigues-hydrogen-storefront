@@ -51,7 +51,7 @@ export function CheckoutConfidenceModal() {
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <div className="mb-6">
-                    <img src="/images/logo.png" alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
+                    <img src="/logo_on_white.png" alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
                   </div>
                   
                   <Dialog.Title as="h3" className="text-2xl font-bold text-center mb-4">
