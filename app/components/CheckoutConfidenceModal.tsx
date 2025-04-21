@@ -9,10 +9,15 @@ export function CheckoutConfidenceModal() {
     <>
       <button
         type="button"
-        onClick={() => setIsOpen(true)}
-        className="inline-flex items-center text-primary hover:text-primary/80 absolute bottom-0 right-0"
+        onClick={(e) => {
+          e.preventDefault(); // Prevent parent button click
+          e.stopPropagation(); // Prevent event bubbling
+          setIsOpen(true);
+        }}
+        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm mt-2"
       >
         <IconInformation className="h-5 w-5" />
+        <span>Learn about unlimited exchanges and returns</span>
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
@@ -46,7 +51,7 @@ export function CheckoutConfidenceModal() {
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <div className="mb-6">
-                    <img src='/branding/logo_black.png' alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
+                    <img src="/images/logo.png" alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
                   </div>
                   
                   <Dialog.Title as="h3" className="text-2xl font-bold text-center mb-4">
