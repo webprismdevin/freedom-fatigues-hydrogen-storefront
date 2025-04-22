@@ -45,7 +45,11 @@ export default async function handleRequest(
       "localhost:*",
       "*.getfondue.com",
       "googleads.g.doubleclick.net",
-      "getredo.com"
+      "getredo.com",
+      "challenges.cloudflare.com",
+      "https://challenges.cloudflare.com",
+      "*.submit-form.com",
+      "submit-form.com"
     ],
     connectSrc: [
       "'self'",
@@ -70,8 +74,11 @@ export default async function handleRequest(
       "sc-static.net",
       "google.com/pagead/",
       "analytics.google.com",
-      "*.getredo.com"
-
+      "*.getredo.com",
+      "challenges.cloudflare.com",
+      "https://challenges.cloudflare.com",
+      "*.submit-form.com",
+      "submit-form.com"
     ],
     scriptSrc: [
       "'self'",
@@ -90,6 +97,8 @@ export default async function handleRequest(
       "*.aimerce.ai",
       "*.getfondue.com",
       "localhost:*",
+      "challenges.cloudflare.com",
+      "https://challenges.cloudflare.com"
     ],
     scriptSrcElem: [
       "'self'",
@@ -110,7 +119,9 @@ export default async function handleRequest(
       "localhost:*",
       "*.youtube.com",
       "loox.io",
-      "*.getredo.com"
+      "*.getredo.com",
+      "challenges.cloudflare.com",
+      "https://challenges.cloudflare.com"
     ],
     styleSrc: [
       "'self'",
@@ -170,13 +181,24 @@ export default async function handleRequest(
       "*.captcha-delivery.com",
       "*.facebook.com",
       "*.klaviyo.com",
-      "loox.io"
+      "loox.io",
+      "challenges.cloudflare.com",
     ],
     workerSrc: ["'self'", "blob:"],
     mediaSrc: ["'self'", "data:", "blob:", "*.shopify.com", "*.cloudfront.net"],
     objectSrc: ["'none'"],
     manifestSrc: ["'self'"],
   });
+
+  // Add nonce to scriptSrc and scriptSrcElem after nonce is created
+  const updatedHeader = header.replace(
+    'script-src',
+    `script-src 'nonce-${nonce}'`
+  ).replace(
+    'script-src-elem',
+    `script-src-elem 'nonce-${nonce}'`
+  );
+
   const body = await renderToReadableStream(
     <NonceProvider>
       <RemixServer context={{...remixContext, isSpaMode: false}} url={request.url} />
@@ -197,7 +219,7 @@ export default async function handleRequest(
   }
 
   responseHeaders.set('Content-Type', 'text/html');
-  responseHeaders.set('Content-Security-Policy', header);
+  responseHeaders.set('Content-Security-Policy', updatedHeader);
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,

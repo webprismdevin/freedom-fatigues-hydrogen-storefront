@@ -1,25 +1,47 @@
-import {type SeoConfig} from '@shopify/hydrogen';
+import {Storefront} from '@shopify/hydrogen';
 import type {
   Article,
   Blog,
   Collection,
   CollectionConnection,
+  Maybe,
   Page,
   Product,
   ProductVariant,
-  ShopPolicy,
   Shop,
+  ShopPolicy,
 } from '@shopify/hydrogen-react/storefront-api-types';
 import type {
+  WithContext,
   Article as SeoArticle,
   BreadcrumbList,
-  Blog as SeoBlog,
   CollectionPage,
-  Offer,
   Organization,
   Product as SeoProduct,
   WebPage,
+  Offer,
+  Blog as SeoBlog,
 } from 'schema-dts';
+
+export type SeoConfig<T = WebPage> = {
+  title?: string;
+  titleTemplate?: string;
+  description?: string;
+  handle?: string;
+  url?: string;
+  noIndex?: boolean;
+  noFollow?: boolean;
+  media?: {
+    type: string;
+    url?: string;
+    height?: string;
+    width?: string;
+    altText?: string;
+  };
+  jsonLd?: WithContext<Organization | WebPage | BreadcrumbList | SeoArticle | SeoProduct | CollectionPage>;
+};
+
+export type SeoConfigReturn = SeoConfig;
 
 function root({
   shop,
@@ -27,35 +49,21 @@ function root({
 }: {
   shop: Shop;
   url: Request['url'];
-}): SeoConfig<Organization> {
+}): SeoConfigReturn {
   return {
     title: shop?.name,
-    titleTemplate: '%s | Hydrogen Demo Store',
+    titleTemplate: '%s | ' + shop?.name,
     description: truncate(shop?.description ?? ''),
-    handle: '@shopify',
-    url,
-    robots: {
-      noIndex: false,
-      noFollow: false,
+    media: {
+      type: 'logo',
+      url: shop?.brand?.logo?.image?.url ?? '',
     },
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: shop.name,
+      url: new URL(url).origin,
       logo: shop.brand?.logo?.image?.url,
-      sameAs: [
-        'https://twitter.com/shopify',
-        'https://facebook.com/shopify',
-        'https://instagram.com/shopify',
-        'https://youtube.com/shopify',
-        'https://tiktok.com/@shopify',
-      ],
-      url,
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: `${url}search?q={search_term}`,
-        query: "required name='search_term'",
-      },
     },
   };
 }
@@ -146,21 +154,47 @@ function productJsonLd({
 
 function product({
   product,
-  url,
   selectedVariant,
+  url,
 }: {
   product: Product;
   selectedVariant: ProductVariant;
   url: Request['url'];
-}): SeoConfig<SeoProduct | BreadcrumbList> {
-  const description = truncate(
-    product?.seo?.description ?? product?.description ?? '',
-  );
+}): SeoConfigReturn {
+  const jsonLd: WithContext<SeoProduct> = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    brand: {
+      '@type': 'Brand',
+      name: product.vendor ?? '',
+    },
+    description: truncate(product?.description ?? ''),
+    image: [selectedVariant?.image?.url ?? product?.featuredImage?.url ?? ''],
+    name: product.title ?? '',
+    url,
+    offers: {
+      '@type': 'Offer',
+      availability: selectedVariant?.availableForSale
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      price: selectedVariant?.price?.amount ?? '',
+      priceCurrency: selectedVariant?.price?.currencyCode ?? '',
+    },
+  };
+
   return {
-    title: product?.seo?.title ?? product?.title,
-    description,
-    media: selectedVariant?.image,
-    jsonLd: productJsonLd({product, selectedVariant, url}),
+    title: product?.title ?? undefined,
+    description: truncate(product?.description ?? ''),
+    titleTemplate: '%s | Product',
+    url,
+    media: {
+      type: 'image',
+      url: selectedVariant?.image?.url ?? product?.featuredImage?.url ?? undefined,
+      height: selectedVariant?.image?.height?.toString() ?? product?.featuredImage?.height?.toString() ?? undefined,
+      width: selectedVariant?.image?.width?.toString() ?? product?.featuredImage?.width?.toString() ?? undefined,
+      altText: selectedVariant?.image?.altText ?? product?.featuredImage?.altText ?? undefined,
+    },
+    jsonLd,
   };
 }
 
@@ -222,21 +256,30 @@ function collection({
 }: {
   collection: Collection;
   url: Request['url'];
-}): SeoConfig<CollectionPage | BreadcrumbList> {
+}): SeoConfigReturn {
+  const jsonLd: WithContext<CollectionPage> = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: collection?.title ?? '',
+    description: truncate(collection?.description ?? ''),
+    image: collection?.image?.url ?? undefined,
+    url,
+  };
+
   return {
-    title: collection?.seo?.title,
-    description: truncate(
-      collection?.seo?.description ?? collection?.description ?? '',
-    ),
+    title: collection?.title ?? undefined,
+    description: truncate(collection?.description ?? ''),
     titleTemplate: '%s | Collection',
+    url,
+    noIndex: false,
     media: {
       type: 'image',
-      url: collection?.image?.url,
-      height: collection?.image?.height,
-      width: collection?.image?.width,
-      altText: collection?.image?.altText,
+      url: collection?.image?.url ?? undefined,
+      height: collection?.image?.height?.toString() ?? undefined,
+      width: collection?.image?.width?.toString() ?? undefined,
+      altText: collection?.image?.altText ?? undefined,
     },
-    jsonLd: collectionJsonLd({collection, url}),
+    jsonLd,
   };
 }
 
@@ -288,36 +331,40 @@ function listCollections({
 
 function article({
   article,
+  blog,
   url,
 }: {
   article: Article;
+  blog: Blog;
   url: Request['url'];
-}): SeoConfig<SeoArticle> {
+}): SeoConfigReturn {
+  const jsonLd: WithContext<SeoArticle> = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article?.title ?? '',
+    description: truncate(article?.content ?? ''),
+    image: article?.image?.url ?? undefined,
+    datePublished: article?.publishedAt ?? '',
+    dateModified: article?.publishedAt ?? '',
+    author: {
+      '@type': 'Person',
+      name: article?.author?.name ?? '',
+    },
+  };
+
   return {
-    title: article?.seo?.title ?? article?.title,
-    description: truncate(article?.seo?.description ?? ''),
-    titleTemplate: '%s | Journal',
+    title: article?.title ?? undefined,
+    description: truncate(article?.content ?? ''),
+    titleTemplate: '%s | Blog',
     url,
     media: {
       type: 'image',
-      url: article?.image?.url,
-      height: article?.image?.height,
-      width: article?.image?.width,
-      altText: article?.image?.altText,
+      url: article?.image?.url ?? undefined,
+      height: article?.image?.height?.toString() ?? undefined,
+      width: article?.image?.width?.toString() ?? undefined,
+      altText: article?.image?.altText ?? undefined,
     },
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      alternativeHeadline: article.title,
-      articleBody: article.contentHtml,
-      datePublished: article?.publishedAt,
-      description: truncate(
-        article?.seo?.description || article?.excerpt || '',
-      ),
-      headline: article?.seo?.title || '',
-      image: article?.image?.url,
-      url,
-    },
+    jsonLd,
   };
 }
 
@@ -369,12 +416,18 @@ function policy({
 }: {
   policy: ShopPolicy;
   url: Request['url'];
-}): SeoConfig<WebPage> {
+}): SeoConfigReturn {
   return {
-    description: truncate(policy?.body ?? ''),
     title: policy?.title,
-    titleTemplate: '%s | Policy',
+    description: truncate(policy?.body ?? ''),
+    titleTemplate: '%s | ' + policy?.title,
     url,
+    noIndex: true,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      url,
+    },
   };
 }
 
@@ -384,7 +437,7 @@ function policies({
 }: {
   policies: ShopPolicy[];
   url: Request['url'];
-}): SeoConfig<WebPage | BreadcrumbList> {
+}): SeoConfigReturn {
   const origin = new URL(url).origin;
   const itemListElement: BreadcrumbList['itemListElement'] = policies
     .filter(Boolean)
@@ -396,24 +449,27 @@ function policies({
         item: `${origin}/policies/${policy.handle}`,
       };
     });
+
   return {
     title: 'Policies',
+    description: 'Policies',
     titleTemplate: '%s | Policies',
-    description: 'Hydroge store policies',
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement,
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebPage',
-        description: 'Hydrogen store policies',
-        name: 'Policies',
-        url,
-      },
-    ],
+    url,
+    noIndex: true,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement,
+    },
+  };
+}
+
+function contact({storefront}: {storefront: Storefront}) {
+  return {
+    title: 'Contact Us - Freedom Fatigues',
+    description: 'Get in touch with our customer service team. We\'re here to help with orders, returns, exchanges, and any other questions you may have.',
+    titleTemplate: '%s',
+    url: '/contact-us',
   };
 }
 
@@ -428,6 +484,7 @@ export const seoPayload = {
   policy,
   product,
   root,
+  contact,
 };
 
 /**
