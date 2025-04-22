@@ -98,7 +98,11 @@ export default async function handleRequest(
       "*.getfondue.com",
       "localhost:*",
       "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com"
+      "https://challenges.cloudflare.com",
+      "unpkg.com",
+      "*.unpkg.com",
+      "ucarecdn.com",
+      "*.ucarecdn.com"
     ],
     scriptSrcElem: [
       "'self'",
@@ -121,7 +125,11 @@ export default async function handleRequest(
       "loox.io",
       "*.getredo.com",
       "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com"
+      "https://challenges.cloudflare.com",
+      "unpkg.com",
+      "*.unpkg.com",
+      "ucarecdn.com",
+      "*.ucarecdn.com"
     ],
     styleSrc: [
       "'self'",

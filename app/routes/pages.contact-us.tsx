@@ -83,6 +83,12 @@ export default function ContactUs() {
                 method="POST"
                 className="grid gap-4"
               >
+                <input 
+                  type="hidden" 
+                  name="_redirect" 
+                  value="https://freedomfatigues.com/pages/contact-us"
+                />
+
                 <div>
                   <label htmlFor="name" className="block mb-2">
                     Name

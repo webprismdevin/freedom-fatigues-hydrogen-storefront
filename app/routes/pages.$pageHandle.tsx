@@ -2,7 +2,8 @@ import {
   json,
   type MetaFunction,
   type SerializeFrom,
-  type LoaderArgs,
+  type LoaderFunctionArgs,
+  redirect,
 } from '@shopify/remix-oxygen';
 import type { Page as PageType } from '@shopify/hydrogen/storefront-api-types';
 import { Await, useLoaderData } from '@remix-run/react';
@@ -16,16 +17,21 @@ import Modules from '~/components/Modules';
 import useScript from '~/hooks/useScript';
 
 const seo: SeoHandleFunction<typeof loader> = ({data}) => ({
-  title: data?.page?.seo?.title ?? data?.page?.title,
-  description: data?.page?.seo?.description ?? '',
+  title: data?.shopPage?.seo?.title ?? data?.shopPage?.title,
+  description: data?.shopPage?.seo?.description ?? '',
 });
 
 export const handle = {
   seo,
 };
 
-export async function loader({ request, params, context }: LoaderArgs) {
+export async function loader({ request, params, context }: LoaderFunctionArgs) {
   invariant(params.pageHandle, 'Missing page handle');
+
+  // Redirect /pages/contact-us to the dedicated contact page route
+  if (params.pageHandle === 'contact-us') {
+    return redirect('/pages/contact-us');
+  }
 
   const sanityPage = await sanity.fetch(
     `*[_type == 'page' && slug.current == '${params.pageHandle}'][0]{
