@@ -2688,6 +2688,12 @@ select{
   margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
 }
+.space-y-4 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * (1 - var(--tw-space-y-reverse)));
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
 .divide-y > :not([hidden]) ~ :not([hidden]){
   --tw-divide-y-reverse: 0;
   border-top-width: calc(1px * (1 - var(--tw-divide-y-reverse)));
@@ -2765,6 +2771,9 @@ select{
 }
 .rounded-sm{
   border-radius: 0.125rem;
+}
+.rounded-lg{
+  border-radius: 0.5rem;
 }
 .rounded-b{
   border-bottom-right-radius: 0.25rem;
@@ -3418,6 +3427,11 @@ select{
   color: rgba(255, 255, 255, 1);
   color: rgba(255, 255, 255, var(--tw-text-opacity, 1));
 }
+.text-red-700{
+  --tw-text-opacity: 1;
+  color: rgba(185, 28, 28, 1);
+  color: rgba(185, 28, 28, var(--tw-text-opacity, 1));
+}
 .underline{
   text-decoration-line: underline;
 }
@@ -3833,6 +3847,9 @@ button.uploadcare--button_primary {
 .hover\:opacity-80:hover{
   opacity: 0.8;
 }
+.hover\:opacity-90:hover{
+  opacity: 0.9;
+}
 .focus\:border-blue-500:focus{
   --tw-border-opacity: 1;
   border-color: rgba(59, 130, 246, 1);
@@ -3853,6 +3870,11 @@ button.uploadcare--button_primary {
 .focus\:border-primary\/90:focus{
   border-color: rgba(20, 20, 20, 0.9);
   border-color: rgb(var(--color-primary) / 0.9);
+}
+.focus\:border-primary:focus{
+  --tw-border-opacity: 1;
+  border-color: rgba(20, 20, 20, 1);
+  border-color: rgb(var(--color-primary) / var(--tw-border-opacity, 1));
 }
 .focus\:underline:focus{
   text-decoration-line: underline;
