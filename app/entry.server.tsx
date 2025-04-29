@@ -71,8 +71,8 @@ export default async function handleRequest(
       "google.com/pagead/",
       "analytics.google.com",
       "*.getredo.com",
-      "submit-form.com/9WklqL8w"
-
+      "submit-form.com/9WklqL8w",
+      "www.google.com/ccm/collect"
     ],
     scriptSrc: [
       "'self'",
@@ -111,7 +111,9 @@ export default async function handleRequest(
       "localhost:*",
       "*.youtube.com",
       "loox.io",
-      "*.getredo.com"
+      "*.getredo.com",
+      "*.google-analytics.com",
+      "*.googleadservices.com"
     ],
     styleSrc: [
       "'self'",
@@ -171,7 +173,11 @@ export default async function handleRequest(
       "*.captcha-delivery.com",
       "*.facebook.com",
       "*.klaviyo.com",
-      "loox.io"
+      "loox.io",
+      "www.googletagmanager.com",
+      "*.google-analytics.com",
+      "td.doubleclick.net",
+      "*.doubleclick.net"
     ],
     workerSrc: ["'self'", "blob:"],
     mediaSrc: ["'self'", "data:", "blob:", "*.shopify.com", "*.cloudfront.net"],
