@@ -2,19 +2,11 @@ import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import {PageHeader, Section} from '~/components';
 import {routeHeaders} from '~/data/cache';
-import {ATTR_LOADING_EAGER} from '~/lib/const';
-import {seoPayload} from '~/lib/seo.server';
 import {useState, useEffect} from 'react';
 
 export const headers = routeHeaders;
 
-export async function loader({request, context: {storefront}}: LoaderFunctionArgs) {
-  const seo = seoPayload.contact({storefront});
-  return json({seo});
-}
-
 export default function ContactUs() {
-  const {seo} = useLoaderData<typeof loader>();
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 

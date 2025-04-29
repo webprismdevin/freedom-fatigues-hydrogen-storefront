@@ -440,9 +440,7 @@ function CartCheckoutActions({cart, checkoutUrl}: CartProps) {
               </Button>
             </div>
           </RedoCheckoutButtons>
-          <div className="flex justify-center">
-            <CheckoutConfidenceModal />
-          </div>
+          <CheckoutConfidenceModal />
         </>
       ) : (
         // Other vendors checkout flow

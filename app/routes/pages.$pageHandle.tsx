@@ -2,7 +2,7 @@ import {
   json,
   type MetaFunction,
   type SerializeFrom,
-  type LoaderFunctionArgs,
+  type LoaderArgs,
   redirect,
 } from '@shopify/remix-oxygen';
 import type { Page as PageType } from '@shopify/hydrogen/storefront-api-types';
@@ -25,13 +25,13 @@ export const handle = {
   seo,
 };
 
-export async function loader({ request, params, context }: LoaderFunctionArgs) {
+export async function loader({ request, params, context }: LoaderArgs) {
   invariant(params.pageHandle, 'Missing page handle');
 
-  // Redirect /pages/contact-us to the dedicated contact page route
-  if (params.pageHandle === 'contact-us') {
-    return redirect('/pages/contact-us');
-  }
+    // Redirect /pages/contact-us to the dedicated contact page route
+    if (params.pageHandle === 'contact-us') {
+      return redirect('/pages/contact-us');
+    }
 
   const sanityPage = await sanity.fetch(
     `*[_type == 'page' && slug.current == '${params.pageHandle}'][0]{

@@ -45,11 +45,7 @@ export default async function handleRequest(
       "localhost:*",
       "*.getfondue.com",
       "googleads.g.doubleclick.net",
-      "getredo.com",
-      "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com",
-      "*.submit-form.com",
-      "submit-form.com"
+      "getredo.com"
     ],
     connectSrc: [
       "'self'",
@@ -75,10 +71,8 @@ export default async function handleRequest(
       "google.com/pagead/",
       "analytics.google.com",
       "*.getredo.com",
-      "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com",
-      "*.submit-form.com",
-      "submit-form.com"
+      "submit-form.com/9WklqL8w",
+      "www.google.com/ccm/collect"
     ],
     scriptSrc: [
       "'self'",
@@ -97,12 +91,6 @@ export default async function handleRequest(
       "*.aimerce.ai",
       "*.getfondue.com",
       "localhost:*",
-      "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com",
-      "unpkg.com",
-      "*.unpkg.com",
-      "ucarecdn.com",
-      "*.ucarecdn.com"
     ],
     scriptSrcElem: [
       "'self'",
@@ -124,12 +112,11 @@ export default async function handleRequest(
       "*.youtube.com",
       "loox.io",
       "*.getredo.com",
-      "challenges.cloudflare.com",
-      "https://challenges.cloudflare.com",
-      "unpkg.com",
-      "*.unpkg.com",
-      "ucarecdn.com",
-      "*.ucarecdn.com"
+      "*.google-analytics.com",
+      "*.googleadservices.com",
+      "*.doubleclick.net",
+      "*.googleadservices.com",
+      "googleads.g.doubleclick.net"
     ],
     styleSrc: [
       "'self'",
@@ -190,23 +177,16 @@ export default async function handleRequest(
       "*.facebook.com",
       "*.klaviyo.com",
       "loox.io",
-      "challenges.cloudflare.com",
+      "www.googletagmanager.com",
+      "*.google-analytics.com",
+      "td.doubleclick.net",
+      "*.doubleclick.net"
     ],
     workerSrc: ["'self'", "blob:"],
     mediaSrc: ["'self'", "data:", "blob:", "*.shopify.com", "*.cloudfront.net"],
     objectSrc: ["'none'"],
     manifestSrc: ["'self'"],
   });
-
-  // Add nonce to scriptSrc and scriptSrcElem after nonce is created
-  const updatedHeader = header.replace(
-    'script-src',
-    `script-src 'nonce-${nonce}'`
-  ).replace(
-    'script-src-elem',
-    `script-src-elem 'nonce-${nonce}'`
-  );
-
   const body = await renderToReadableStream(
     <NonceProvider>
       <RemixServer context={{...remixContext, isSpaMode: false}} url={request.url} />
@@ -227,7 +207,7 @@ export default async function handleRequest(
   }
 
   responseHeaders.set('Content-Type', 'text/html');
-  responseHeaders.set('Content-Security-Policy', updatedHeader);
+  responseHeaders.set('Content-Security-Policy', header);
   return new Response(body, {
     headers: responseHeaders,
     status: responseStatusCode,
