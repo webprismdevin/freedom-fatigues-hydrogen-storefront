@@ -14,7 +14,7 @@ export function CheckoutConfidenceModal() {
           e.stopPropagation(); // Prevent event bubbling
           setIsOpen(true);
         }}
-        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm mt-2"
+        className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm mt-2 justify-center"
       >
         <IconInformation className="h-5 w-5" />
         <span>Learn about unlimited exchanges and returns</span>
@@ -51,7 +51,7 @@ export function CheckoutConfidenceModal() {
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <div className="mb-6">
-                    <img src="/images/logo.png" alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
+                    <img src="/logo_on_white.png" alt="Freedom Fatigues Logo" className="mx-auto h-12 w-auto" />
                   </div>
                   
                   <Dialog.Title as="h3" className="text-2xl font-bold text-center mb-4">
