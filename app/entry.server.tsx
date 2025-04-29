@@ -113,7 +113,10 @@ export default async function handleRequest(
       "loox.io",
       "*.getredo.com",
       "*.google-analytics.com",
-      "*.googleadservices.com"
+      "*.googleadservices.com",
+      "*.doubleclick.net",
+      "*.googleadservices.com",
+      "googleads.g.doubleclick.net"
     ],
     styleSrc: [
       "'self'",
