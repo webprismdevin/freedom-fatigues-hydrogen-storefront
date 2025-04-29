@@ -1,9 +1,10 @@
-import {json, type LoaderArgs} from '@shopify/remix-oxygen';
-import {useLoaderData} from '@remix-run/react';
-import type {ShopPolicy} from '@shopify/hydrogen/storefront-api-types';
+import { json } from '@shopify/remix-oxygen';
+import { useLoaderData } from '@remix-run/react';
+import type { ShopPolicy } from '@shopify/hydrogen/storefront-api-types';
+import type { LoaderFunctionArgs } from '@remix-run/server-runtime';
 import invariant from 'tiny-invariant';
 
-import {PageHeader, Section, Heading, Link} from '~/components';
+import { PageHeader, Section, Heading, Link } from '~/components';
 
 export const handle = {
   seo: {
@@ -11,16 +12,16 @@ export const handle = {
   },
 };
 
-export async function loader({context: {storefront}}: LoaderArgs) {
+export async function loader({ context: { storefront } }: LoaderFunctionArgs) {
   const data = await storefront.query<{
     shop: Record<string, ShopPolicy>;
   }>(POLICIES_QUERY);
 
   invariant(data, 'No data returned from Shopify API');
-  const policies = Object.values(data.shop || {});
+  const policies = Object.values(data.shop || {}).filter((policy): policy is ShopPolicy => Boolean(policy));
 
   if (policies.length === 0) {
-    throw new Response('Not found', {status: 404});
+    throw new Response('Not found', { status: 404 });
   }
 
   return json(
@@ -36,49 +37,50 @@ export async function loader({context: {storefront}}: LoaderArgs) {
 }
 
 export default function Policies() {
-  const {policies} = useLoaderData<typeof loader>();
+  const { policies } = useLoaderData<typeof loader>();
 
   return (
     <>
       <PageHeader heading="Policies" />
       <Section padding="x" className="mb-24">
-        {policies.map((policy) => {
-          return (
-            policy && (
-              <Heading className="font-normal text-heading" key={policy.id}>
-                <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-              </Heading>
-            )
-          );
-        })}
+        {policies.map((policy) => (
+          <Heading className="font-normal text-heading" key={policy.id}>
+            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
+          </Heading>
+        ))}
       </Section>
     </>
   );
 }
 
 const POLICIES_QUERY = `#graphql
-  fragment PolicyItem on ShopPolicy {
-    id
-    title
-    handle
-  }
 
   query PoliciesQuery {
     shop {
       privacyPolicy {
-        ...PolicyItem
+            id
+    title
+    handle
       }
       shippingPolicy {
-        ...PolicyItem
+            id
+    title
+    handle
       }
       termsOfService {
-        ...PolicyItem
+        id
+        title
+        handle
       }
       refundPolicy {
-        ...PolicyItem
+        id
+        title
+        handle
       }
       subscriptionPolicy {
-        ...PolicyItem
+        id
+        title
+        handle
       }
     }
   }
