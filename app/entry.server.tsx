@@ -72,7 +72,9 @@ export default async function handleRequest(
       "analytics.google.com",
       "*.getredo.com",
       "submit-form.com/9WklqL8w",
-      "www.google.com/ccm/collect"
+      "www.google.com/ccm/collect",
+      "*.getfondue.com",
+      "browser-intake-datadoghq.com"
     ],
     scriptSrc: [
       "'self'",

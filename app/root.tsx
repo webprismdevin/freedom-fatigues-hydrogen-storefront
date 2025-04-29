@@ -23,6 +23,7 @@ import {
   type SeoHandleFunction,
   Script,
   type HydrogenCart,
+  CartForm,
 } from '@shopify/hydrogen';
 import type { Cart as CartType } from '@shopify/hydrogen/storefront-api-types';
 import { Layout } from '~/components/Layout';
@@ -38,6 +39,8 @@ import { getSiteSettings } from './lib/sanity';
 import { CustomScriptsAndAnalytics } from './components/CustomScriptsAndAnalytics';
 import { useLoadScript } from '@shopify/hydrogen';
 import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { useEffect } from 'react';
+import { useCartFetchers } from './hooks/useCartFetchers';
 
 declare global {
   interface Window {
@@ -46,6 +49,7 @@ declare global {
     TriplePixel?: any;
     _aimTrack?: any[];
     klaviyo?: any;
+    Fondue?: any;
   }
 }
 
@@ -178,7 +182,44 @@ function Document({ children }: { children: React.ReactNode }) {
 
   useAnalytics(hasUserConsent, locale);
 
-  useLoadScript("https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com")
+  // Load Aimerce script
+  useLoadScript("https://cdn.aimerce.ai/a.browser.shopify.hydrogen.umd.js?domain=freedom-fatigues.myshopify.com");
+
+  // Load Fondue script
+  const fondueScriptStatus = useLoadScript('https://public.getfondue.com/cashback-extension/cart/fundle.js', {
+    in: 'head',
+    attributes: {
+      async: 'true',
+      id: 'fondue-cashback',
+      'data-api': 'STOREFRONT',
+      'data-shop': 'freedom-fatigues.myshopify.com',
+    }
+  });
+
+  // Integrate Fondue cart functionality
+  useEffect(() => {
+    if (fondueScriptStatus === 'done') {
+      if (typeof window?.Fondue?.cart === 'object') {
+        let cartId: string | undefined;
+        data.cart.then((cart) => {
+          cartId = cart?.id;
+        });
+
+        window.Fondue.cart.getCartId = () => {
+          return cartId;
+        };
+      }
+    }
+  }, [fondueScriptStatus, data.cart]);
+
+  const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
+  const updateCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesUpdate);
+
+  useEffect(() => {
+    if (addToCartFetchers.length > 0 || updateCartFetchers.length > 0) {
+      window.Fondue.cart.dispatchUpdatedCartEvent();
+    }
+  }, [addToCartFetchers, updateCartFetchers]);
 
   return (
     <html lang={locale.language}>
