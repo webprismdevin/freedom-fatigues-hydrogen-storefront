@@ -3,7 +3,7 @@ import {useFetcher} from '@remix-run/react';
 import {Image} from '@shopify/hydrogen';
 import {Listbox} from '@headlessui/react';
 import {AddToCartButton} from './AddToCartButton';
-import {Drawer, useDrawer} from './Drawer';
+import {Drawer} from './Drawer';
 import {IconClose, IconSelect, IconCheck} from './Icon';
 import StarRating from './StarRating';
 import {Link} from './Link';
@@ -28,7 +28,7 @@ export default function QuickAdd({
   image,
   rebuy,
 }: QuickAddProps) {
-  const {isOpen, openDrawer, closeDrawer} = useDrawer();
+  const [isOpen, setIsOpen] = useState(false);
   const fetcher = useFetcher<{product: any}>();
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [selectedVariant, setSelectedVariant] = useState<null | {
@@ -44,20 +44,18 @@ export default function QuickAdd({
   
   // Monitor cart fetchers to detect when cart drawer opens
   const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
-  
-  // Close QuickAdd drawer when an item is added to cart
-  useEffect(() => {
-    if (!isOpen) return;
-    
-    // Check if there's a new cart action that's not a redo
-    const hasNewCartAction = addToCartFetchers.some(fetcher => 
-      fetcher.state === 'loading' && !fetcher.isRedoAction
-    );
-    
-    if (hasNewCartAction) {
-      closeDrawer();
+
+  const openDrawer = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
-  }, [addToCartFetchers, isOpen, closeDrawer]);
+    setIsOpen(true);
+  }, []);
+
+  const closeDrawer = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   // Initial product data load when drawer opens
   useEffect(() => {
@@ -222,18 +220,29 @@ export default function QuickAdd({
   return (
     <>
       <button 
-        onClick={(e) => {
-          e.stopPropagation();
+        onClick={openDrawer}
+        onTouchEnd={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           openDrawer();
-        }} 
+        }}
         className={className}
       >
         {children ?? 'Add'}
       </button>
       
-      <Drawer open={isOpen} onClose={closeDrawer} openFrom="bottom" className="md:max-w-lg">
-        <div className="flex flex-col h-full">
+      <Drawer 
+        open={isOpen} 
+        onClose={(e?: any) => {
+          // Only close if it's an explicit close action
+          if (e?.type === 'click' && e.target.closest('[data-test="close-cart"]')) {
+            closeDrawer();
+          }
+        }} 
+        openFrom="bottom" 
+        className="md:max-w-lg"
+      >
+        <div role="dialog" aria-modal="true" className="flex flex-col h-full">
           <div className="flex-grow overflow-auto p-4 pb-20">
             <Suspense fallback={<LoadingFallback />}>
               {fetcher.data?.product ? (
