@@ -45,16 +45,23 @@ export default function QuickAdd({
   // Monitor cart fetchers to detect when cart drawer opens
   const addToCartFetchers = useCartFetchers(CartForm.ACTIONS.LinesAdd);
 
+  const closeDrawer = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
+  // Close drawer when cart drawer opens
+  useEffect(() => {
+    if (addToCartFetchers.length > 0 && addToCartFetchers.some(fetcher => fetcher.state === 'loading')) {
+      closeDrawer();
+    }
+  }, [addToCartFetchers, closeDrawer]);
+
   const openDrawer = useCallback((e?: React.MouseEvent | React.TouchEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
     setIsOpen(true);
-  }, []);
-
-  const closeDrawer = useCallback(() => {
-    setIsOpen(false);
   }, []);
 
   // Initial product data load when drawer opens
