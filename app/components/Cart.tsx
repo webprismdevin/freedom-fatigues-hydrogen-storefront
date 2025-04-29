@@ -1,11 +1,7 @@
 import clsx from 'clsx';
 import React, {useMemo, useRef, useEffect, useState, useCallback} from 'react';
 import {useScroll} from 'react-use';
-import {
-  Image,
-  Money,
-  flattenConnection,
-} from '@shopify/hydrogen-react';
+import {flattenConnection, Image, Money} from '@shopify/hydrogen';
 import {
   Button,
   Heading,
@@ -16,32 +12,40 @@ import {
 } from '~/components';
 import {getInputStyleClasses} from '~/lib/utils';
 import type {
-  Cart as CartType,
-  CartCost,
+  Cart,
   CartLine,
   CartLineUpdateInput,
-} from '@shopify/hydrogen-react/storefront-api-types';
-import {useMatches} from 'react-router-dom';
+  MoneyV2,
+  Product,
+} from '@shopify/hydrogen/storefront-api-types';
+import {useFetcher, useMatches} from '@remix-run/react';
 import {CartAction} from '~/lib/type';
 import GovXID from './GovXID';
 import confetti from 'canvas-confetti';
 import posthog from 'posthog-js';
-import {CartForm} from '@shopify/hydrogen';
+import {CartForm, useOptimisticCart, type OptimisticCart} from '@shopify/hydrogen';
 import {useIsHydrated} from '~/hooks/useIsHydrated';
 import {RedoCheckoutButtons} from '@redotech/redo-hydrogen';
 import {RedoProvider} from '@redotech/redo-hydrogen';
 import ShopifyRecommendations from './ShopifyRecommendations';
 import ShopifyRecommendationCard from './ShopifyRecommendationCard';
 import {CheckoutConfidenceModal} from './CheckoutConfidenceModal';
+import {useRedoCoverageClient} from '@redotech/redo-hydrogen/src';
+import {flattenConnection as flattenConnectionReact} from '@shopify/hydrogen-react';
 
 type Layouts = 'page' | 'drawer';
 
 const freeShippingThreshold = 99;
 const REDO_STORE_ID = '6439e48e41e6bb001f6407a5';
 
-// Add type for optimistic cart line
-interface OptimisticCartLine extends CartLine {
+type OptimisticCartLine = CartLine & {
   isOptimistic?: boolean;
+};
+
+declare global {
+  interface Window {
+    gtag: (command: string, action: string, params?: any) => void;
+  }
 }
 
 export function Cart({
@@ -51,34 +55,35 @@ export function Cart({
 }: {
   layout: Layouts;
   onClose?: () => void;
-  cart: CartType | null;
+  cart: Cart | null | undefined;
 }) {
-  if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} />;
+  if (!cart) return <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={null} />;
 
-  const lines = cart?.lines?.nodes || [];
+  // Use optimistic cart
+  const optimisticCart = useOptimisticCart(cart);
+
+  // If optimisticCart is undefined, use the original cart
+  const safeCart = optimisticCart || cart;
+  
+  const lines = safeCart?.lines?.nodes || [];
   const linesCount = lines.length > 0;
 
   // Memoize the cart transformation for Redo
   const cartForRedo = useMemo(
     () =>
       ({
-        ...cart,
+        ...safeCart,
         lines: {
           nodes: lines,
-          edges: lines.map((node) => ({
-            node: {
-              ...node,
-              __typename: 'CartLine' as const
-            }
-          })),
+          edges: lines.map((node) => ({node})),
           pageInfo: {hasNextPage: false, hasPreviousPage: false},
         },
-      } as CartType),
-    [cart, lines],
+      } as unknown as Cart),
+    [safeCart, lines],
   );
 
   // Ensure cart has all required properties
-  if (!cart?.cost?.totalAmount) {
+  if (!safeCart?.cost?.totalAmount) {
     console.log('Missing required cart properties');
     return (
       <CartEmpty hidden={false} onClose={onClose} layout={layout} cart={cart} />
@@ -164,7 +169,7 @@ export function CartDetails({
   cart,
 }: {
   layout: Layouts;
-  cart: CartType | null;
+  cart: Cart | null | undefined;
 }) {
   const [root] = useMatches();
   const [offerUnlocked, setOfferUnlocked] = useState(false);
@@ -331,109 +336,127 @@ export function CartDetails({
   );
 }
 
-function CartCheckoutActions({
-  cart,
-  checkoutUrl,
-}: {
-  cart: CartType;
-  checkoutUrl: string;
-}) {
-  if (!checkoutUrl) return null;
+interface CartProps {
+  cart: Cart | null | undefined;
+  checkoutUrl: string | null;
+}
 
-  // Add defensive check for cart data
-  if (!cart.cost?.totalAmount) return null;
+function CartCheckoutActions({cart, checkoutUrl}: CartProps) {
+  if (!cart || !checkoutUrl) return null;
 
-  const lines = flattenConnection(cart.lines);
-  if (lines.length === 0) return null;
-
-  const handleAnalytics = useCallback(
-    (enabled: boolean) => {
-      // Capture checkout event
-      posthog.capture('begin_checkout', {
-        $value: cart.cost.totalAmount.amount,
-        currency: cart.cost.totalAmount.currencyCode,
-        items: lines.map((line) => ({
-          product_id: line.merchandise.product.id,
-          variant_id: line.merchandise.id,
-          product_title: line.merchandise.product.title,
-          variant_title: line.merchandise.title,
-          price: parseFloat(line.cost.totalAmount.amount),
-          quantity: line.quantity,
-        })),
-        redo_coverage: enabled,
-      });
-    },
-    [cart.cost.totalAmount, lines],
+  const cartLines = (cart.lines?.edges?.map(edge => edge.node) || []) as CartLine[];
+  
+  const cartHasFFProducts = cartLines.some(
+    (line: CartLine) => line?.merchandise?.product?.vendor === 'Freedom Fatigues'
   );
 
-  // Memoize the cart transformation for Redo
-  const cartForRedo = useMemo(
-    () =>
-      ({
-        ...cart,
-        lines: {
-          nodes: lines,
-          edges: lines.map((node) => ({node})),
-          pageInfo: {hasNextPage: false, hasPreviousPage: false},
-        },
-      } as unknown as CartType),
-    [cart, lines],
-  );
+  const totalAmount = cart.cost?.totalAmount as MoneyV2;
+  const amount = totalAmount?.amount ? Number(totalAmount.amount) : 0;
 
-  // Memoize the fallback button
-  const fallbackButton = useMemo(
-    () => (
-      <CartForm
-        route="/cart"
-        action={CartForm.ACTIONS.LinesAdd}
-        inputs={{
-          lines: [{
-            merchandiseId: 'your-redo-product-id',
-            quantity: 1,
-            attributes: [{
-              key: 'redo_opted_in_from_cart',
-              value: 'true'
-            }]
-          }]
-        }}
-      >
-        <input type="hidden" name="checkoutUrl" value={checkoutUrl} />
-        <button
-          type="submit"
-          onClick={() => handleAnalytics(false)}
-          className="w-full cursor-pointer bg-black px-4 py-3 text-center text-white transition-colors duration-200 hover:bg-FF-red hover:opacity-80"
-        >
-          Continue to Checkout
-        </button>
-      </CartForm>
-    ),
-    [checkoutUrl, handleAnalytics],
-  );
+  if (!totalAmount || amount === 0) {
+    return null;
+  }
+
+  interface GtagEvent {
+    event: string;
+    currency?: string;
+    value?: number;
+    items?: Array<{
+      item_id: string;
+      item_name: string;
+      price: number;
+      quantity: number;
+    }>;
+    content_type?: string;
+    content_id?: string;
+  }
+
+  const trackEvent = (eventData: GtagEvent) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', eventData.event, eventData);
+    }
+  };
+
+  const onCheckoutBegin = () => {
+    trackEvent({
+      event: 'begin_checkout',
+      currency: totalAmount.currencyCode,
+      value: amount,
+      items: cartLines.map((line) => ({
+        item_id: String(line?.merchandise?.product?.id || ''),
+        item_name: String(line?.merchandise?.product?.title || ''),
+        price: Number(line?.cost?.amountPerQuantity?.amount || 0),
+        quantity: line?.quantity || 0,
+      })),
+    });
+  };
+
+  const handleCheckoutWithProtection = () => {
+    onCheckoutBegin();
+    trackEvent({
+      event: 'select_content',
+      content_type: 'product',
+      content_id: 'mulberry_protection',
+    });
+    window.location.href = checkoutUrl + '?protection=true';
+  };
+
+  const handleCheckoutWithoutProtection = () => {
+    onCheckoutBegin();
+    window.location.href = checkoutUrl;
+  };
 
   return (
-    <div className="mt-2 flex w-full flex-col text-center">
-      <div className="flex items-center justify-center gap-2 w-full relative">
-        <style>
-          {`
-            div:not([class]) {
-              width: 100%;
-            }
-          `}
-        </style>
-        <RedoCheckoutButtons
-          onClick={handleAnalytics}
-          cart={cartForRedo}
-          storeId={REDO_STORE_ID}
+    <div className="flex flex-col gap-4">
+      {cartHasFFProducts ? (
+        // Freedom Fatigues checkout flow with Redo integration
+        <>
+          <RedoCheckoutButtons
+            storeId={REDO_STORE_ID}
+            cart={cart}
+            onClick={(enabled) => {
+              if (enabled) {
+                handleCheckoutWithProtection();
+              } else {
+                handleCheckoutWithoutProtection();
+              }
+            }}
+          >
+            <div className="grid gap-4">
+              <Button
+                width="full"
+                data-redo-checkout-with-protection
+                className="rounded bg-primary px-6 py-3 text-center font-medium text-white hover:bg-primary/90 [&_svg]:text-white [&_svg]:fill-white"
+              >
+                Checkout with Protection
+              </Button>
+              <Button
+                width="full"
+                data-redo-checkout-without-protection
+                variant="secondary"
+                className="rounded border border-primary/10 bg-white px-6 py-3 text-center font-medium text-primary hover:bg-primary/5"
+              >
+                Checkout without Protection
+              </Button>
+            </div>
+          </RedoCheckoutButtons>
+          <CheckoutConfidenceModal />
+        </>
+      ) : (
+        // Other vendors checkout flow
+        <Button
+          width="full"
+          onClick={handleCheckoutWithoutProtection}
+          className="rounded bg-black px-6 py-3 text-center font-medium text-white"
         >
-          {fallbackButton}
-        </RedoCheckoutButtons>
-        <CheckoutConfidenceModal />
-      </div>
+          Proceed to Checkout
+        </Button>
+      )}
     </div>
   );
 }
 
-function FreeShippingProgress({cart}: {cart: CartType}) {
+function FreeShippingProgress({cart}: {cart: Cart}) {
   //qualified shipping cart cost
   const cart_cost = useMemo(() => {
     const lines = flattenConnection(cart.lines) as CartLine[];
@@ -469,7 +492,7 @@ function FreeShippingProgress({cart}: {cart: CartType}) {
 export function CartDiscounts({
   discountCodes,
 }: {
-  discountCodes: CartType['discountCodes'];
+  discountCodes: Cart['discountCodes'];
 }) {
 
   const codes: string[] =
@@ -549,7 +572,7 @@ function CartLines({
   lines: cartLines,
 }: {
   layout: Layouts;
-  lines: CartType['lines'] | undefined;
+  lines: Cart['lines'] | undefined;
 }) {
   const currentLines = cartLines ? flattenConnection(cartLines) : [];
   const scrollRef = useRef(null);
@@ -584,7 +607,7 @@ function CartSummary({
   children = null,
 }: {
   children?: React.ReactNode;
-  cost: CartCost;
+  cost: Cart['cost'];
   layout: Layouts;
 }) {
   const summary = {
@@ -795,7 +818,7 @@ export function CartEmpty({
   hidden: boolean;
   layout?: 'page' | 'drawer';
   onClose?: () => void;
-  cart?: CartType;
+  cart: Cart | null | undefined;
 }) {
   const scrollRef = useRef(null);
   const {y} = useScroll(scrollRef);

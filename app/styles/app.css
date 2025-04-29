@@ -2408,6 +2408,9 @@ select{
 .max-w-xl{
   max-width: 36rem;
 }
+.max-w-\[660px\]{
+  max-width: 660px;
+}
 .flex-1{
   flex: 1 1 0%;
 }
@@ -3134,6 +3137,10 @@ select{
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
+.px-8{
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
 .pb-0{
   padding-bottom: 0px;
 }
@@ -3787,6 +3794,14 @@ button.uploadcare--button_primary {
 .hover\:bg-primary\/80:hover{
   background-color: rgba(20, 20, 20, 0.8);
   background-color: rgb(var(--color-primary) / 0.8);
+}
+.hover\:bg-primary\/5:hover{
+  background-color: rgba(20, 20, 20, 0.05);
+  background-color: rgb(var(--color-primary) / 0.05);
+}
+.hover\:bg-primary\/90:hover{
+  background-color: rgba(20, 20, 20, 0.9);
+  background-color: rgb(var(--color-primary) / 0.9);
 }
 .hover\:text-primary:hover{
   --tw-text-opacity: 1;
@@ -4970,4 +4985,12 @@ button.uploadcare--button_primary {
     border-color: rgba(20, 20, 20, 0.2);
     border-color: rgb(var(--color-primary) / 0.2);
   }
+}
+.\[\&_svg\]\:fill-white svg{
+  fill: #fff;
+}
+.\[\&_svg\]\:text-white svg{
+  --tw-text-opacity: 1;
+  color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, var(--tw-text-opacity, 1));
 }

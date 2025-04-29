@@ -70,7 +70,8 @@ export default async function handleRequest(
       "sc-static.net",
       "google.com/pagead/",
       "analytics.google.com",
-      "*.getredo.com"
+      "*.getredo.com",
+      "submit-form.com/9WklqL8w"
 
     ],
     scriptSrc: [
