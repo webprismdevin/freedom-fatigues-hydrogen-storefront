@@ -118,7 +118,8 @@ export default async function handleRequest(
       "*.googleadservices.com",
       "*.doubleclick.net",
       "*.googleadservices.com",
-      "googleads.g.doubleclick.net"
+      "googleads.g.doubleclick.net",
+      "www.clarity.ms"
     ],
     styleSrc: [
       "'self'",
