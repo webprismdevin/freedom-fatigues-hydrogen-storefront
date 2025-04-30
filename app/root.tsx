@@ -207,6 +207,7 @@ function Document({ children }: { children: React.ReactNode }) {
 
         window.Fondue.cart.getCartId = () => {
           return cartId;
+          
         };
       }
     }
