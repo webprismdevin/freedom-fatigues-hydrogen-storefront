@@ -17,7 +17,7 @@ export function CheckoutConfidenceModal() {
         className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-sm mt-2 justify-center"
       >
         <IconInformation className="h-5 w-5" />
-        <span>Learn about unlimited exchanges and returns</span>
+        <span>Learn about free exchanges and returns</span>
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
