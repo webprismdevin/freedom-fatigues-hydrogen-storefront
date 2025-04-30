@@ -382,8 +382,8 @@ function MobileHeader({
           <img
             src={
               isHome
-                ? 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/logo_white.png?v=1698351208'
-                : 'https://cdn.shopify.com/s/files/1/0056/6342/4630/files/logo_black_9e33daf2-1fce-4685-b677-5e86902fdf2d.png?v=1698351208'
+                ? '/branding/original_logo_white.svg'
+                : '/branding/original_logo_black.svg'
             }
             alt="logo"
             height={84}
@@ -465,7 +465,9 @@ function DesktopHeader({
           <div>
             <img
               src={
-                isHome ? '/branding/logo_white.png' : '/branding/logo_black.png'
+                isHome
+                  ? '/branding/original_logo_white.svg'
+                  : '/branding/original_logo_black.svg'
               }
               alt="logo"
               height={96}
@@ -736,19 +738,17 @@ function Badge({
 }
 
 export function GodFamilyCountry({preFooter}: {preFooter: any}) {
-  const {title, text, image} = preFooter;
-
   return (
     <div className="flex flex-col items-center justify-center gap-1 bg-primary p-12 text-center text-contrast">
-      <p className="text-2xl font-bold">{title}</p>
-      <p className="text-lg font-bold">{text}</p>
-      <div
+      <p className="text-4xl font-bold">God, Family, Country.</p>
+      <p className="text-2xl font-bold">In that order.</p>
+      {/* <div
         style={{
           width: 128,
         }}
       >
-        <Image src={urlFor(image).url()} alt={image?.alt} sizes="128px" />
-      </div>
+        <img src="/branding/original_logo_white.svg" alt="Freedom Fatigues" width={128} height={128} />
+      </div> */}
     </div>
   );
 }

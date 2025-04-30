@@ -64,7 +64,7 @@ const seo: SeoHandleFunction<typeof loader> = ({ data, pathname }) => ({
     '@type': 'Organization',
     name: data?.shop?.shop?.name,
     url: `https://www.freedomfatigues.com/`,
-    logo: '/branding/logo_black.png',
+    logo: '/branding/original_logo_black.png',
     sameAs: [
       'https://www.facebook.com/freedomfatigues',
       'https://www.instagram.com/freedomfatigues/',

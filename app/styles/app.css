@@ -1910,9 +1910,6 @@ select{
 .pointer-events-none{
   pointer-events: none;
 }
-.pointer-events-auto{
-  pointer-events: auto;
-}
 .static{
   position: static;
 }
@@ -2263,9 +2260,6 @@ select{
   height: calc(100vh - 3.5rem);
   height: calc(var(--screen-height, 100vh) - var(--height-nav));
 }
-.h-\[1000px\]{
-  height: 1000px;
-}
 .max-h-0{
   max-height: 0px;
 }
@@ -2529,10 +2523,6 @@ select{
 .cursor-pointer{
   cursor: pointer;
 }
-.touch-pan-y{
-  --tw-pan-y: pan-y;
-  touch-action: var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom);
-}
 .select-none{
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -2746,9 +2736,6 @@ select{
 }
 .overflow-y-scroll{
   overflow-y: scroll;
-}
-.overscroll-contain{
-  overscroll-behavior: contain;
 }
 .truncate{
   overflow: hidden;

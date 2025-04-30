@@ -63,7 +63,7 @@ function root({
       '@type': 'Organization',
       name: shop.name,
       url: new URL(url).origin,
-      logo: shop.brand?.logo?.image?.url,
+      logo: '/branding/original_logo_black.svg',
     },
   };
 }
@@ -71,8 +71,8 @@ function root({
 function home(): SeoConfig<WebPage> {
   return {
     title: 'Home',
-    titleTemplate: '%s | Hydrogen Demo Store',
-    description: 'The best place to buy snowboarding products',
+    titleTemplate: '%s | Freedom Fatigues',
+    description: 'The most American-made apparel you can buy',
     robots: {
       noIndex: false,
       noFollow: false,
